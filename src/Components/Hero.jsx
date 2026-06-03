@@ -2,8 +2,11 @@ import React from "react";
 import "../Css/Hero.css";
 import { Rocket, Play, CheckCircle } from "lucide-react";
 import dashboard from '../assets/Inventra Dashboard.png'
+import { useNavigate } from "react-router-dom";
 
 const Hero = () => {
+  const nav = useNavigate();
+
   return (
     <section className="hero">
 
@@ -22,7 +25,7 @@ const Hero = () => {
         </p>
 
         <div className="hero-buttons">
-          <button className="primary-btn">
+          <button className="primary-btn" onClick={() => nav("/signup")}>
             <Rocket size={18} />
             Get Started
           </button>
