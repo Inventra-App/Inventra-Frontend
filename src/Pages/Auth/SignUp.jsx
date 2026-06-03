@@ -6,6 +6,7 @@ import bg2 from '../../assets/Pricing bdg.jpg'
 import bg3 from '../../assets/Warehouse.jpg'
 import './Css/SignUp.css'
 import Header from '../../Components/Header'
+import { useNavigate } from 'react-router-dom'
 
 const backgrounds = [bg1, bg2, bg3]
 
@@ -13,6 +14,7 @@ const SignUp = () => {
 const [currentBg, setCurrentBg] = useState(0)
 const [nextBg, setNextBg] = useState(1)
 const [fading, setFading] = useState(false)
+const nav = useNavigate();
 
 useEffect(() => {
   const interval = setInterval(() => {
@@ -131,9 +133,9 @@ useEffect(() => {
                 I agree to the <a href="/terms" className="signup-link">Terms and Privacy Policy</a>
               </label>
             </div>
-            <button type="submit" className="signup-btn">Create Account</button>
+            <button type="submit" className="signup-btn" onClick={() => nav("/signupverify")}>Create Account</button>
             <div className="signup-divider"><span>or continue with</span></div>
-            <button type="button" className="signup-google-btn">
+            <button type="button" className="signup-google-btn" onClick={() => nav("/supermarket-info")}>
               <img src="https://www.google.com/favicon.ico" alt="Google" width={18} />
               Google
             </button>
