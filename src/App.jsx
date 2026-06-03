@@ -7,6 +7,9 @@ import ContactUs from './Pages/Auth/ContactUs'
 import SignUp from './Pages/Auth/SignUp'
 import Login from './Pages/Auth/Login'
 import SignUpVerify from './Pages/Auth/SignUpVerify'
+import SupermarketInfo from './Pages/Auth/SupermarketInfo'
+import SettingUp from './Pages/Auth/SettingUp'
+import Created from './Pages/Auth/Created'
 
 
 function App() {
@@ -21,6 +24,10 @@ function App() {
       <Route path='/signup' element={<SignUp />} />
       <Route path='/login' element={<Login />} />
       <Route path='/signupverify' element={<SignUpVerify />} />
+      <Route path='/supermarket-info' element={<SupermarketInfo />} />
+      <Route path='/setting-up' element={<SettingUp />} />
+      <Route path='/created' element={<Created />} />
+      
     </Routes>
     </BrowserRouter>
   )

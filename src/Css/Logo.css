@@ -1,0 +1,25 @@
+.inventra-logo-component {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.inventra-logo-img {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+}
+
+.inventra-logo-component span {
+  font-size: 1.35rem;
+  font-weight: 700;
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+.inventra-logo-component.white span {
+  color: #ffffff;
+}
+
+.inventra-logo-component.dark span {
+  color: #111827;
+}

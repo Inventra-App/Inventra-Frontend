@@ -135,7 +135,7 @@ useEffect(() => {
             </div>
             <button type="submit" className="signup-btn" onClick={() => nav("/signupverify")}>Create Account</button>
             <div className="signup-divider"><span>or continue with</span></div>
-            <button type="button" className="signup-google-btn">
+            <button type="button" className="signup-google-btn" onClick={() => nav("/supermarket-info")}>
               <img src="https://www.google.com/favicon.ico" alt="Google" width={18} />
               Google
             </button>
