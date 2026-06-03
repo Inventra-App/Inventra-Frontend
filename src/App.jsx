@@ -19,7 +19,7 @@ function App() {
       <Route path='/about' element={<AboutUs />} />
       <Route path='/contact' element={<ContactUs />} />
       <Route path='/signup' element={<SignUp />} />
-      <Route path='/login' element={<Login />}/>
+      <Route path='/login' element={<Login />} />
       <Route path='/signupverify' element={<SignUpVerify />} />
     </Routes>
     </BrowserRouter>

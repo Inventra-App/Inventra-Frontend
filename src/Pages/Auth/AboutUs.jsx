@@ -186,15 +186,29 @@ now more transparent and efficient <br /></h6>
     <div className="review-card">
     <div className="review-content">
       <div className="reviewer-info">
-        <h6 className="reviewer-name">Since we started using inventra, tracking expiring <br/>
-products has become much easier. we've reduced <br />
-product losses and improved our inventory accuracy <br />
-significantly</h6>
+        <h6 className="reviewer-name">The dashboard is clean,simple, and very easy to use. <br />
+we can now monitor stock levels, sales and expiry <br />
+reports in one place with stress.</h6>
       </div>
       <img src={star} alt="" className='star'/>
       <article className='reviewer-info2'>
         <img src={anto} alt="" className='anto'/>
-        <p className='reviewer-name2'>Chinedu Okafor, Store Manager</p>
+        <p className='reviewer-name2'>David Johnson, Operational Supervisor</p>
+      </article>
+    </div>
+  </div>
+
+    <div className="review-card">
+    <div className="review-content">
+      <div className="reviewer-info">
+        <h6 className="reviewer-name">Inventra helped us organize our inventory and monitor <br />
+staff activities better. The expiry alerts alone save us <br />
+from unnecessary waste every week</h6>
+      </div>
+      <img src={star} alt="" className='star'/>
+      <article className='reviewer-info2'>
+        <img src={anto} alt="" className='anto'/>
+        <p className='reviewer-name2'>Amaka Eze, Supermarket Owner</p>
       </article>
     </div>
   </div>
@@ -211,22 +225,6 @@ significantly</h6>
       <article className='reviewer-info2'>
         <img src={anto} alt="" className='anto'/>
         <p className='reviewer-name2'>Chinedu Okafor, Store Manager</p>
-      </article>
-    </div>
-  </div>
-
-    <div className="review-card">
-    <div className="review-content">
-      <div className="reviewer-info">
-        <h6 className="reviewer-name">Since we started using inventra, tracking expiring <br/>
-products has become much easier. we've reduced <br />
-product losses and improved our inventory accuracy <br />
-significantly</h6>
-      </div>
-      <img src={star} alt="" className='star'/>
-      <article className='reviewer-info2'>
-        <img src={anto} alt="" className='anto'/>
-        <p className='reviewer-name2'>Mary ibrahim, Inventory Officer</p>
       </article>
     </div>
   </div>

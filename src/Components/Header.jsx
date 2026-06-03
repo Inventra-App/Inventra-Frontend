@@ -23,7 +23,7 @@ const Header = () => {
       </nav>
 
       <div className="header-actions">
-        <button className="login-btn">Login</button>
+        <button className="login-btn" onClick={() => nav("/login")}>Login</button>
         <button className="start-btn" onClick={() => nav("/signup")}>Get Started</button>
       </div>
 
@@ -41,7 +41,7 @@ const Header = () => {
           <NavLink to="/about" onClick={() => setMenuOpen(false)}>About Us</NavLink>
           <NavLink to="/contact" onClick={() => setMenuOpen(false)}>Contact Us</NavLink>
           <div className="mobile-menu-actions">
-            <button className="login-btn">Login</button>
+            <button className="login-btn" onClick={() => nav("/login")}>Login</button>
             <button className="start-btn" onClick={() => nav("/signup")}>Get Started</button>
           </div>
         </div>
