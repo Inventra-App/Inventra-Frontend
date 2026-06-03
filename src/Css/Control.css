@@ -1,0 +1,142 @@
+.control-section {
+  background-color: #0f172a;
+  padding: 60px 80px 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-top: 40px;
+  overflow: visible;
+  min-height: 380px;
+}
+
+.control-left {
+  width: 50%;
+  padding-top: 40px;
+  padding-bottom: 100px;
+}
+
+.control-title {
+  font-size: 2rem;
+  font-weight: 800;
+  color: #ffffff;
+  line-height: 1.35;
+  margin: 0 0 20px 0;
+  max-width: 570px;
+}
+
+.control-desc {
+  font-size: 1rem;
+  color: #94a3b8;
+  line-height: 1.7;
+  margin: 0 0 36px 0;
+  max-width: 550px;
+}
+
+.control-btn {
+  background-color: #ffffff;
+  color: #0f172a;
+  border: none;
+  padding: 14px 28px;
+  border-radius: 20px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.control-btn-mobile {
+  display: none;
+}
+
+.control-right {
+  width: 45%;
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-end;
+  margin-top: -120px;
+}
+
+.control-img {
+  width: 100%;
+  max-width: 480px;
+  object-fit: contain;
+  object-position: bottom;
+}
+
+@media (max-width: 768px) {
+  .control-section {
+    padding: 50px 24px 32px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start; 
+    justify-content: flex-start;
+    min-height: auto;
+  }
+
+  .control-left {
+    width: 100%;
+    padding-top: 0;
+    padding-bottom: 0;
+    text-align: left;
+  }
+
+  .control-title {
+    font-size: 1.85rem;
+    margin-bottom: 16px;
+    max-width: 480px; 
+  }
+
+  .control-desc {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin-bottom: 24px;
+    max-width: 100%;
+  }
+
+  .control-btn-desktop {
+    display: none !important;
+  }
+
+  .control-btn-mobile {
+    display: block;
+    align-self: flex-start;
+  }
+
+  .control-right {
+    width: 100%;
+    margin-top: 0;
+    justify-content: flex-start;
+    margin-bottom: 24px;
+  }
+
+  .control-img {
+    max-width: 380px;
+    display: block;
+  }
+}
+
+@media (max-width: 468px) {
+  .control-section {
+    padding: 40px 16px 28px;
+  }
+
+  .control-title {
+    font-size: 1.3rem;
+    line-height: 1.5;
+    max-width: 420px;
+  }
+
+  .control-desc {
+    font-size: 0.75rem;
+    line-height: 1.7;
+  }
+
+  .control-btn-mobile {
+    padding: 12px 24px;
+    font-size: 0.95rem;
+    border-radius: 12px;
+  }
+
+  .control-img {
+    max-width: 100%;
+  }
+}

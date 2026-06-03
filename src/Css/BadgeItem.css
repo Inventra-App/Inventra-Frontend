@@ -1,0 +1,8 @@
+.all-badge {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.95rem;
+  font-weight: 550;
+  color: #1a1a1a;
+}

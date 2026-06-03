@@ -4,6 +4,7 @@ import LandingPage from './Pages/Auth/LandingPage'
 import Pricing from './Pages/Auth/Pricing'
 import AboutUs from './Pages/Auth/AboutUs'
 import ContactUs from './Pages/Auth/ContactUs'
+import SignUp from './Pages/Auth/SignUp'
 
 
 function App() {
@@ -15,6 +16,7 @@ function App() {
       <Route path='/pricing' element={<Pricing />} />
       <Route path='/about' element={<AboutUs />} />
       <Route path='/contact' element={<ContactUs />} />
+      <Route path='/signup' element={<SignUp />} />
     </Routes>
     </BrowserRouter>
   )

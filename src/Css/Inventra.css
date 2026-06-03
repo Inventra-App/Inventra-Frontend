@@ -1,0 +1,136 @@
+.inventra-section {
+  background-color: #f5f5f5;
+  padding: 80px 60px;
+  text-align: center;
+}
+
+.inventra-title {
+  font-size: 42px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-bottom: 12px;
+}
+
+.inventra-subtitle {
+  font-size: 1.1rem;
+  color: #666666;
+  margin-bottom: 48px;
+}
+
+.inventra-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.inventra-card {
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+  height: 280px;
+  cursor: pointer;
+}
+
+.inventra-card-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.inventra-card-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.45);
+}
+
+.inventra-card-text {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  padding: 24px;
+  box-sizing: border-box;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.inventra-card-text h3 {
+  color: #ffffff;
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin: 0 0 8px 0;
+}
+
+.inventra-card-text p {
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 0.875rem;
+  line-height: 1.6;
+  margin: 0;
+}
+
+@media (max-width: 768px) {
+  .inventra-section {
+    padding: 60px 24px; 
+  }
+
+  .inventra-title {
+    font-size: 32px; 
+  }
+
+  .inventra-subtitle {
+    font-size: 1rem;
+    margin-bottom: 36px;
+  }
+
+  .inventra-grid {
+    grid-template-columns: 1fr; 
+    gap: 20px; 
+  }
+
+  .inventra-card {
+    height: 240px; 
+  }
+}
+
+@media (max-width: 468px) {
+  .inventra-section {
+    padding: 48px 16px;
+  }
+
+  .inventra-title {
+    font-size: 26px; 
+  }
+
+  .inventra-card {
+    height: 210px; 
+    border-radius: 8px; 
+  }
+
+  .inventra-subtitle{
+    line-height: 1.6;
+  }
+
+  .inventra-card-text {
+    padding: 16px;
+  }
+
+  .inventra-card-text h3 {
+    font-size: 1.25rem; 
+    margin-bottom: 4px;
+  }
+
+  .inventra-card-text p {
+    font-size: 0.8rem; 
+    line-height: 1.4;
+    max-width: 240px;
+    margin: 0 auto;
+  }
+}

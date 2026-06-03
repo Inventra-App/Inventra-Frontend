@@ -1,0 +1,99 @@
+.freq-section {
+  background-color: #0f172a;
+  padding: 50px 80px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.freq-left {
+  width: 50%;
+}
+
+.freq-title {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: #ffffff;
+  line-height: 1.4;
+  margin: 0 0 14px 0;
+}
+
+.freq-desc {
+  font-size: 0.95rem;
+  color: #94a3b8;
+  line-height: 1.7;
+  margin: 0;
+  font-weight: 600;
+}
+
+.freq-right {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 30px;
+  height: 160px;
+  width: 280px;
+}
+
+.freq-img {
+  width: 200px;
+  object-fit: contain;
+}
+
+@media (max-width: 768px) {
+  .freq-section {
+    padding: 50px 24px;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+  }
+
+  .freq-left {
+    width: 100%;
+  }
+
+  .freq-title {
+    font-size: 1.65rem;
+    line-height: 1.3;
+  }
+
+  .freq-desc {
+    font-size: 0.9rem;
+    line-height: 1.6;
+  }
+
+  .freq-right {
+    width: 100%;
+    max-width: 280px;
+    margin: 40px auto 0 auto;
+    height: auto;
+  }
+
+  .freq-img {
+    width: 100%;
+    max-width: 240px;
+  }
+}
+
+@media (max-width: 468px) {
+  .freq-section {
+    padding: 40px 16px;
+  }
+
+  .freq-title {
+    font-size: 1.45rem;
+    line-height: 2.5;
+  }
+
+  .freq-desc{
+    font-size: 0.6;
+  }
+
+  .freq-right {
+    margin-top: 32px;
+  }
+
+  .freq-img {
+    max-width: 200px;
+  }
+}
