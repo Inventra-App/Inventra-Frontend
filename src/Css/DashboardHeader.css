@@ -1,0 +1,20 @@
+.dash-header {
+  height: 50px;
+  background-color: #ffffff;
+  border-bottom: 1px solid #e5e7eb;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 0 32px;
+  position: fixed;
+  top: 0;
+  left: 235px;
+  right: 0;
+  z-index: 99;
+}
+
+.dash-header-date {
+  font-size: 0.9rem;
+  color: #6b7280;
+  font-weight: 500;
+}
