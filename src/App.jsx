@@ -10,6 +10,13 @@ import SupermarketInfo from './Pages/Auth/SupermarketInfo'
 import SettingUp from './Pages/Auth/SettingUp'
 import Created from './Pages/Auth/Created'
 import ForgetPassUi from './Components/ForgetPassUi'
+import Dashboard from './Pages/Auth/Dashboard'
+import Inventory from './Pages/Auth/Inventory'
+import Sales from './Pages/Auth/Sales'
+import ExpiryMgm from './Pages/Auth/ExpiryMgm'
+import ActivityLog from './Pages/Auth/ActivityLog'
+import UserMgm from './Pages/Auth/UserMgm'
+import Settings from './Pages/Auth/Settings'
 
 
 function App() {
@@ -29,6 +36,13 @@ function App() {
       <Route path='/created' element={<Created />} />
       <Route path='/resetpassword' element={<ForgetPassUi/>} />
       <Route path='/forgot-password' element={<ForgetPassUi/>} />
+      <Route path='/dashboard' element={<Dashboard />} />
+      <Route path='/inventory' element={<Inventory />} />
+      <Route path='/sales' element={<Sales />} />
+      <Route path='/expiry' element={<ExpiryMgm />} />
+      <Route path='/activity' element={<ActivityLog />} />
+      <Route path='/users' element={<UserMgm />} />
+      <Route path='/settings' element={<Settings />} />
     </Routes>
     </BrowserRouter>
   )
