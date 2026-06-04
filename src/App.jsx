@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import LandingPage from './Pages/Auth/LandingPage'
 import Pricing from './Pages/Auth/Pricing'
@@ -10,12 +9,13 @@ import SignUpVerify from './Pages/Auth/SignUpVerify'
 import SupermarketInfo from './Pages/Auth/SupermarketInfo'
 import SettingUp from './Pages/Auth/SettingUp'
 import Created from './Pages/Auth/Created'
+import ForgetPassUi from './Components/ForgetPassUi'
 
 
 function App() {
 
   return (
-    <BrowserRouter>
+    <BrowserRouter> 
     <Routes>
       <Route path='/' element={<LandingPage />} />
       <Route path='/pricing' element={<Pricing />} />
@@ -27,7 +27,8 @@ function App() {
       <Route path='/supermarket-info' element={<SupermarketInfo />} />
       <Route path='/setting-up' element={<SettingUp />} />
       <Route path='/created' element={<Created />} />
-      
+      <Route path='/resetpassword' element={<ForgetPassUi/>} />
+      <Route path='/forgot-password' element={<ForgetPassUi/>} />
     </Routes>
     </BrowserRouter>
   )
