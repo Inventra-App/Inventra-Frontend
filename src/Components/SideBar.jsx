@@ -1,5 +1,5 @@
 import React from 'react'
-import { NavLink } from 'react-router-dom'
+import { NavLink, useNavigate } from 'react-router-dom'
 import { LayoutDashboard, Package, ShoppingCart, AlertTriangle, ClipboardList, Users, Settings, LogOut } from 'lucide-react'
 import Logo from './Logo'
 import '../Css/SideBar.css'
@@ -15,6 +15,8 @@ const navItems = [
 ]
 
 const SideBar = ({ onItemClick }) => {
+  const nav = useNavigate();
+
   return (
     <div className="sidebar">
 
@@ -39,7 +41,7 @@ const SideBar = ({ onItemClick }) => {
       <div className="sidebar-bottom">
         <div className="sidebar-item sidebar-logout" onClick={onItemClick}>
           <span className="sidebar-icon"><LogOut size={20} /></span>
-          <span className="sidebar-label">Logout</span>
+          <span className="sidebar-label" onClick={() => nav("/")}>Logout</span>
         </div>
       </div>
 
