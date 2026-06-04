@@ -1,0 +1,423 @@
+.pricing-Page {
+  width: 100%;
+  min-height: 100vh;
+  font-family: Arial, Helvetica, sans-serif;
+  /* background-color: aqua; */
+}
+
+.pricing_plansHeader {
+  width: 100%;
+  height: 30%;
+  /* background-color: black; */
+  margin-top: 15px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.plans_container {
+  width: 70%;
+  height: 90%;
+  /* background-color: aliceblue; */
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+}
+.cont_title {
+  width: 134px;
+  height: 34px;
+  border-radius: 1rem;
+  box-shadow: 0px 0px 4px 0px #00000040;
+  background-color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  font-weight: 600;
+  font-style: Semi Bold;
+  font-size: 14px;
+  line-height: 20px;
+  letter-spacing: 0px;
+  text-align: center;
+  color: #6366f1;
+}
+.texts {
+  width: 90%;
+  height: 70%;
+   display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  flex-direction: column;
+
+  .bold_text {
+    width: 893px;
+    height: 45px;
+    font-size: 37px;
+    font-weight: 600;
+    color: #111827;
+    margin-bottom: 10px;
+  }
+
+  .sub_text {
+    width: 893px;
+    height: 28px;
+    font-size: 18px;
+    font-weight: 400;
+    color: #6B7280;
+  }
+}
+
+.pricing_interface {
+  width: 100%;
+  min-height: 70vh;
+  /* background-color: #000; */
+  padding: 0 0 40px;
+}
+
+.billing_toggle {
+  width: 266px;
+  height: 44px;
+  border-radius: 24px;
+  background-color: #f4f4f6;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 22px;
+  margin: 0 auto 48px;
+}
+
+.billing_option {
+  width: 90px;
+  height: 22px;
+  border: 0;
+  background-color: transparent;
+  border-radius: 5px;
+  color: #6b7280;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.billing_option_active {
+  background-color: #fff;
+  border: 1px solid #9de8dd;
+  color: #111827;
+}
+
+.pricing_cards {
+  width: min(100%, 1280px);
+  padding: 0 0;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 22px;
+  align-items: stretch;
+}
+
+.pricing_card {
+  min-height: 684px;
+  border-radius: 14px;
+  border: 1px solid #e5e7eb;
+  background-color: #fff;
+  padding: 34px 32px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.pricing_card h2 {
+  color: #111827;
+  font-size: 22px;
+  font-weight: 700;
+  margin: 0 0 10px;
+}
+
+.plan_caption {
+  color: #6b7280;
+  font-size: 15px;
+  line-height: 22px;
+  margin: 0;
+}
+
+.plan_price {
+  color: #111827;
+  font-size: 38px;
+  font-weight: 800;
+  line-height: 1;
+  margin-top: 28px;
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.plan_price span {
+  color: #6b7280;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 20px;
+}
+
+.plan_features {
+  list-style: none;
+  padding: 0;
+  margin: 34px 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.plan_features li {
+  color: #111827;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font-size: 14px;
+  line-height: 19px;
+}
+
+.check_mark {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+  flex: 0 0 auto;
+}
+
+.plan_btn {
+  width: 100%;
+  height: 52px;
+  border-radius: 9px;
+  border: 2px solid #5d5fef;
+  background-color: #fff;
+  color: #4f52ff;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.plan_btn:hover{
+    background-color: #432DD7;
+    border: #432DD7;
+    color: white;
+}
+
+.pricing_card_featured {
+  position: relative;
+  min-height: 700px;
+  background-color: #5d5fef;
+  border-color: #5d5fef;
+  color: #fff;
+  box-shadow: 0 20px 32px rgba(255, 255, 255, 0.22);
+  transform: translateY(-16px);
+}
+
+.pricing_card_featured h2,
+.pricing_card_featured .plan_price,
+.pricing_card_featured .plan_features li,
+.pricing_card_featured .plan_caption,
+.pricing_card_featured .plan_price span,
+.pricing_card_featured .plan_caption {
+  color: #fff;
+}
+
+.popular_badge {
+  position: absolute;
+  top: -16px;
+  left: 50%;
+  transform: translateX(-50%);
+  min-width: 138px;
+  height: 30px;
+  border-radius: 20px;
+  border: 2px solid #5d5fef;
+  background-color: #fff;
+  color: #5d5fef;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.plan_btn_featured {
+  border-color: #fff;
+}
+
+.pricing_benefits {
+  width: 100%;
+  min-height: 148px;
+  background-color: #fff;
+  border-radius: 8px;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  align-items: center;
+  gap: 28px;
+  padding: 32px 38px;
+}
+
+.pricing_benefit {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.benefit_icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+}
+
+.benefit_icon img {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+}
+
+.benefit_icon_purple {
+  background-color: #f0ddff;
+}
+
+.benefit_icon_green {
+  background-color: #d8ffe5;
+}
+
+.benefit_icon_blue {
+  background-color: #dceaff;
+}
+
+.benefit_icon_orange {
+  background-color: #ffe9d7;
+}
+
+.pricing_benefit h3 {
+  color: #000;
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 21px;
+  margin: 0 0 8px;
+}
+
+.pricing_benefit p {
+  color: #111827;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 14px;
+  margin: 0;
+  white-space: pre-line;
+}
+
+.pricing_cta {
+  width: 93%;
+  min-height: 260px;
+  border-radius: 10px;
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  justify-self: center;
+  align-self: center;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 42px 24px;
+  margin-bottom: 30px;
+  overflow: hidden;
+}
+
+.pricing_cta h2 {
+  color: #fff;
+  font-size: 31px;
+  font-weight: 700;
+  line-height: 39px;
+  margin: 0 0 24px;
+}
+
+.pricing_cta p {
+  color: #fff;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 22px;
+  margin: 0 0 28px;
+}
+
+.pricing_cta button {
+  width: 190px;
+  height: 56px;
+  border: 0;
+  border-radius: 9px;
+  background-color: #fff;
+  color: #5d5fef;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.pricing_cta button:hover {
+  background-color: #f4f4f6;
+}
+
+@media (max-width: 1024px) {
+  .pricing_cards {
+    grid-template-columns: 1fr;
+    max-width: 620px;
+    margin: 0 auto;
+  }
+
+  .pricing_benefits {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .pricing_card,
+  .pricing_card_featured {
+    min-height: auto;
+    transform: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .plans_container {
+    padding: 0 16px;
+  }
+
+  .texts,
+  .texts .bold_text,
+  .texts .sub_text {
+    width: 100%;
+    height: auto;
+  }
+
+  .texts .bold_text {
+    font-size: 30px;
+    line-height: 38px;
+  }
+
+  .texts .sub_text {
+    font-size: 16px;
+    line-height: 24px;
+  }
+
+  .pricing_card {
+    padding: 30px 24px;
+  }
+
+  .plan_price {
+    font-size: 34px;
+  }
+
+  .pricing_benefits {
+    grid-template-columns: 1fr;
+    padding: 28px 22px;
+  }
+
+  .pricing_cta h2 {
+    font-size: 26px;
+    line-height: 34px;
+  }
+
+  .pricing_cta p {
+    font-size: 15px;
+  }
+}
