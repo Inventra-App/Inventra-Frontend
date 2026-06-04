@@ -1,4 +1,4 @@
-import React from "react";
+import { useState } from "react";
 import {
   BarChart3,
   Box,
@@ -12,6 +12,26 @@ import {
 import "./Css/Login.css";
 
 const Login = () => {
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+
+  const handleLoginSubmit = (event) => {
+    event.preventDefault();
+    setIsLoggingIn(true);
+  };
+
+  const handleGoogleLogin = () => {
+    setIsGoogleLoading(true);
+  };
+
+  if (isLoggingIn) {
+    return (
+      <main className="loginLoadingPage" aria-label="Logging in">
+        <div className="loginLoader"></div>
+      </main>
+    );
+  }
+
   return (
     <main className="loginPage">
       <section className="LoginPage_left">
@@ -108,7 +128,7 @@ const Login = () => {
           <a href="/signup">Get Started</a>
         </div>
 
-        <form className="loginFormCard">
+        <form className="loginFormCard" onSubmit={handleLoginSubmit}>
           <div className="loginFormHeading">
             <h2>Welcome Back!</h2>
             <p>Login to your Inventra account</p>
@@ -132,7 +152,7 @@ const Login = () => {
             <a href="/resetpassword">Forgot Password?</a>
           </div>
 
-          <button className="loginSubmit" type="submit">
+          <button className="loginSubmit" type="submit" disabled={isLoggingIn}>
             Login
           </button>
 
@@ -142,11 +162,22 @@ const Login = () => {
             <span></span>
           </div>
 
-          <button className="googleLogin" type="button">
-            <span className="googleMark" aria-hidden="true">
-              <img src="https://www.google.com/favicon.ico" alt="Google" width={18} />
-            </span>
-            <span>Google</span>
+          <button
+            className={`googleLogin ${isGoogleLoading ? "googleLoginLoading" : ""}`}
+            type="button"
+            onClick={handleGoogleLogin}
+            disabled={isGoogleLoading}
+          >
+            {isGoogleLoading ? (
+              <span className="googleButtonLoader" aria-label="Loading"></span>
+            ) : (
+              <>
+                <span className="googleMark" aria-hidden="true">
+                  <img src="https://www.google.com/favicon.ico" alt="Google" width={18} />
+                </span>
+                <span>Google</span>
+              </>
+            )}
           </button>
 
           <div className="formRule"></div>
