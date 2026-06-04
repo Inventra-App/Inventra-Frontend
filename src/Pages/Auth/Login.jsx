@@ -10,8 +10,11 @@ import {
   UsersRound,
 } from "lucide-react";
 import "./Css/Login.css";
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
+  const nav = useNavigate();
+
   return (
     <main className="loginPage">
       <section className="LoginPage_left">
@@ -132,7 +135,7 @@ const Login = () => {
             <a href="/resetpassword">Forgot Password?</a>
           </div>
 
-          <button className="loginSubmit" type="submit">
+          <button className="loginSubmit" type="submit" onClick={() => nav("/dashboard")}>
             Login
           </button>
 
