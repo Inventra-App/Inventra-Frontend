@@ -1,0 +1,172 @@
+.demo-page-container {
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f9fafb;
+  padding: 20px;
+}
+
+.demo-card {
+  background-color: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 520px;
+  padding: 40px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.demo-title {
+  font-size: 2rem;
+  font-weight: 800;
+  color: #4f46e5;
+  margin: 0 0 32px 0;
+  letter-spacing: 0.5px;
+  text-align: center;
+}
+
+.demo-form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.demo-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.demo-input-group label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #374151;
+}
+
+.demo-input-group input,
+.demo-input-group textarea {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  color: #111827;
+  background-color: #ffffff;
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+
+.demo-input-group input::placeholder,
+.demo-input-group textarea::placeholder {
+  color: #9ca3af;
+}
+
+.demo-input-group input:focus,
+.demo-input-group textarea:focus {
+  border-color: #4f46e5;
+}
+
+.demo-input-group textarea {
+  resize: none;
+}
+
+.demo-submit-btn {
+  width: 100%;
+  background-color: #4f46e5;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  padding: 14px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+  margin-top: 12px;
+}
+
+.demo-submit-btn:hover {
+  background-color: #4338ca;
+}
+
+.demo-back-home {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  color: #374151;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 32px;
+  padding: 4px 8px;
+  transition: color 0.15s ease;
+}
+
+.demo-back-home:hover {
+  color: #4f46e5;
+}
+
+@media screen and (max-width: 768px) {
+  .demo-page-container {
+    padding: 16px;
+  }
+
+  .demo-card {
+    padding: 32px 24px;
+    max-width: 480px;
+  }
+
+  .demo-title {
+    font-size: 1.75rem;
+    margin-bottom: 24px;
+  }
+}
+
+@media screen and (max-width: 468px) {
+  .demo-page-container {
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .demo-card {
+    padding: 28px 20px;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .demo-title {
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+  }
+
+  .demo-form {
+    gap: 16px;
+  }
+
+  .demo-input-group input,
+  .demo-input-group textarea {
+    padding: 10px 14px;
+    font-size: 0.9rem;
+  }
+
+  .demo-submit-btn {
+    padding: 12px;
+    font-size: 0.9rem;
+    margin-top: 8px;
+  }
+
+  .demo-back-home {
+    margin-top: 24px;
+  }
+}

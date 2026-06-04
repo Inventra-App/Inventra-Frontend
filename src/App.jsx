@@ -18,6 +18,7 @@ import ExpiryMgm from './Pages/Auth/ExpiryMgm'
 import ActivityLog from './Pages/Auth/ActivityLog'
 import UserMgm from './Pages/Auth/UserMgm'
 import Settings from './Pages/Auth/Settings'
+import Demo from './Pages/Auth/Demo'
 
 function App() {
   return (
@@ -35,6 +36,7 @@ function App() {
         <Route path='/created' element={<Created />} />
         <Route path='/resetpassword' element={<ForgetPassUi/>} />
         <Route path='/forgot-password' element={<ForgetPassUi/>} />
+        <Route path='/demo' element={<Demo />} />
 
         <Route element={<DashboardLayout />}>
           <Route path='/dashboard' element={<Dashboard />} />
