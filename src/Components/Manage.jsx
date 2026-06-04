@@ -3,8 +3,8 @@ import "../Css/Manage.css";
 
 import Img1 from "../assets/Ellipse 9.png";
 import Img2 from "../assets/Ellipse 8.png";
-import Img3 from "../assets/Manage3.jpg";
-import Img4 from "../assets/Manage4.jpg";
+import Img3 from "../assets/Slide 3.jpg";
+import Img4 from "../assets/Slide 4.jpg";
 
 const Manage = () => {
   const [hovered, setHovered] = useState(false);

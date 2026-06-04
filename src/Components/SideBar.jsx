@@ -14,7 +14,7 @@ const navItems = [
   { path: '/settings', icon: <Settings size={20} />, label: 'Settings' },
 ]
 
-const SideBar = () => {
+const SideBar = ({ onItemClick }) => {
   return (
     <div className="sidebar">
 
@@ -27,6 +27,7 @@ const SideBar = () => {
           <NavLink
             key={item.path}
             to={item.path}
+            onClick={onItemClick}
             className={({ isActive }) => `sidebar-item ${isActive ? 'sidebar-item-active' : ''}`}
           >
             <span className="sidebar-icon">{item.icon}</span>
@@ -36,7 +37,7 @@ const SideBar = () => {
       </nav>
 
       <div className="sidebar-bottom">
-        <div className="sidebar-item sidebar-logout">
+        <div className="sidebar-item sidebar-logout" onClick={onItemClick}>
           <span className="sidebar-icon"><LogOut size={20} /></span>
           <span className="sidebar-label">Logout</span>
         </div>

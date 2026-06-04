@@ -1,7 +1,5 @@
 import React from 'react'
-import SideBar from '../../Components/SideBar'
-import DashboardHeader from '../../Components/DashboardHeader'
-import { Package, Activity, ShoppingCart, AlertTriangle, AlertOctagon, TrendingDown, Calendar, ShoppingBag, Truck } from 'lucide-react'
+import { Package, Activity, ShoppingCart, AlertTriangle, TrendingDown, Calendar, Truck } from 'lucide-react'
 import './Css/Dashboard.css'
 
 const statCards = [
@@ -47,110 +45,102 @@ const getExpiryColor = (days) => {
 
 const Dashboard = () => {
   return (
-    <div className="dashboard-page">
-      <SideBar />
-      <div className="dashboard-main">
-        <DashboardHeader />
+    <div className="dashboard-content">
+      <div className="dashboard-welcome">
+        <h2>Welcome back, Admin User!</h2>
+        <p>Here's what's happening in your supermarket today. <span className="dashboard-role">(Admin)</span></p>
+      </div>
 
-        <div className="dashboard-content">
-          <div className="dashboard-welcome">
-            <h2>Welcome back, Admin User!</h2>
-            <p>Here's what's happening in your supermarket today. <span className="dashboard-role">(Admin)</span></p>
+      <div className="dashboard-stats">
+        {statCards.map((card, index) => (
+          <div key={index} className="stat-card">
+            <div className="stat-card-left">
+              <p className="stat-label">{card.label}</p>
+              <h3 className="stat-value">{card.value}</h3>
+              {card.sub && <p className="stat-sub">{card.sub}</p>}
+            </div>
+            <div className={`stat-icon stat-icon-${card.color}`}>{card.icon}</div>
           </div>
+        ))}
+      </div>
 
-          <div className="dashboard-stats">
-            {statCards.map((card, index) => (
-              <div key={index} className="stat-card">
-                <div className="stat-card-left">
-                  <p className="stat-label">{card.label}</p>
-                  <h3 className="stat-value">{card.value}</h3>
-                  {card.sub && <p className="stat-sub">{card.sub}</p>}
+      <div className="dashboard-alerts">
+        <div className="alert-card">
+          <div className="alert-card-header">
+            <div className="alert-card-title">
+              <AlertTriangle size={18} className="alert-icon-orange" />
+              <h4>Expiry Alerts</h4>
+            </div>
+            <span className="alert-badge alert-badge-orange">{expiryAlerts.length}</span>
+          </div>
+          <div className="alert-list">
+            {expiryAlerts.map((item, index) => (
+              <div key={index} className={`expiry-item ${getExpiryColor(item.daysLeft)}`}>
+                <div className="expiry-item-left">
+                  <p className="expiry-name">{item.name}</p>
+                  <p className="expiry-meta">Batch: {item.batch} • Qty: {item.qty} • Expires: {item.expires}</p>
                 </div>
-                <div className={`stat-icon stat-icon-${card.color}`}>{card.icon}</div>
+                <span className="expiry-tag">{item.daysLeft}d left</span>
               </div>
             ))}
           </div>
+        </div>
 
-          <div className="dashboard-alerts">
-            <div className="alert-card">
-              <div className="alert-card-header">
-                <div className="alert-card-title">
-                  <AlertTriangle size={18} className="alert-icon-orange" />
-                  <h4>Expiry Alerts</h4>
-                </div>
-                <span className="alert-badge alert-badge-orange">{expiryAlerts.length}</span>
-              </div>
-              <div className="alert-list">
-                {expiryAlerts.map((item, index) => (
-                  <div key={index} className={`expiry-item ${getExpiryColor(item.daysLeft)}`}>
-                    <div className="expiry-item-left">
-                      <p className="expiry-name">{item.name}</p>
-                      <p className="expiry-meta">Batch: {item.batch} • Qty: {item.qty} • Expires: {item.expires}</p>
-                    </div>
-                    <span className="expiry-tag">{item.daysLeft}d left</span>
-                  </div>
-                ))}
-              </div>
+        <div className="alert-card">
+          <div className="alert-card-header">
+            <div className="alert-card-title">
+              <TrendingDown size={18} className="alert-icon-red" />
+              <h4>Low Stock Alerts</h4>
             </div>
-
-            <div className="alert-card">
-              <div className="alert-card-header">
-                <div className="alert-card-title">
-                  <TrendingDown size={18} className="alert-icon-red" />
-                  <h4>Low Stock Alerts</h4>
-                </div>
-                <span className="alert-badge alert-badge-red">{lowStockAlerts.length}</span>
-              </div>
-              <div className="alert-list">
-                {lowStockAlerts.map((item, index) => (
-                  <div key={index} className="lowstock-item">
-                    <div>
-                      <p className="expiry-name">{item.name}</p>
-                      <p className="expiry-meta">Category: {item.category}</p>
-                    </div>
-                    <div className="lowstock-units">
-                      <span className="lowstock-count">{item.units}</span>
-                      <span className="lowstock-label">units left</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
+            <span className="alert-badge alert-badge-red">{lowStockAlerts.length}</span>
           </div>
-
-          <div className="activity-card">
-            <div className="alert-card-header">
-              <div className="alert-card-title">
-                <Calendar size={18} className="alert-icon-blue" />
-                <h4>Recent Activities</h4>
-              </div>
-            </div>
-            <div className="activity-list">
-              {recentActivities.map((item, index) => (
-                <div key={index} className="activity-item">
-                  <div className={`activity-icon activity-icon-${item.type}`}>
-                    {getActivityIcon(item.type)}
-                  </div>
-                  <div className="activity-text">
-                    <p className="activity-desc">{item.text}</p>
-                    <p className="activity-meta">{item.user} • {item.time}</p>
-                  </div>
+          <div className="alert-list">
+            {lowStockAlerts.map((item, index) => (
+              <div key={index} className="lowstock-item">
+                <div>
+                  <p className="expiry-name">{item.name}</p>
+                  <p className="expiry-meta">Category: {item.category}</p>
                 </div>
-              ))}
-            </div>
-            <div className="activity-footer">
-              <p>Showing 1 to 8 of 50 actions</p>
-              <div className="activity-pagination">
-                <button>‹</button>
-                <button className="active">1</button>
-                <button>2</button>
-                <button>...</button>
-                <button>›</button>
-                <span>4 per page ▾</span>
+                <div className="lowstock-units">
+                  <span className="lowstock-count">{item.units}</span>
+                  <span className="lowstock-label">units left</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div className="activity-card">
+        <div className="alert-card-header">
+          <div className="alert-card-title">
+            <Calendar size={18} className="alert-icon-blue" />
+            <h4>Recent Activities</h4>
+          </div>
+        </div>
+        <div className="activity-list">
+          {recentActivities.map((item, index) => (
+            <div key={index} className="activity-item">
+              <div className={`activity-icon activity-icon-${item.type}`}>
+                {getActivityIcon(item.type)}
+              </div>
+              <div className="activity-text">
+                <p className="activity-desc">{item.text}</p>
+                <p className="activity-meta">{item.user} • {item.time}</p>
               </div>
             </div>
+          ))}
+        </div>
+        <div className="activity-footer">
+          <p>Showing 1 to 8 of 50 actions</p>
+          <div className="activity-pagination">
+            <button>‹</button>
+            <button className="active">1</button>
+            <button>2</button>
+            <button>...</button>
+            <button>›</button>
+            <span>4 per page ▾</span>
           </div>
-
         </div>
       </div>
     </div>
