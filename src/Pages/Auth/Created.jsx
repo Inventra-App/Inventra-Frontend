@@ -8,7 +8,7 @@ const Created = () => {
   const navigate = useNavigate()
 
   const handleGoToDashboard = () => {
-    // navigate('/dashboard')
+    navigate('/dashboard')
   }
 
   return (
