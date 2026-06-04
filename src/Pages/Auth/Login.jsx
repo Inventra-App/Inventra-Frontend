@@ -5,6 +5,7 @@ import {
   CheckCircle2,
   Clock3,
   LockKeyhole,
+  Menu,
   Shield,
   UsersRound,
 } from "lucide-react";
@@ -90,6 +91,18 @@ const Login = () => {
       </section>
 
       <section className="LoginPage_right">
+        <div className="mobileLoginHeader">
+          <a href="/" className="mobileLoginBrand">
+            <span>
+              <Box size={14} />
+            </span>
+            <strong>Inventra</strong>
+          </a>
+          <button type="button" aria-label="Open menu">
+            <Menu size={20} />
+          </button>
+        </div>
+
         <div className="loginSignupPrompt">
           <span>Don't have an account?</span>
           <a href="/signup">Get Started</a>
@@ -116,7 +129,7 @@ const Login = () => {
               <input type="checkbox" />
               <span>Remember Me</span>
             </label>
-            <a href="/forgot-password">Forgot Password?</a>
+            <a href="/resetpassword">Forgot Password?</a>
           </div>
 
           <button className="loginSubmit" type="submit">
@@ -131,7 +144,7 @@ const Login = () => {
 
           <button className="googleLogin" type="button">
             <span className="googleMark" aria-hidden="true">
-              <img src="https://www.google.com/favicon.ico" alt="Google" width={25} />j
+              <img src="https://www.google.com/favicon.ico" alt="Google" width={18} />
             </span>
             <span>Google</span>
           </button>
