@@ -112,7 +112,7 @@ const Login = () => {
         <div className="loginOverlay"></div>
 
         <div className="leftContent">
-          <div className="loginLogo">
+          <div className="loginLogo" onClick={() => nav("/")}>
             <div className="loginLogoBox">
               <Box size={24} />
             </div>

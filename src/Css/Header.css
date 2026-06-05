@@ -2,13 +2,15 @@
   width: 100%;
   height: 80px;
   padding: 0 80px;
-  
   display: flex;
   justify-content: space-between;
   align-items: center;
   border-bottom: 1px solid #e5e7eb;
   background: white;
   position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
 }
 
 .header-logo {
@@ -99,7 +101,7 @@
   flex-direction: column;
   padding: 20px 20px;
   gap: 20px;
-  z-index: 999;
+  z-index: 1001;
 }
 
 .mobile-menu a {
