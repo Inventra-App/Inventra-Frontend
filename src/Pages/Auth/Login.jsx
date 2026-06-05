@@ -8,22 +8,82 @@ import {
   Menu,
   Shield,
   UsersRound,
+  Eye,
+  EyeOff
 } from "lucide-react";
 import "./Css/Login.css";
 import { useNavigate } from "react-router-dom";
 
 const Login = () => {
   const nav = useNavigate();
-
+  const [showPassword, setShowPassword] = useState(false);
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleLoginSubmit = (event) => {
-    event.preventDefault();
-    setIsLoggingIn(true);
+  const [formData, setFormData] = useState({
+    email: '',
+    password: '',
+    rememberMe: false
+  });
+
+  const [errors, setErrors] = useState({});
+  const [touched, setTouched] = useState({});
+
+  const validateField = (name, value) => {
+    let error = "";
+    if (name === "email") {
+      if (!value.trim()) {
+        error = "Email address is required";
+      } else if (!/\S+@\S+\.\S+/.test(value)) {
+        error = "Please enter a valid email address";
+      }
+    }
+    if (name === "password" && !value) {
+      error = "Password is required";
+    }
+    setErrors((prev) => ({ ...prev, [name]: error }));
+  };
+
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    const fieldValue = type === "checkbox" ? checked : value;
+
+    setFormData((prev) => ({ ...prev, [name]: fieldValue }));
+
+    if (touched[name]) {
+      validateField(name, fieldValue);
+    }
+  };
+
+  const handleBlur = (e) => {
+    const { name, value } = e.target;
+    setTouched((prev) => ({ ...prev, [name]: true }));
+    validateField(name, value);
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (isSubmitting) return;
+
+    const newErrors = {};
+    if (!formData.email.trim()) newErrors.email = "Email address is required";
+    if (!formData.password) newErrors.password = "Password is required";
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      setTouched({ email: true, password: true });
+      return;
+    }
+
+    setIsSubmitting(true);
+    setTimeout(() => {
+      setIsLoggingIn(true);
+    }, 700);
+
     setTimeout(() => {
       nav("/dashboard");
-    }, 700);
+    }, 1800);
   };
 
   const handleGoogleLogin = () => {
@@ -142,32 +202,68 @@ const Login = () => {
           <a href="/signup">Get Started</a>
         </div>
 
-        <form className="loginFormCard" onSubmit={handleLoginSubmit}>
+        <form className="loginFormCard" onSubmit={handleSubmit}>
           <div className="loginFormHeading">
             <h2>Welcome Back!</h2>
             <p>Login to your Inventra account</p>
           </div>
 
-          <label className="loginField">
+          <div className="loginField">
             <span>Email Address</span>
-            <input type="email" placeholder="Ajchibuzor@gmail.com" />
-          </label>
+            <input 
+              type="email" 
+              name="email"
+              placeholder="Ajchibuzor@gmail.com" 
+              value={formData.email}
+              onChange={handleChange}
+              onBlur={handleBlur}
+              className={touched.email && errors.email ? "login-input-error" : ""}
+            />
+            {touched.email && errors.email && <span className="login-error-text">{errors.email}</span>}
+          </div>
 
-          <label className="loginField">
+          <div className="loginField">
             <span>Password</span>
-            <input type="password" placeholder="••••••••" />
-          </label>
+            <div className="login-password-input-wrapper">
+              <input 
+                type={showPassword ? "text" : "password"} 
+                name="password"
+                placeholder="••••••••" 
+                value={formData.password}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                className={touched.password && errors.password ? "login-input-error" : ""}
+              />
+              <button
+                type="button"
+                className="login-password-toggle-btn"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+              </button>
+            </div>
+            {touched.password && errors.password && <span className="login-error-text">{errors.password}</span>}
+          </div>
 
           <div className="loginOptions">
             <label className="rememberLogin">
-              <input type="checkbox" />
+              <input 
+                type="checkbox" 
+                name="rememberMe"
+                checked={formData.rememberMe}
+                onChange={handleChange}
+              />
               <span>Remember Me</span>
             </label>
             <a href="/resetpassword">Forgot Password?</a>
           </div>
 
-          <button className="loginSubmit" type="submit" disabled={isLoggingIn}>
-            Login
+          <button 
+            className="loginSubmit" 
+            type="submit" 
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? "Logging in..." : "Login"}
           </button>
 
           <div className="loginDivider">
