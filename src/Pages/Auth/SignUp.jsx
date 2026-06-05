@@ -192,7 +192,7 @@ const SignUp = () => {
         />
         <div className="signup-overlay" />
 
-        <div className="signup-left-logo">
+        <div className="signup-left-logo" onClick={() => nav('/')}>
           <img src={logo} alt="Inventra" className="signup-logo-img" />
           <span>Inventra</span>
         </div>
