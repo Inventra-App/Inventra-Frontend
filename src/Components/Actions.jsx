@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import faqData from '../Components/faqData'
-import action from '../Assets/Action.png'
+import action from '../assets/Action.png'
 import '../Css/Actions.css'
 
 const Actions = () => {

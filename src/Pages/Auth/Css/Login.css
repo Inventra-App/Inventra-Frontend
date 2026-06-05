@@ -14,6 +14,31 @@
     sans-serif;
 }
 
+.loginLoadingPage {
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100svh;
+  background-color: #0f172a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.loginLoader {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  border: 6px solid #ffffff;
+  border-top-color: #4f2ff0;
+  animation: loginLoaderSpin 850ms linear infinite;
+}
+
+@keyframes loginLoaderSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 .LoginPage_left {
   position: relative;
   width: 50%;
@@ -332,6 +357,12 @@
   box-shadow: 0 15px 26px rgba(79, 47, 240, 0.38);
 }
 
+.loginSubmit:disabled {
+  cursor: wait;
+  opacity: 0.85;
+  transform: none;
+}
+
 .loginDivider {
   margin: clamp(16px, 3vh, 26px) 0;
   display: grid;
@@ -365,6 +396,23 @@
 .googleLogin:hover {
   border-color: #b9c1cf;
   background: #fafafa;
+}
+
+.googleLoginLoading,
+.googleLoginLoading:hover {
+  background: white;
+  border: 2px solid #d7dbe5;
+  box-shadow: none;
+  cursor: wait;
+}
+
+.googleButtonLoader {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 3px solid #ffffff;
+  border-top-color: #4f2ff0;
+  animation: loginLoaderSpin 850ms linear infinite;
 }
 
 .formRule {
