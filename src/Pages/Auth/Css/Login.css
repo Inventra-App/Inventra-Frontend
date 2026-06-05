@@ -97,13 +97,11 @@
 .heroText h1 {
   margin: 0;
   color: #ffffff;
-  font-size:36px;
+  font-size: 36px;
   line-height: 1.12;
   font-weight: 850;
   letter-spacing: 0;
-      margin-top: 30px;
-
-
+  margin-top: 30px;
 }
 
 .heroText p {
@@ -112,7 +110,7 @@
   font-size: 18px;
   line-height: 1.55;
   max-width: 560px;
-      margin-top: 30px;
+  margin-top: 30px;
 }
 
 .loginFeatures {
@@ -151,7 +149,6 @@
   font-size: 15px;
   line-height: 1.5;
   max-width: 440px;
-  /* margin-top: 20px; */
 }
 
 .bottomInfo {
@@ -370,7 +367,6 @@
   background: #fafafa;
 }
 
-
 .formRule {
   height: 1.5px;
   margin: clamp(18px, 3.4vh, 32px) 0 clamp(14px, 2.5vh, 22px);
@@ -393,6 +389,55 @@
   white-space: nowrap;
 }
 
+.login-password-input-wrapper {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.login-password-input-wrapper input {
+  padding-right: 48px;
+}
+
+.login-password-toggle-btn {
+  position: absolute;
+  right: 16px;
+  background: none;
+  border: none;
+  color: #8f97a6;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.login-password-toggle-btn:hover {
+  color: #4f2ff0;
+}
+
+.loginSubmit:disabled,
+.googleLogin:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+.login-input-error {
+  border-color: #ff0000 !important;
+}
+
+.login-error-text {
+  color: #ff0000;
+  font-size: 0.85rem;
+  font-weight: 500;
+  display: block;
+  margin-top: 6px;
+  text-align: left;
+}
+
 @media (max-height: 760px) and (min-width: 821px) {
   .leftContent {
     padding: 26px 42px;
@@ -413,7 +458,6 @@
 
   .heroText h1 {
     font-size: 32px;
-    
   }
 
   .heroText p {

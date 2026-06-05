@@ -41,7 +41,7 @@ const SideBar = ({ onItemClick }) => {
       <div className="sidebar-bottom">
         <div className="sidebar-item sidebar-logout" onClick={onItemClick}>
           <span className="sidebar-icon"><LogOut size={20} /></span>
-          <span className="sidebar-label" onClick={() => nav("/")}>Logout</span>
+          <span className="sidebar-label" onClick={() => nav("/login")}>Logout</span>
         </div>
       </div>
 
