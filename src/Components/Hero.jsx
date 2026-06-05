@@ -29,7 +29,7 @@ const Hero = () => {
             <Rocket size={18} />
             Get Started
           </button>
-          <button className="secondary-btn">
+          <button className="secondary-btn" onClick={() => nav("/demo")}>
             <Play size={18} />
             Book a Demo
           </button>

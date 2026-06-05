@@ -10,8 +10,11 @@ import {
   UsersRound,
 } from "lucide-react";
 import "./Css/Login.css";
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
+  const nav = useNavigate();
+
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
 
@@ -153,6 +156,7 @@ const Login = () => {
           </div>
 
           <button className="loginSubmit" type="submit" disabled={isLoggingIn}>
+          <button className="loginSubmit" type="submit" onClick={() => nav("/dashboard")}>
             Login
           </button>
 

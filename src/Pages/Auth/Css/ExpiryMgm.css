@@ -1,0 +1,339 @@
+.expiry-page {
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  margin-top: 50px;
+}
+
+.expiry-title {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #111827;
+  margin: 0 0 6px 0;
+}
+
+.expiry-sub {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin: 0;
+}
+
+.expiry-sub-mobile {
+  display: none;
+}
+
+.expiry-admin {
+  color: #4f46e5;
+  font-weight: 600;
+}
+
+.expiry-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+.expiry-stat-card {
+  background-color: #ffffff;
+  border-radius: 12px;
+  padding: 24px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  border: 1.5px solid #e5e7eb;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+}
+
+.expiry-stat-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.expiry-icon-orange { background-color: #ffedd5; color: #f97316; }
+.expiry-icon-red { background-color: #fee2e2; color: #ef4444; }
+.expiry-icon-yellow { background-color: #fef9c3; color: #ca8a04; }
+
+.expiry-stat-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  margin: 0 0 4px 0;
+}
+
+.expiry-label-orange { color: #f97316; }
+.expiry-label-red { color: #ef4444; }
+.expiry-label-yellow { color: #ca8a04; }
+
+.expiry-stat-value {
+  font-size: 1.8rem;
+  font-weight: 800;
+  margin: 0;
+}
+
+.expiry-value-orange { color: #f97316; }
+.expiry-value-red { color: #ef4444; }
+.expiry-value-yellow { color: #ca8a04; }
+
+.expiry-manage-btn {
+  display: none;
+  width: 100%;
+  height: 50px;
+  background-color: #4f46e5;
+  color: #ffffff;
+  border: none;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.expiry-section {
+  background-color: #ffffff;
+  border-radius: 14px;
+  padding: 24px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+}
+
+.expiry-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.expiry-section-header h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #111827;
+  margin: 0;
+}
+
+.expiry-count {
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.expiry-count-red { color: #ef4444; }
+.expiry-count-orange { color: #f97316; }
+.expiry-count-yellow { color: #ca8a04; }
+
+.expiry-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.expiry-item {
+  border-radius: 10px;
+  padding: 16px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.expiry-item-red { background-color: #fef2f2; }
+.expiry-item-orange { background-color: #fff7ed; }
+.expiry-item-yellow { background-color: #fefce8; }
+
+.expiry-item-left {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  flex: 1;
+}
+
+.expiry-item-body {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.expiry-item-top-mobile {
+  display: none;
+}
+
+.expiry-item-name {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #111827;
+  margin: 0 0 6px 0;
+}
+
+.expiry-item-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.expiry-item-icon-red { background-color: #fee2e2; color: #ef4444; }
+.expiry-item-icon-orange { background-color: #ffedd5; color: #f97316; }
+.expiry-item-icon-yellow { background-color: #fef9c3; color: #ca8a04; }
+
+.expiry-batch-tag {
+  font-size: 0.7rem;
+  font-weight: 500;
+  max-width: max-content;
+  padding: 4px 12px;
+  border-radius: 6px;
+  display: inline-block;
+  background-color: #ffffff;
+  color: #111827;
+  border: 1px solid #e5e7eb;
+  margin-bottom: 8px;
+}
+
+.expiry-item-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  color: #6b7280;
+}
+
+.expiry-date {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.expiry-item-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.expiry-status-red { font-size: 0.8rem; font-weight: 700; color: #ef4444; }
+.expiry-days-red { font-size: 0.8rem; font-weight: 700; color: #ef4444; }
+.expiry-days-orange { font-size: 0.8rem; font-weight: 700; color: #f97316; }
+.expiry-days-yellow { font-size: 0.8rem; font-weight: 700; color: #ca8a04; }
+
+.expiry-view-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border: none;
+  border-radius: 8px;
+  background-color: #4f46e5;
+  color: #ffffff;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+@media (max-width: 768px) {
+  .expiry-page {
+    padding: 20px 16px;
+    margin-top: 50px;
+  }
+
+  .expiry-title {
+    font-size: 1.3rem;
+  }
+
+  .expiry-sub-desktop {
+    display: none;
+  }
+
+  .expiry-sub-mobile {
+    display: block;
+  }
+
+  .expiry-stats {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+
+  .expiry-stat-card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 20px 16px;
+    min-height: 120px;
+  }
+
+  .expiry-manage-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .expiry-section {
+    padding: 16px;
+  }
+
+  .expiry-item {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 14px;
+    gap: 8px;
+  }
+
+  .expiry-item-left {
+    width: 100%;
+    gap: 0;
+  }
+
+  .expiry-item-icon {
+    display: none;
+  }
+
+  .expiry-item-right {
+    display: none;
+  }
+
+  .expiry-item-top-mobile {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 6px;
+  }
+
+  .expiry-item-name-desktop {
+    display: none;
+  }
+
+  .expiry-item-meta {
+    justify-content: space-between;
+    width: 100%;
+    font-size: 0.875rem;
+  }
+}
+
+@media (max-width: 468px) {
+  .expiry-page {
+    padding: 16px 12px;
+  }
+
+  .expiry-stats {
+    gap: 10px;
+  }
+
+  .expiry-stat-card {
+    padding: 14px;
+  }
+
+  .expiry-stat-value {
+    font-size: 1.4rem;
+  }
+
+  .expiry-section-header h3 {
+    font-size: 0.95rem;
+  }
+
+  .expiry-item-name {
+    font-size: 0.875rem;
+  }
+}
