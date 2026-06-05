@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   BarChart3,
   Box,
@@ -17,8 +17,10 @@ import { useNavigate } from "react-router-dom";
 const Login = () => {
   const nav = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
+
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -76,9 +78,33 @@ const Login = () => {
 
     setIsSubmitting(true);
     setTimeout(() => {
+      setIsLoggingIn(true);
+    }, 700);
+
+    setTimeout(() => {
       nav("/dashboard");
-    }, 1500);
+    }, 1800);
   };
+
+  const handleGoogleLogin = () => {
+    setIsGoogleLoading(true);
+
+    setTimeout(() => {
+      setIsLoggingIn(true);
+    }, 1200);
+
+    setTimeout(() => {
+      nav("/dashboard");
+    }, 3000);
+  };
+
+  if (isLoggingIn) {
+    return (
+      <main className="loginLoadingPage" aria-label="Logging in">
+        <div className="loginLoader"></div>
+      </main>
+    );
+  }
 
   return (
     <main className="loginPage">
@@ -246,11 +272,22 @@ const Login = () => {
             <span></span>
           </div>
 
-          <button className="googleLogin" type="button" disabled={isSubmitting}>
-            <span className="googleMark" aria-hidden="true">
-              <img src="https://www.google.com/favicon.ico" alt="Google" width={18} />
-            </span>
-            <span>Google</span>
+          <button
+            className={`googleLogin ${isGoogleLoading ? "googleLoginLoading" : ""}`}
+            type="button"
+            onClick={handleGoogleLogin}
+            disabled={isGoogleLoading}
+          >
+            {isGoogleLoading ? (
+              <span className="googleButtonLoader" aria-label="Loading"></span>
+            ) : (
+              <>
+                <span className="googleMark" aria-hidden="true">
+                  <img src="https://www.google.com/favicon.ico" alt="Google" width={18} />
+                </span>
+                <span>Google</span>
+              </>
+            )}
           </button>
 
           <div className="formRule"></div>
