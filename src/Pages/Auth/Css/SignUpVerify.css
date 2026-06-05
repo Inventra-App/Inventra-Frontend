@@ -150,6 +150,39 @@
   animation: slideIn 0.5s ease-out;
 }
 
+.verify-otp-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.verify-otp-input-error {
+  border-color: #ef4444 !important;
+}
+
+.verify-error-text {
+  color: #ef4444;
+  font-size: 0.85rem;
+  font-weight: 500;
+  text-align: left;
+  margin-top: 2px;
+}
+
+.verify-btn {
+  transition: opacity 0.2s ease, background-color 0.2s ease;
+}
+
+.verify-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.verify-resend-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 @keyframes slideIn {
   from {
     opacity: 0;

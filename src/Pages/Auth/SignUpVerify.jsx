@@ -1,5 +1,4 @@
-// Add 'Check' to your lucide-react imports at the top
-import React, { useState, useRef } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import { Shield, BarChart2, Users, Lock, CheckCircle, Clock, Check } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import logo from '../../assets/Inventra Logo.png'
@@ -9,8 +8,18 @@ const SignUpVerify = () => {
   const [otp, setOtp] = useState(['', '', '', '', '', ''])
   const [timeLeft, setTimeLeft] = useState(165)
   const [showPopup, setShowPopup] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [error, setError] = useState('')
   const inputRefs = useRef([])
   const navigate = useNavigate()
+
+  useEffect(() => {
+    if (timeLeft <= 0) return
+    const timer = setInterval(() => {
+      setTimeLeft((prev) => prev - 1)
+    }, 1000)
+    return () => clearInterval(timer)
+  }, [timeLeft])
 
   const formatTime = (seconds) => {
     const m = Math.floor(seconds / 60).toString().padStart(2, '0')
@@ -23,6 +32,9 @@ const SignUpVerify = () => {
     const newOtp = [...otp]
     newOtp[index] = value.slice(-1)
     setOtp(newOtp)
+    
+    if (error) setError('')
+
     if (value && index < 5) {
       inputRefs.current[index + 1].focus()
     }
@@ -39,11 +51,25 @@ const SignUpVerify = () => {
     if (!/^\d+$/.test(paste)) return
     const newOtp = paste.split('')
     setOtp([...newOtp, ...Array(6 - newOtp.length).fill('')])
-    inputRefs.current[Math.min(paste.length, 5)].focus()
+    if (error) setError('')
+    inputRefs.current[Math.min(paste.length - 1, 5)].focus()
   }
 
-  const handleVerify = () => {
+  const handleVerify = (e) => {
+    e.preventDefault()
+    
+    if (isSubmitting) return
+
+    const isOtpComplete = otp.every(digit => digit !== '')
+
+    if (!isOtpComplete) {
+      setError('Please fill in all 6 verification digits')
+      return
+    }
+
+    setIsSubmitting(true)
     setShowPopup(true)
+    
     setTimeout(() => {
       setShowPopup(false)
       navigate('/login')
@@ -97,36 +123,43 @@ const SignUpVerify = () => {
       <div className="verify-right">
         <div className="verify-right-top">
           <span>Didn't receive code?</span>
-          <button className="verify-resend-btn">Resend OTP</button>
+          <button className="verify-resend-btn" disabled={isSubmitting}>Resend OTP</button>
         </div>
 
         <div className="verify-form-wrapper">
           <h2>Verify Your Account</h2>
           <p>We've sent a 6-digit OTP to your email address <span className="verify-email">ao******@gmail.com</span></p>
 
-          <div className="verify-otp-group">
-            {otp.map((digit, index) => (
-              <input
-                key={index}
-                ref={(el) => (inputRefs.current[index] = el)}
-                type="text"
-                inputMode="numeric"
-                maxLength={1}
-                value={digit}
-                className="verify-otp-input"
-                onChange={(e) => handleOtpChange(index, e.target.value)}
-                onKeyDown={(e) => handleKeyDown(index, e)}
-                onPaste={handlePaste}
-              />
-            ))}
+          <div className="verify-otp-container">
+            <div className="verify-otp-group">
+              {otp.map((digit, index) => (
+                <input
+                  key={index}
+                  ref={(el) => (inputRefs.current[index] = el)}
+                  type="text"
+                  inputMode="numeric"
+                  maxLength={1}
+                  value={digit}
+                  className={`verify-otp-input ${error ? 'verify-otp-input-error' : ''}`}
+                  onChange={(e) => handleOtpChange(index, e.target.value)}
+                  onKeyDown={(e) => handleKeyDown(index, e)}
+                  onPaste={handlePaste}
+                />
+              ))}
+            </div>
+            {error && <span className="verify-error-text">{error}</span>}
           </div>
 
           <p className="verify-timer">
             OTP expires in <span className="verify-timer-count">{formatTime(timeLeft)}</span>
           </p>
 
-          <button className="verify-btn" onClick={handleVerify}>
-            Verify
+          <button 
+            className="verify-btn" 
+            onClick={handleVerify}
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? 'Verifying...' : 'Verify'}
           </button>
 
           <div className="verify-bottom-footer">
