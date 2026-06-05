@@ -1,56 +1,50 @@
-import React, { useMemo, useState } from 'react'
-import {
-  Trash2,} from 'lucide-react'
+import React, { useState } from 'react'
 import './Css/Sales.css'
 import calendar from '../../assets/calendar.png'
 import Container1 from '../../assets/Container (6).png'
 import Container2 from '../../assets/Container (7).png'
 import Container3 from '../../assets/Container (8).png'
 import Container4 from '../../assets/Button.png'
-const products = [
-  {
-    id: 1,
-    name: 'Fresh Milk',
-    price: 250,
-    quantity: 1,
-  },
-]
-
-const formatNaira = (amount) => `\u20a6${amount.toLocaleString('en-NG', {
-  minimumFractionDigits: 2,
-  maximumFractionDigits: 2,
-})}`
 
 const Sales = () => {
-  const [cartItems, setCartItems] = useState(products)
   const [selectedProduct, setSelectedProduct] = useState('')
+  const [quantity, setQuantity] = useState(1)
+  const [showCartItem, setShowCartItem] = useState(true)
 
-  const subtotal = useMemo(
-    () => cartItems.reduce((total, item) => total + item.price * item.quantity, 0),
-    [cartItems]
-  )
+  const productName = 'Fresh Milk'
+  const productPrice = 250
+  const subtotal = showCartItem ? productPrice * quantity : 0
+  const itemsInCart = showCartItem ? quantity : 0
 
-  const updateQuantity = (itemId, action) => {
-    setCartItems((items) =>
-      items.map((item) => {
-        if (item.id !== itemId) return item
-
-        const nextQuantity =
-          action === 'increase'
-            ? item.quantity + 1
-            : Math.max(1, item.quantity - 1)
-
-        return { ...item, quantity: nextQuantity }
-      })
-    )
+  const formatNaira = (amount) => {
+    return `\u20a6${amount.toLocaleString('en-NG', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })}`
   }
 
-  const removeCartItem = (itemId) => {
-    setCartItems((items) => items.filter((item) => item.id !== itemId))
+  const increaseQuantity = () => {
+    setQuantity(quantity + 1)
+  }
+
+  const reduceQuantity = () => {
+    if (quantity > 1) {
+      setQuantity(quantity - 1)
+    }
+  }
+
+  const addToCart = () => {
+    setShowCartItem(true)
+    setQuantity(1)
+    setSelectedProduct('')
+  }
+
+  const removeCartItem = () => {
+    setShowCartItem(false)
   }
 
   const clearCart = () => {
-    setCartItems([])
+    setShowCartItem(false)
   }
 
   return (
@@ -62,7 +56,7 @@ const Sales = () => {
         </div>
 
         <button className="sales-history-btn" type="button">
-         <img src={calendar} alt="" />
+          <img src={calendar} alt="" />
           <span>Show Order History</span>
         </button>
       </div>
@@ -80,7 +74,7 @@ const Sales = () => {
 
         <article className="sales-metric-card">
           <div className="sales-metric-icon sales-metric-blue">
-             <img src={Container2} alt="" />
+            <img src={Container2} alt="" />
           </div>
           <div>
             <p>Revenue Today</p>
@@ -94,7 +88,7 @@ const Sales = () => {
           </div>
           <div>
             <p>Items in Cart</p>
-            <strong>{cartItems.reduce((total, item) => total + item.quantity, 0)}</strong>
+            <strong>{itemsInCart}</strong>
           </div>
         </article>
       </section>
@@ -103,6 +97,7 @@ const Sales = () => {
         <div className="sales-left-column">
           <form className="sales-panel sales-product-form">
             <label htmlFor="product">Select Product</label>
+
             <div className="sales-product-row">
               <input
                 id="product"
@@ -111,7 +106,8 @@ const Sales = () => {
                 onChange={(event) => setSelectedProduct(event.target.value)}
                 aria-label="Select product"
               />
-              <button type="button" disabled={!selectedProduct.trim()}>
+
+              <button type="button" disabled={!selectedProduct.trim()} onClick={addToCart}>
                 Add to Cart
               </button>
             </div>
@@ -121,41 +117,38 @@ const Sales = () => {
             <h3>Cart Items</h3>
 
             <div className="sales-cart-list">
-              {cartItems.length === 0 ? (
+              {!showCartItem ? (
                 <p className="sales-empty-cart">No items in cart</p>
               ) : (
-                cartItems.map((item) => (
-                  <div className="sales-cart-item" key={item.id}>
-                    <div className="sales-cart-product">
-                      <strong>{item.name}</strong>
-                      <span>{formatNaira(item.price)} each</span>
-                    </div>
+                <div className="sales-cart-item">
+                  <div className="sales-cart-product">
+                    <strong>{productName}</strong>
+                    <span>{formatNaira(productPrice)} each</span>
+                  </div>
 
-                    <div className="sales-quantity-control" aria-label={`${item.name} quantity`}>
-                      <button
-                        type="button"
-                        aria-label="Reduce quantity"
-                        onClick={() => updateQuantity(item.id, 'decrease')}>-</button>
-                      <span>{item.quantity}</span>
-                      <button
-                        type="button"
-                        aria-label="Increase quantity"
-                        onClick={() => updateQuantity(item.id, 'increase')}>+</button>
-                    </div>
-
-                    <strong className="sales-item-total">
-                      {formatNaira(item.price * item.quantity)}
-                    </strong>
-
-                    <button
-                      className="sales-remove-item"
-                      type="button"
-                      aria-label={`Remove ${item.name}`}
-                      onClick={() => removeCartItem(item.id)}
-                    ><img src={Container4} alt="" />
+                  <div className="sales-quantity-control" aria-label={`${productName} quantity`}>
+                    <button type="button" aria-label="Reduce quantity" onClick={reduceQuantity}>
+                      -
+                    </button>
+                    <span>{quantity}</span>
+                    <button type="button" aria-label="Increase quantity" onClick={increaseQuantity}>
+                      +
                     </button>
                   </div>
-                ))
+
+                  <strong className="sales-item-total">
+                    {formatNaira(productPrice * quantity)}
+                  </strong>
+
+                  <button
+                    className="sales-remove-item"
+                    type="button"
+                    aria-label={`Remove ${productName}`}
+                    onClick={removeCartItem}
+                  >
+                    <img src={Container4} alt="" />
+                  </button>
+                </div>
               )}
             </div>
           </div>
@@ -169,9 +162,10 @@ const Sales = () => {
               <span>Subtotal</span>
               <strong>{formatNaira(subtotal)}</strong>
             </div>
+
             <div>
               <span>Items</span>
-              <strong>{cartItems.reduce((total, item) => total + item.quantity, 0)}</strong>
+              <strong>{itemsInCart}</strong>
             </div>
           </div>
 
@@ -180,9 +174,10 @@ const Sales = () => {
             <strong>{formatNaira(subtotal)}</strong>
           </div>
 
-          <button className="sales-complete-btn" type="button" disabled={!cartItems.length}>
+          <button className="sales-complete-btn" type="button" disabled={!showCartItem}>
             Complete Sale
           </button>
+
           <button className="sales-clear-btn" type="button" onClick={clearCart}>
             Clear Cart
           </button>

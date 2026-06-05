@@ -1,0 +1,408 @@
+.user-page {
+  width: min(100%, 1180px);
+  margin: 50px auto 0;
+  padding: 38px 32px;
+  color: #111827;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.user-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+  margin-bottom: 28px;
+}
+
+.user-top h2 {
+  font-size: 24px;
+  font-weight: 700;
+  margin: 0 0 8px;
+  color: #101828;
+}
+
+.user-top p {
+  color: #4A5565;
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.onboard-btn {
+  height: 50px;
+  padding: 0 22px;
+  border: none;
+  border-radius: 8px;
+  background: #4f35f5;
+  color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.logged-card {
+  background: #0f172a;
+  color: white;
+  border-radius: 12px;
+  padding: 30px 24px;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  box-shadow: 0 12px 22px rgba(15, 23, 42, 0.18);
+  margin-bottom: 24px;
+}
+
+.logged-avatar {
+  width: 66px;
+  height: 66px;
+  border-radius: 50%;
+  background: white;
+  color: black;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.logged-card p {
+  color: #FFFFFF;
+  font-size: 14px;
+  font-weight: 400;
+  margin: 0 0 6px;
+}
+
+.logged-card h3 {
+  color: #FFFFFF;
+  font-size: 24px;
+  font-weight: 700;
+  margin: 0 0 7px;
+}
+
+.logged-card span {
+  color: #FFFFFF;
+  font-size: 14px;
+  font-weight: 400;
+}
+
+.user-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.user-stat-card {
+  min-height: 104px;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 24px 26px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  box-shadow: 0 1px 5px rgba(15, 23, 42, 0.12);
+}
+
+.user-stat-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.user-stat-icon.violet {
+  background: #f2dcff;
+  color: #8a18ff;
+}
+
+.user-stat-card p {
+  color: #4A5565;
+  font-size: 14px;
+  font-weight: 400;
+  margin: 0 0 5px;
+}
+
+.user-stat-card h3 {
+  color: #101828;
+  font-size: 24px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.staff-card,
+.permission-card {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  box-shadow: 0 1px 5px rgba(15, 23, 42, 0.1);
+}
+
+.staff-card {
+  margin-bottom: 24px;
+  overflow: hidden;
+}
+
+.staff-card h3,
+.permission-card h3 {
+  font-size: 18px;
+  color: #101828;
+  font-weight: 600;
+  margin: 0;
+}
+
+.staff-card h3 {
+  padding: 28px 26px;
+}
+
+.staff-table {
+  width: 100%;
+}
+
+.table-head,
+.table-row {
+  display: grid;
+  grid-template-columns: 2.2fr 0.9fr 0.9fr 0.75fr 0.9fr;
+  align-items: center;
+  column-gap: 20px;
+  padding: 0 26px;
+}
+
+.table-head {
+  height: 50px;
+  background: #f8fafc;
+  border-top: 1px solid #eef2f7;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.table-head span {
+  font-size: 12px;
+  color: #4A5565;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.table-row {
+  min-height: 74px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.table-row:last-child {
+  border-bottom: none;
+}
+
+.staff-user {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.staff-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #dfe6ff;
+  color: #4f35f5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+
+.staff-user strong {
+  display: block;
+  color: #101828;
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 3px;
+}
+
+.staff-user p,
+.username-text {
+  color: #6A7282;
+  font-size: 12px;
+  font-weight: 400;
+  margin: 0;
+}
+
+.role-pill {
+  width: fit-content;
+  padding: 7px 14px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.role-pill.admin {
+  background: #f2dcff;
+  border: 1px solid #e5c6ff;
+  color: #8a18ff;
+}
+
+.role-pill.manager {
+  background: #dceaff;
+  border: 1px solid #a9d0ff;
+  color: #1769ff;
+}
+
+.role-pill.cashier {
+  background: #d8fae5;
+  border: 1px solid #9cf0bb;
+  color: #008f3a;
+}
+
+.role-pill.staff {
+  background: #f3f4f6;
+  border: 1px solid #d1d5db;
+  color: #374151;
+}
+
+.status-text {
+  color: #334155;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 14px;
+  font-weight: 400;
+}
+
+.status-text span {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #12c76a;
+}
+
+.you-text {
+  color: #371cff;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.details-btn {
+  width: fit-content;
+  border: none;
+  border-radius: 10px;
+  background: #eef2ff;
+  color: #371cff;
+  padding: 8px 13px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.permission-card {
+  padding: 28px 26px;
+}
+
+.permission-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.permission-box {
+  border-radius: 8px;
+  padding: 20px 18px;
+  border: 2px solid;
+}
+
+.permission-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.permission-title h4 {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.permission-box p {
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.45;
+  margin: 0;
+}
+
+.permission-box.admin {
+  background: #fbf5ff;
+  border-color: #dfb8ff;
+  color: #8a18ff;
+}
+
+.permission-box.manager {
+  background: #eff6ff;
+  border-color: #a9d0ff;
+  color: #155dfc;
+}
+
+.permission-box.cashier {
+  background: #effdf4;
+  border-color: #9cf0bb;
+  color: #008f3a;
+}
+
+.permission-box.staff {
+  background: #f8fafc;
+  border-color: #d8dde6;
+  color: #334155;
+}
+
+@media (max-width: 1000px) {
+  .user-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .staff-table {
+    overflow-x: auto;
+  }
+
+  .table-head,
+  .table-row {
+    min-width: 900px;
+  }
+}
+
+@media (max-width: 768px) {
+  .user-page {
+    margin-top: 70px;
+    padding: 24px 18px;
+  }
+
+  .user-top {
+    flex-direction: column;
+  }
+
+  .onboard-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .logged-card {
+    align-items: flex-start;
+  }
+
+  .permission-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 520px) {
+  .user-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .logged-card {
+    flex-direction: column;
+  }
+}
