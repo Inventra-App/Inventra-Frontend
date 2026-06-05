@@ -56,56 +56,85 @@
 
 .aboutImg {
   width: min(100%, 700px);
-  height: 290px;
+  height: 320px;
   position: relative;
   overflow: hidden;
   border-radius: 20px;
+  background-color: transparent;
 }
 
-.imagePair {
+.slide-img {
   position: absolute;
-  inset: 0;
-  transition: opacity 0.8s ease, transform 0.8s ease;
-}
-
-.show {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-.hide {
-  opacity: 0;
-  transform: translateY(50px);
-  pointer-events: none;
-}
-
-.bigImg,
-.smallImg {
   object-fit: cover;
-  border-radius: 20px;
-  transition: transform 0.3s ease;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transition: transform 2.5s ease-in-out, opacity 2.5s ease-in-out;
 }
 
-.bigImg {
-  width: 75%;
-  height: 100%;
+.first-img {
+  width: 70%;
+  height: 85%;
+  left: 0;
+  top: 10px;
+  z-index: 2;
+  transform: translateX(0);
+  opacity: 1;
 }
 
-.smallImg {
-  width: 45%;
-  height: 250px;
-  position: absolute;
-  top: 40px;
+.second-img {
+  width: 42%;
+  height: 70%;
   right: 0;
+  top: 45px;
   border: 4px solid white;
+  z-index: 4;
+  transform: translateX(0);
+  opacity: 1;
 }
 
-.aboutImg:hover .bigImg {
-  transform: scale(1.03);
+.third-img {
+  width: 42%;
+  height: 70%;
+  left: 0;
+  top: 45px;
+  border: 4px solid white;
+  z-index: 3;
+  transform: translateX(-60%);
+  opacity: 0;
 }
 
-.aboutImg:hover .smallImg {
-  transform: scale(1.08);
+.fourth-img {
+  width: 70%;
+  height: 85%;
+  right: 0;
+  top: 10px;
+  z-index: 1;
+  transform: translateX(60%);
+  opacity: 0;
+}
+
+.aboutImg.is-hovered .first-img {
+  transform: translateX(25%);
+  opacity: 0;
+  transition: transform 1.6s ease-in-out, opacity 0.1s linear 1s;
+}
+
+.aboutImg.is-hovered .second-img {
+  transform: translateX(-45%);
+  opacity: 0;
+  transition: transform 1.6s ease-in-out, opacity 0.1s linear 1s;
+}
+
+.aboutImg.is-hovered .third-img {
+  transform: translateX(0);
+  opacity: 1;
+  transition: transform 2.8s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.1s linear 1s;
+}
+
+.aboutImg.is-hovered .fourth-img {
+  transform: translateX(0);
+  opacity: 1;
+  transition: transform 2.8s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.1s linear 1s;
 }
 
 .ourstory {
@@ -342,7 +371,7 @@
 
 .customerReviewText2h5 {
   margin: 0;
-  font-weight: 500;
+  font-weight: 550;
   font-size: clamp(26px, 3vw, 32px);
   line-height: 1.1;
   color: #000000;
@@ -407,7 +436,6 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
-  /* background-color: #14377e; */
   padding-top: 10px;
   padding-right: 10px;
   padding-bottom: 10px;
@@ -526,9 +554,26 @@
     height: 260px;
   }
 
-  .smallImg {
-    height: 190px;
-    top: 62px;
+  .first-img {
+    width: 70%;
+    height: 85%;
+  }
+
+  .second-img {
+    width: 42%;
+    height: 70%;
+    top: 45px;
+  }
+
+  .third-img {
+    width: 42%;
+    height: 70%;
+    top: 45px;
+  }
+
+  .fourth-img {
+    width: 70%;
+    height: 85%;
   }
 
   .ourstory {
@@ -676,15 +721,28 @@
     height: 220px;
   }
 
-  .bigImg {
-    width: 82%;
+  .first-img {
+    width: 70%;
+    height: 85%;
   }
 
-  .smallImg {
-    width: 48%;
-    height: 150px;
-    top: 70px;
+  .second-img {
+    width: 42%;
+    height: 70%;
+    top: 45px;
     border-width: 3px;
+  }
+
+  .third-img {
+    width: 42%;
+    height: 70%;
+    top: 45px;
+    border-width: 3px;
+  }
+
+  .fourth-img {
+    width: 70%;
+    height: 85%;
   }
 
   .story-text {
