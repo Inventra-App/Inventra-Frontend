@@ -21,10 +21,21 @@ const Login = () => {
   const handleLoginSubmit = (event) => {
     event.preventDefault();
     setIsLoggingIn(true);
+    setTimeout(() => {
+      nav("/dashboard");
+    }, 700);
   };
 
   const handleGoogleLogin = () => {
     setIsGoogleLoading(true);
+
+    setTimeout(() => {
+      setIsLoggingIn(true);
+    }, 1200);
+
+    setTimeout(() => {
+      nav("/dashboard");
+    }, 3000);
   };
 
   if (isLoggingIn) {
@@ -156,7 +167,6 @@ const Login = () => {
           </div>
 
           <button className="loginSubmit" type="submit" disabled={isLoggingIn}>
-          <button className="loginSubmit" type="submit" onClick={() => nav("/dashboard")}>
             Login
           </button>
 
