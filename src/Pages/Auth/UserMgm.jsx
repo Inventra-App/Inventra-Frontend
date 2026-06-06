@@ -7,6 +7,8 @@ import Icon3 from '../../assets/Icon (0).png'
 import Icon4 from '../../assets/Icon (6).png'
 import Icon5 from '../../assets/Icon (7).png'
 import manage from '../../assets/manage-roles-icon.png'
+import green from '../../assets/Icon green.png'
+import gray from '../../assets/Icon gray.png'
 
 const UserMgm = () => {
   return (
@@ -204,7 +206,7 @@ const UserMgm = () => {
 
           <div className="permission-box cashier">
             <div className="permission-title">
-           <img src={Icon4} alt="" className='icon4'/>
+           <img src={green} alt="" className='icon4'/>
               <h4>Cashier</h4>
             </div>
             <p>Can process sales, view inventory, and access sales history.</p>
@@ -212,7 +214,7 @@ const UserMgm = () => {
 
           <div className="permission-box staff">
             <div className="permission-title">
-              <img src={Icon2} alt="" />
+              <img src={gray} alt="" />
               <h4>Staff</h4>
             </div>
             <p>Can add products, receive goods, and update inventory levels.</p>

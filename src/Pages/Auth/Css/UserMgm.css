@@ -54,14 +54,23 @@
 }
 
 .manage-roles-icon {
-  font-size: 21px;
-  line-height: 1;
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+  flex-shrink: 0;
 }
 
 .onboard-btn {
   border: none;
   background: #4f35f5;
   color: #FFFFFF;
+}
+
+.onboard-btn img {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+  flex-shrink: 0;
 }
 
 .logged-card {
@@ -86,6 +95,12 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+}
+
+.logged-avatar img {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
 }
 
 .logged-card p {
@@ -137,9 +152,27 @@
   flex-shrink: 0;
 }
 
+.user-stat-icon img {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+}
+
+.user-stat-icon.purple {
+  background: #ede9fe;
+}
+
 .user-stat-icon.violet {
   background: #f2dcff;
   color: #8a18ff;
+}
+
+.user-stat-icon.blue {
+  background: #dbeafe;
+}
+
+.user-stat-icon.green {
+  background: #dcfce7;
 }
 
 .user-stat-card p {
@@ -340,6 +373,13 @@
   align-items: center;
   gap: 10px;
   margin-bottom: 10px;
+}
+
+.permission-title img {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+  flex-shrink: 0;
 }
 
 .permission-title h4 {
