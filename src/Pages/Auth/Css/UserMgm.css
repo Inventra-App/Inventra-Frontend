@@ -28,19 +28,40 @@
   margin: 0;
 }
 
+.user-top-actions {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.manage-roles-btn,
 .onboard-btn {
   height: 50px;
   padding: 0 22px;
-  border: none;
   border-radius: 8px;
-  background: #4f35f5;
-  color: #FFFFFF;
   display: flex;
   align-items: center;
   gap: 8px;
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
+}
+
+.manage-roles-btn {
+  border: 2px solid #d1d5db;
+  background: #ffffff;
+  color: #111827;
+}
+
+.manage-roles-icon {
+  font-size: 21px;
+  line-height: 1;
+}
+
+.onboard-btn {
+  border: none;
+  background: #4f35f5;
+  color: #FFFFFF;
 }
 
 .logged-card {
@@ -383,6 +404,13 @@
     flex-direction: column;
   }
 
+  .user-top-actions {
+    width: 100%;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .manage-roles-btn,
   .onboard-btn {
     width: 100%;
     justify-content: center;

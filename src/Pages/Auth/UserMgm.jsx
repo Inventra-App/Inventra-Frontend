@@ -3,9 +3,10 @@ import './Css/UserMgm.css'
 import Icon1 from '../../assets/Icon (10).png'
 import Icon2 from '../../assets/Icon (11).png'
 import Vector from '../../assets/Vector (2).png'
-import Icon3 from '../../assets/Icon (8).png'
+import Icon3 from '../../assets/Icon (0).png'
 import Icon4 from '../../assets/Icon (6).png'
 import Icon5 from '../../assets/Icon (7).png'
+import manage from '../../assets/manage-roles-icon.png'
 
 const UserMgm = () => {
   return (
@@ -16,10 +17,17 @@ const UserMgm = () => {
           <p>Manage staff accounts and access levels</p>
         </div>
 
-        <button className="onboard-btn" type="button">
-          <img src={Icon1} alt="" />
-          <span>Onboard Staff</span>
-        </button>
+        <div className="user-top-actions">
+          <button className="manage-roles-btn" type="button">
+           <img src={manage} alt=""  className='manage-roles-icon'/>
+            <span>Manage Roles</span>
+          </button>
+
+          <button className="onboard-btn" type="button">
+            <img src={Icon1} alt="" />
+            <span>Onboard Staff</span>
+          </button>
+        </div>
       </div>
 
       <section className="logged-card">

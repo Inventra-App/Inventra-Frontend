@@ -312,14 +312,67 @@
   color: #3a3a3a;
 }
 
-.customerFeedbackImg {
-  display: block;
+.customerFeedback {
   width: 100%;
-  height: clamp(220px, 34vw, 458px);
+  min-height: 458px;
+  padding: 111px 48px;
   border-radius: 20px;
-  padding: 32px;
-  object-fit: cover;
   background-color: #f3f4f6;
+}
+
+.customerFeedback-title {
+  margin: 0 0 42px;
+  color: #111827;
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 1.2;
+  text-align: center;
+}
+
+.customerFeedback-list {
+  width: min(100%, 882px);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  column-gap: 86px;
+  row-gap: 27px;
+}
+
+.customerFeedback-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 15px;
+}
+
+.customerFeedback-icon {
+  width: 41px;
+  height: 39px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9px;
+  background-color: #dcfce7;
+  color: #00b050;
+  font-size: 29px;
+  font-weight: 400;
+  line-height: 1;
+}
+
+.customerFeedback-item h4 {
+  margin: 3px 0 8px;
+  color: #111827;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.customerFeedback-item p {
+  margin: 0;
+  color: #4b5563;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.45;
 }
 
 .customerReview {
@@ -482,11 +535,150 @@
 }
 
 .team {
-  display: block;
+  position: relative;
   width: 100%;
-  height: auto;
-  max-height: 1304px;
-  object-fit: cover;
+  background-color: #e6e8ed;
+  overflow: hidden;
+}
+
+.team-container {
+  position: relative;
+  width: 100%;
+  padding-bottom: 92px;
+  background-color: #e6e8ed;
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.team-container::before,
+.team-container::after {
+  content: "";
+  position: absolute;
+  width: 178px;
+  height: 178px;
+  border-radius: 50%;
+  background-color: #432DD7;
+  z-index: 0;
+}
+
+.team-container::before {
+  left: -26px;
+  bottom: -66px;
+}
+
+.team-container::after {
+  right: -88px;
+  top: 60%;
+}
+
+.team-header {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 327px;
+  border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  background-color: #432DD7;
+}
+
+.team-text {
+  width: 30%;
+  height: 100px;
+  display: flex;
+  flex-direction: column;
+  align-self: center;
+  margin-top: 50px;
+}
+
+.teamh3 {
+  width: 277px;
+  height: 78px;
+  display: flex;
+  margin-left: 60px;
+  gap: 10px;
+  padding: 10px;
+}
+
+.teamh3-content {
+  width: 257px;
+  height: 58px;
+  color: #FFFFFF;
+  font-weight: 700;
+  font-style: Bold;
+  font-size: 48px;
+  line-height: 100%;
+  text-align: center;
+  letter-spacing: 0px;
+  vertical-align: middle;
+}
+
+.teamp {
+  width: 279px;
+  height: 19px;
+  margin-left: 65px;
+  font-weight: 500;
+  font-style: Medium;
+  text-align: center;
+  font-size: 16px;
+  line-height: 100%;
+  letter-spacing: 0px;
+  vertical-align: middle;
+  color: #FFFFFF;
+}
+
+.teamMember-container {
+  position: relative;
+  z-index: 1;
+  width: min(100%, 1213px);
+  margin: -59px auto 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 68px 35px;
+}
+
+.team-row {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  gap: 35px;
+}
+
+.team-row-bottom {
+  justify-content: center;
+}
+
+.team-member-card {
+  width: 277px;
+  height: 438px;
+  padding: 25px 23px 24px;
+  text-align: center;
+  background-color: #ffffff;
+  border-radius: 8px;
+}
+
+.team-member-img {
+  width: 100%;
+  height: 305px;
+  border-radius: 7px;
+  object-fit: fill;
+  display: block;
+}
+
+.team-member-card h4 {
+  margin: 25px 0 0;
+  color: #000000;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 100%;
+}
+
+.team-member-card p {
+  margin: 4px 0 0;
+  color: #000000;
+  font-size: 14px;
+  line-height: 100%;
 }
 
 @media (max-width: 1024px) {
@@ -515,6 +707,25 @@
 
   .acoma {
     gap: 48px;
+  }
+
+  .team-text {
+    width: 100%;
+    align-items: center;
+  }
+
+  .teamh3,
+  .teamp {
+    margin-left: 0;
+  }
+
+  .teamMember-container {
+    gap: 32px;
+  }
+
+  .team-row {
+    flex-wrap: wrap;
+    gap: 32px;
   }
 }
 
@@ -622,18 +833,22 @@
     border-radius: 3px;
   }
 
-  .customerFeedbackImg {
-    height: 300px;
-    padding: 20px;
-    border-radius: 14px;
+  .customerFeedback {
+    min-height: auto;
+    padding: 64px 24px;
+  }
+
+  .customerFeedback-list {
+    column-gap: 32px;
   }
 
   .customerReview {
     height: auto;
     min-height: auto;
     flex-direction: column;
-    gap: 8px;
-    padding: 48px 24px;
+    gap: 18px;
+    padding: 32px 16px 24px;
+    border-radius: 0;
   }
 
   .customerReview-container,
@@ -644,19 +859,35 @@
   }
 
   .customerReviewText {
-    flex-direction: row;
-    align-items: center;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    margin-left: 0;
   }
 
   .customerReviewText1 {
-    width: 90px;
-    height: 90px;
+    width: 35px;
+    height: 24px;
     flex-shrink: 0;
   }
 
   .ear {
-    width: 78px;
-    height: 90px;
+    width: 35px;
+    height: 24px;
+    margin-left: 0;
+    object-fit: contain;
+    object-position: left center;
+  }
+
+  .customerReviewText2 {
+    padding: 0;
+  }
+
+  .customerReviewText2h5 {
+    width: 100%;
+    max-width: 145px;
+    font-size: 20px;
+    line-height: 1.08;
   }
 
   .reviews-container {
@@ -664,7 +895,7 @@
     height: auto;
     margin-top: 0;
     margin-left: 0;
-    padding-top: 16px;
+    padding-top: 0;
     align-items: stretch;
   }
 
@@ -674,8 +905,9 @@
   }
 
   .review-card {
-    width: min(86vw, 380px);
-    min-width: min(86vw, 380px);
+    width: 100%;
+    min-width: 100%;
+    padding: 0;
   }
 
   .review-content,
@@ -688,13 +920,61 @@
   }
 
   .reviewer-name {
-    font-size: 15px;
-    line-height: 1.45;
+    font-size: 11px;
+    line-height: 1.6;
   }
 
   .reviewer-name2 {
     margin-top: 0;
+    font-size: 11px;
     line-height: 1.3;
+  }
+
+  .review-content {
+    min-height: 184px;
+    padding: 18px 12px 20px;
+  }
+
+  .reviewer-info {
+    padding: 0;
+  }
+
+  .star {
+    width: 70px;
+    height: auto;
+    margin-top: 18px;
+  }
+
+  .reviewer-info2 {
+    align-items: center;
+    margin-top: 10px;
+    gap: 8px;
+  }
+
+  .anto {
+    width: 34px;
+    height: 34px;
+  }
+
+  .team-container::before,
+  .team-container::after {
+    display: none;
+  }
+
+  .team-header {
+    height: 260px;
+  }
+
+  .teamh3 {
+    justify-content: center;
+  }
+
+  .teamh3-content {
+    font-size: 38px;
+  }
+
+  .teamMember-container {
+    margin-top: -42px;
   }
 }
 
@@ -775,15 +1055,32 @@
     line-height: 1.25;
   }
 
-  .customerFeedbackImg {
-    height: 220px;
-    padding: 12px;
+  .customerFeedback {
+    padding: 48px 16px;
     border-radius: 10px;
+  }
+
+  .customerFeedback-title {
+    margin-bottom: 28px;
+    font-size: 22px;
+  }
+
+  .customerFeedback-list {
+    grid-template-columns: 1fr;
+    row-gap: 22px;
+  }
+
+  .customerFeedback-item h4 {
+    font-size: 16px;
+  }
+
+  .customerFeedback-item p {
+    font-size: 13px;
   }
 
   .customerReviewText {
     align-items: flex-start;
-    gap: 12px;
+    gap: 8px;
   }
 
   .customerReviewText2 {
@@ -791,21 +1088,88 @@
   }
 
   .customerReviewText2h5 {
-    font-size: 24px;
+    width: 100%;
+    max-width: 145px;
+    font-size: 20px;
+    line-height: 1.08;
   }
 
   .review-card {
-    width: 86vw;
-    min-width: 86vw;
+    width: 100%;
+    min-width: 100%;
     padding: 0;
   }
 
   .review-content {
-    min-height: 240px;
-    padding: 22px 12px 26px;
+    min-height: 184px;
+    padding: 18px 12px 20px;
   }
 
   .team {
     min-height: 360px;
+  }
+
+  .team-container {
+    padding-bottom: 56px;
+  }
+
+  .team-container::before,
+  .team-container::after {
+    display: none;
+  }
+
+  .team-header {
+    height: 230px;
+  }
+
+  .team-text {
+    margin-top: 45px;
+  }
+
+  .teamh3 {
+    width: 100%;
+    height: auto;
+    padding: 0;
+  }
+
+  .teamh3-content {
+    width: 100%;
+    height: auto;
+    font-size: 34px;
+  }
+
+  .teamp {
+    width: 100%;
+    font-size: 14px;
+  }
+
+  .teamMember-container {
+    width: 100%;
+    padding: 0 16px;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+  }
+
+  .team-member-card {
+    width: 100%;
+    height: auto;
+    max-width: none;
+    padding: 10px;
+  }
+
+  .team-member-img {
+    height: clamp(170px, 45vw, 230px);
+  }
+
+  .team-member-card h4 {
+    margin-top: 14px;
+    font-size: 13px;
+    line-height: 1.2;
+  }
+
+  .team-member-card p {
+    font-size: 12px;
+    line-height: 1.2;
   }
 }
