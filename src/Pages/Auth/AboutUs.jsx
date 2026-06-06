@@ -3,15 +3,24 @@ import Footer from '../../Components/Footer';
 import './Css/AboutUs.css';
 import Header from '../../Components/Header';
 import about from "../../assets/about.png";
-import team from "../../assets/team.png";
-import ourmission from "../../assets/about 3.jpg";
-import ourvission from "../../assets/about 4.jpg";
+import ourmission from "../../assets/OUR MISSION.png";
+import ourvission from "../../assets/OUR VISION.png";
+import abouts from "../../assets/about 3.jpg";
+import ourabout from "../../assets/about 4.jpg";
 import amico from "../../assets/amico.png";
-import customerFeedback from "../../assets/customerFeedback.png";
 import ear from "../../assets/Ear.png";
 import star from "../../assets/Star.png";
 import anto from "../../assets/about 1.jpg";
 import Ellipse from "../../assets/about 2.jpg";
+import azubuike from "../../assets/Azu.png";
+import jane from "../../assets/jane.png";
+import vincent from "../../assets/vincent.png";
+import john from "../../assets/john.png";
+import nnaemeka from "../../assets/nana.png";
+import anthony from "../../assets/Anthony.png";
+import destiny from "../../assets/destiny.png";
+import { motion } from "framer-motion";
+
 
 const AboutUs = () => {
   const [hovered, setHovered] = useState(false);
@@ -67,8 +76,8 @@ const AboutUs = () => {
         >
           <img src={images.first} alt="" className='slide-img first-img' />
           <img src={images.second} alt="" className='slide-img second-img' />
-          <img src={images.third} alt="" className='slide-img third-img' />
-          <img src={images.fourth} alt="" className='slide-img fourth-img' />
+          <img src={abouts} alt="" className='slide-img third-img' />
+          <img src={ourabout} alt="" className='slide-img fourth-img' />
         </div>
       </section>
 
@@ -140,7 +149,41 @@ const AboutUs = () => {
       </section>
 
       <section className='customerFeedback'>
-        <img src={customerFeedback} alt="" className='customerFeedbackImg'/>
+        <h3 className='customerFeedback-title'>Why Choose Our System?</h3>
+
+        <div className='customerFeedback-list'>
+          <div className='customerFeedback-item'>
+            <div className='customerFeedback-icon'>✓</div>
+            <div>
+              <h4>Reduce Product Waste</h4>
+              <p>Prevent losses from expired products with automatic expiry tracking and alerts</p>
+            </div>
+          </div>
+
+          <div className='customerFeedback-item'>
+            <div className='customerFeedback-icon'>✓</div>
+            <div>
+              <h4>Improve Accuracy</h4>
+              <p>Real-time inventory updates ensure you always know exact stock levels</p>
+            </div>
+          </div>
+
+          <div className='customerFeedback-item'>
+            <div className='customerFeedback-icon'>✓</div>
+            <div>
+              <h4>Staff Accountability</h4>
+              <p>Complete activity logging tracks who did what and when for full transparency</p>
+            </div>
+          </div>
+
+          <div className='customerFeedback-item'>
+            <div className='customerFeedback-icon'>✓</div>
+            <div>
+              <h4>Easy to Use</h4>
+              <p>Intuitive interface requires minimal training for your team</p>
+            </div>
+          </div>
+        </div>
       </section>
 
       <section className='customerReview'>
@@ -242,8 +285,58 @@ const AboutUs = () => {
         </div>
       </section>
 
-      <section>
-        <img src={team} alt="" className='team'/>
+      <section className='team'>
+        <article className='team-container'>
+          <header className='team-header'>
+            <div className='team-text'>
+            <h3 className='teamh3'> <p className='teamh3-content'>OUR Team</p></h3>
+            <p className='teamp'>Meet the brains behind the products</p>
+            </div>
+          </header>
+          <div className='teamMember-container'>
+            <div className='team-member-card'>
+              <img src={azubuike} alt="Azubuike Chibuzor Johnson" className='team-member-img' />
+              <h4>Azubuike Chibuzor Johnson</h4>
+              <p>Team lead & Product Designer</p>
+            </div>
+
+            <div className='team-member-card'>
+              <img src={jane} alt="Jane Onyekere" className='team-member-img' />
+              <h4>Jane Onyekere</h4>
+              <p>Backend Developer</p>
+            </div>
+
+            <div className='team-member-card'>
+              <img src={vincent} alt="Vincent Michael" className='team-member-img' />
+              <h4>Vincent Michael</h4>
+              <p>Frontend Developer</p>
+            </div>
+
+            <div className='team-member-card'>
+              <img src={john} alt="John Emmanuel" className='team-member-img' />
+              <h4>John Emmanuel</h4>
+              <p>Frontend Developer</p>
+            </div>
+
+            <div className='team-member-card'>
+              <img src={nnaemeka} alt="Nnaemeka Noble" className='team-member-img' />
+              <h4>Nnaemeka Noble</h4>
+              <p>Backend Developer</p>
+            </div>
+
+            <div className='team-member-card'>
+              <img src={anthony} alt="Anthony Onyema" className='team-member-img' />
+              <h4>Anthony Onyema</h4>
+              <p>Frontend Developer</p>
+            </div>
+
+            <div className='team-member-card'>
+              <img src={destiny} alt="Okpoziakpo destiny" className='team-member-img' />
+              <h4>Okpoziakpo destiny</h4>
+              <p>Product Designer</p>
+            </div>
+          </div>
+        </article>
       </section>
       <Footer/>
     </div>

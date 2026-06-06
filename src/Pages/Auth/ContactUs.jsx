@@ -1,11 +1,45 @@
-import React from 'react'
+import React, { useState } from 'react'
 import './Css/ContactUs.css'
 import Header from '../../Components/Header'
 import Footer from "../../Components/Footer"
-import email from "../../assets/Email.png"
 import  phone from "../../assets/phone.png"
 
 const ContactUs = () => {
+  const [firstName, setFirstName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [message, setMessage] = useState("");
+  const [agreed, setAgreed] = useState(false);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    if (!firstName || !email || !phoneNumber || !message) {
+      alert("Please fill all fields");
+      return;
+    }
+
+    const emailRegex = /\S+@\S+\.\S+/;
+
+    if (!emailRegex.test(email)) {
+      alert("Enter a valid email");
+      return;
+    }
+
+    if (!agreed) {
+      alert("You must agree to the privacy policy");
+      return;
+    }
+
+    alert("Message sent successfully");
+
+    setFirstName("");
+    setEmail("");
+    setPhoneNumber("");
+    setMessage("");
+    setAgreed(false);
+  };
+
   return (
     <div>
       <Header/>
@@ -17,28 +51,56 @@ const ContactUs = () => {
 need support, our team is ready to assist you </p>
           </div>
 
-          <form className='contact-form'>
+          <form className='contact-form' onSubmit={handleSubmit}>
             <label className='contact-field'>
               <span>First Name</span>
-              <input type='text' placeholder='Chibuzor' />
+              <input
+                type='text'
+                placeholder='Chibuzor'
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+              />
             </label>
 
             <label className='contact-field'>
               <span>Email</span>
-              <input type='email' placeholder='you@company.com' />
+              <input
+                type='email'
+                placeholder='you@company.com'
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
             </label>
 
             <label className='contact-field'>
               <span>Phone Number</span>
-              <input type='tel' placeholder='+234' />
+              <input
+                type='tel'
+                placeholder='+234'
+                value={phoneNumber}
+                onChange={(e) => setPhoneNumber(e.target.value)}
+              />
             </label>
 
             <label className='contact-field'>
               <span>Message</span>
-              <textarea placeholder='Leave us a message...'></textarea>
+              <textarea
+                placeholder='Leave us a message...'
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+              ></textarea>
             </label>
 
-            <button type='submit' className='contact-submit'>Send Message</button>
+            <label className='privacy-check'>
+              <input
+                type='checkbox'
+                checked={agreed}
+                onChange={(e) => setAgreed(e.target.checked)}
+              />
+              <span>i agree with your friendly <u>privacy policy</u></span>
+            </label>
+
+            <button type='submit' className='contact-submit'>Send message</button>
           </form>
 
           <section className='contact-info'>
@@ -80,7 +142,57 @@ need support, our team is ready to assist you </p>
                 </div>
               </div>
             </div>
-            <img src={email} alt="" className='content-left'/>
+            <form className='content-left contact-side-form' onSubmit={handleSubmit}>
+              <label className='contact-field'>
+                <span>First Name</span>
+                <input
+                  type='text'
+                  placeholder='Chibuzor'
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                />
+              </label>
+
+              <label className='contact-field'>
+                <span>Email</span>
+                <input
+                  type='email'
+                  placeholder='you@company.com'
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
+              </label>
+
+              <label className='contact-field'>
+                <span>Phone Number</span>
+                <input
+                  type='tel'
+                  placeholder='+234'
+                  value={phoneNumber}
+                  onChange={(e) => setPhoneNumber(e.target.value)}
+                />
+              </label>
+
+              <label className='contact-field'>
+                <span>Message</span>
+                <textarea
+                  placeholder='Leave us a message...'
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                ></textarea>
+              </label>
+
+              <label className='privacy-check'>
+                <input
+                  type='checkbox'
+                  checked={agreed}
+                  onChange={(e) => setAgreed(e.target.checked)}
+                />
+                <span>i agree with your friendly <u>privacy policy</u></span>
+              </label>
+
+              <button type='submit' className='contact-submit'>Send message</button>
+            </form>
           </div>
         </article>
 
