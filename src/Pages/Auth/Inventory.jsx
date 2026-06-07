@@ -4,7 +4,10 @@ import './Css/Inventory.css'
 import ProductDetailsModal from '../../Components/ProductDetailsModal'
 import ManageStockModal from '../../Components/ManageStockModal'
 
-const products = [
+const ITEMS_PER_PAGE = 6
+const tabs = ['All Products', 'Stock Entry', 'Low Stock', 'Stock History', 'Out of Stock']
+
+const initialProducts = [
   { id: 'prod-001', name: 'Fresh Milk', batch: 'Batch0005', category: 'Dairy', availableStock: 45, stockReceived: 20, reservedStock: 50, totalStock: 115, status: 'In Stock' },
   { id: 'prod-002', name: 'White Bread', batch: 'Batch0009', category: 'Bakery', availableStock: 20, stockReceived: 0, reservedStock: 20, totalStock: 40, status: 'In Stock' },
   { id: 'prod-003', name: 'Fresh Eggs (Dozen)', batch: 'Batch0709', category: 'Poultry', availableStock: 8, stockReceived: 0, reservedStock: 8, totalStock: 16, status: 'In Stock' },
@@ -19,11 +22,8 @@ const products = [
   { id: 'prod-012', name: 'Indomie Noodles', batch: 'Batch0023', category: 'food', availableStock: 3, stockReceived: 0, reservedStock: 3, totalStock: 6, status: 'Low Stock' },
 ]
 
-const ITEMS_PER_PAGE = 6
-
-const tabs = ['All Products', 'Stock Entry', 'Low Stock', 'Stock History', 'Out of Stock']
-
 const Inventory = () => {
+  const [productList, setProductList] = useState(initialProducts)
   const [search, setSearch] = useState('')
   const [activeTab, setActiveTab] = useState('All Products')
   const [currentPage, setCurrentPage] = useState(1)
@@ -31,9 +31,9 @@ const Inventory = () => {
   const [manageProduct, setManageProduct] = useState(null)
 
   const getTabFiltered = () => {
-    if (activeTab === 'Low Stock') return products.filter((p) => p.status === 'Low Stock')
-    if (activeTab === 'Out of Stock') return products.filter((p) => p.status === 'Out of Stock')
-    return products
+    if (activeTab === 'Low Stock') return productList.filter((p) => p.status === 'Low Stock')
+    if (activeTab === 'Out of Stock') return productList.filter((p) => p.status === 'Out of Stock')
+    return productList
   }
 
   const tabFiltered = getTabFiltered()
@@ -49,15 +49,24 @@ const Inventory = () => {
   const handlePrev = () => { if (currentPage > 1) setCurrentPage(currentPage - 1) }
   const handleNext = () => { if (currentPage < totalPages) setCurrentPage(currentPage + 1) }
 
-  const totalProducts = products.length
-  const lowStockItems = products.filter((p) => p.status === 'Low Stock').length
-  const stockEntry = products.filter((p) => p.stockReceived > 0).length
-  const outOfStock = products.filter((p) => p.status === 'Out of Stock').length
+  const totalProducts = productList.length
+  const lowStockItems = productList.filter((p) => p.status === 'Low Stock').length
+  const stockEntry = productList.filter((p) => p.stockReceived > 0).length
+  const outOfStock = productList.filter((p) => p.status === 'Out of Stock').length
 
   const getStatusClass = (status) => {
     if (status === 'In Stock') return 'inv-status-instock'
     if (status === 'Low Stock') return 'inv-status-lowstock'
     return 'inv-status-outofstock'
+  }
+
+  const handleProductUpdate = (updatedProduct) => {
+    setProductList((prev) =>
+      prev.map((p) => p.id === updatedProduct.id ? updatedProduct : p)
+    )
+    if (selectedProduct?.id === updatedProduct.id) {
+      setSelectedProduct(updatedProduct)
+    }
   }
 
   return (
@@ -199,12 +208,17 @@ const Inventory = () => {
           </div>
         </div>
       </div>
-      <ProductDetailsModal 
-      product={selectedProduct} 
-      onClose={() => setSelectedProduct(null)}
-      onManage={() => { setManageProduct(selectedProduct); setSelectedProduct(null) }}
+
+      <ProductDetailsModal
+        product={selectedProduct}
+        onClose={() => setSelectedProduct(null)}
+        onManage={() => { setManageProduct(selectedProduct); setSelectedProduct(null) }}
       />
-        <ManageStockModal product={manageProduct} onClose={() => setManageProduct(null)} />
+      <ManageStockModal
+        product={manageProduct}
+        onClose={() => setManageProduct(null)}
+        onUpdate={handleProductUpdate}
+      />
 
     </div>
   )
