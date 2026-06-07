@@ -1,0 +1,56 @@
+.toast-notification {
+  position: fixed;
+  top: 24px;
+  right: 24px;
+  background-color: #ffffff;
+  border: 1px solid #00A63E;
+  border-radius: 20px;
+  padding: 32px 56px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  z-index: 3000;
+  min-width: 380px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  animation: slideInRight 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.toast-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.toast-content span {
+  font-family: Inter, system-ui, -apple-system, sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  color: #1a202c;
+  letter-spacing: -0.2px;
+}
+
+.toast-icon {
+  color: #10b981;
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(120%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@media (max-width: 480px) {
+  .toast-notification {
+    top: 16px;
+    right: 16px;
+    left: 16px;
+    min-width: auto;
+    padding: 24px 32px;
+    border-radius: 16px;
+  }
+}

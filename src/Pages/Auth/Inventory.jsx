@@ -1,15 +1,18 @@
 import React, { useState } from 'react'
-import { Plus, Search, Package, AlertTriangle, Truck, XCircle, Eye, Pencil } from 'lucide-react'
+import { Plus, Search, Package, AlertTriangle, Truck, XCircle, Eye, Pencil, ChevronDown } from 'lucide-react'
 import './Css/Inventory.css'
 import ProductDetailsModal from '../../Components/ProductDetailsModal'
 import ManageStockModal from '../../Components/ManageStockModal'
+import RecordStockModal from '../../InventoryComponents/ModalComponents/RecordStockModal'
+import AddProductModal from '../../InventoryComponents/ModalComponents/AddProductModal'
+import ToastNotification from '../../InventoryComponents/ModalComponents/ToastNotification'
 
 const ITEMS_PER_PAGE = 6
 const tabs = ['All Products', 'Stock Entry', 'Low Stock', 'Stock History', 'Out of Stock']
 
 const initialProducts = [
-  { id: 'prod-001', name: 'Fresh Milk', batch: 'Batch0005', category: 'Dairy', availableStock: 45, stockReceived: 20, reservedStock: 50, totalStock: 115, status: 'In Stock' },
-  { id: 'prod-002', name: 'White Bread', batch: 'Batch0009', category: 'Bakery', availableStock: 20, stockReceived: 0, reservedStock: 20, totalStock: 40, status: 'In Stock' },
+  { id: 'prod-001', name: 'Fresh Milk (1Ltr)', batch: 'Batch0005', category: 'Dairy', availableStock: 45, stockReceived: 20, reservedStock: 50, totalStock: 115, status: 'In Stock' },
+  { id: 'prod-002', name: 'white Bread', batch: 'Batch0009', category: 'Bakery', availableStock: 20, stockReceived: 0, reservedStock: 20, totalStock: 40, status: 'In Stock' },
   { id: 'prod-003', name: 'Fresh Eggs (Dozen)', batch: 'Batch0709', category: 'Poultry', availableStock: 8, stockReceived: 0, reservedStock: 8, totalStock: 16, status: 'In Stock' },
   { id: 'prod-004', name: 'Yogurt', batch: 'Batch0067', category: 'Dairy', availableStock: 30, stockReceived: 0, reservedStock: 30, totalStock: 60, status: 'In Stock' },
   { id: 'prod-005', name: 'Orange Juice', batch: 'Batch0059', category: 'Beverages', availableStock: 0, stockReceived: 0, reservedStock: 15, totalStock: 15, status: 'Out of Stock' },
@@ -29,6 +32,9 @@ const Inventory = () => {
   const [currentPage, setCurrentPage] = useState(1)
   const [selectedProduct, setSelectedProduct] = useState(null)
   const [manageProduct, setManageProduct] = useState(null)
+  const [showRecordStock, setShowRecordStock] = useState(false)
+  const [showAddProduct, setShowAddProduct] = useState(false)
+  const [showToast, setShowToast] = useState(false)
 
   const getTabFiltered = () => {
     if (activeTab === 'Low Stock') return productList.filter((p) => p.status === 'Low Stock')
@@ -60,6 +66,13 @@ const Inventory = () => {
     return 'inv-status-outofstock'
   }
 
+  const getTabIcon = (tabName) => {
+    if (tabName === 'Stock Entry') return <Truck size={18} className="inv-dropdown-icon-left" />
+    if (tabName === 'Low Stock') return <AlertTriangle size={18} className="inv-dropdown-icon-left" />
+    if (tabName === 'Out of Stock') return <XCircle size={18} className="inv-dropdown-icon-left" />
+    return <Package size={18} className="inv-dropdown-icon-left" />
+  }
+
   const handleProductUpdate = (updatedProduct) => {
     setProductList((prev) =>
       prev.map((p) => p.id === updatedProduct.id ? updatedProduct : p)
@@ -67,6 +80,31 @@ const Inventory = () => {
     if (selectedProduct?.id === updatedProduct.id) {
       setSelectedProduct(updatedProduct)
     }
+  }
+
+  const handleAddProduct = (newProduct) => {
+    setProductList((prev) => [newProduct, ...prev])
+  }
+
+  const handleAddProductFromForm = (newProductData) => {
+    const qty = parseInt(newProductData.initialQuantity) || 0
+    let initialStatus = 'In Stock'
+    if (qty === 0) initialStatus = 'Out of Stock'
+    else if (qty <= 5) initialStatus = 'Low Stock'
+
+    const newProduct = {
+      id: `prod-${String(productList.length + 1).padStart(3, '0')}`,
+      name: newProductData.name,
+      batch: newProductData.batchNumber,
+      category: newProductData.category,
+      availableStock: qty,
+      stockReceived: 0,
+      reservedStock: qty,
+      totalStock: qty,
+      status: initialStatus
+    }
+    setProductList((prev) => [newProduct, ...prev])
+    setShowToast(true)
   }
 
   return (
@@ -78,11 +116,11 @@ const Inventory = () => {
           <p className="inventory-sub">Manage your product inventory</p>
         </div>
         <div className="inventory-actions">
-          <button className="inv-btn-green">
-            <Truck size={19} /> Record Stock Entry
+          <button className="inv-btn-green" onClick={() => setShowRecordStock(true)}>
+            <Truck size={17} /> Record Stock Entry
           </button>
-          <button className="inv-btn-filled">
-            <Plus size={19} /> Add Product
+          <button className="inv-btn-filled" onClick={() => setShowAddProduct(true)}>
+            <Plus size={17} /> Add Product
           </button>
         </div>
       </div>
@@ -99,28 +137,28 @@ const Inventory = () => {
 
       <div className="inventory-stats">
         <div className="inv-stat-card">
-          <div className="inv-stat-icon inv-stat-blue"><Package size={24} /></div>
+          <div className="inv-stat-icon inv-stat-blue"><Package size={22} /></div>
           <div>
             <p className="inv-stat-label">Total Products</p>
             <h3 className="inv-stat-value">{totalProducts}</h3>
           </div>
         </div>
         <div className="inv-stat-card">
-          <div className="inv-stat-icon inv-stat-orange"><AlertTriangle size={24} /></div>
+          <div className="inv-stat-icon inv-stat-orange"><AlertTriangle size={22} /></div>
           <div>
-            <p className="inv-stat-label">Low Stock Items</p>
+            <p className="inv-stat-label">Low stock Items</p>
             <h3 className="inv-stat-value">{lowStockItems}</h3>
           </div>
         </div>
         <div className="inv-stat-card">
-          <div className="inv-stat-icon inv-stat-green"><Truck size={24} /></div>
+          <div className="inv-stat-icon inv-stat-green"><Truck size={22} /></div>
           <div>
             <p className="inv-stat-label">Stock Entry</p>
             <h3 className="inv-stat-value">{stockEntry}</h3>
           </div>
         </div>
         <div className="inv-stat-card">
-          <div className="inv-stat-icon inv-stat-red"><XCircle size={24} /></div>
+          <div className="inv-stat-icon inv-stat-red"><XCircle size={22} /></div>
           <div>
             <p className="inv-stat-label">Out of Stock</p>
             <h3 className="inv-stat-value">{outOfStock}</h3>
@@ -129,6 +167,7 @@ const Inventory = () => {
       </div>
 
       <div className="inventory-table-wrapper">
+
         <div className="inv-tabs">
           {tabs.map((tab) => (
             <button
@@ -144,6 +183,22 @@ const Inventory = () => {
               {tab}
             </button>
           ))}
+        </div>
+
+        <div className="inv-tab-mobile-wrapper">
+          <div className="inv-tab-dropdown-container">
+            {getTabIcon(activeTab)}
+            <select
+              className="inv-tab-dropdown"
+              value={activeTab}
+              onChange={(e) => { setActiveTab(e.target.value); setCurrentPage(1) }}
+            >
+              {tabs.map((tab) => (
+                <option key={tab} value={tab}>{tab}</option>
+              ))}
+            </select>
+            <ChevronDown size={18} className="inv-dropdown-icon-right" />
+          </div>
         </div>
 
         <table className="inventory-table">
@@ -164,9 +219,7 @@ const Inventory = () => {
               <tr key={product.id}>
                 <td>
                   <div className="inv-product-cell">
-                    <div className="inv-product-icon">
-                      <Package size={20} />
-                    </div>
+                    <div className="inv-product-icon"><Package size={20} /></div>
                     <div>
                       <p className="inv-product-name">{product.name}</p>
                       <p className="inv-product-id">{product.batch}</p>
@@ -190,6 +243,56 @@ const Inventory = () => {
           </tbody>
         </table>
 
+        <div className="inv-mobile-cards">
+          {paginated.map((product) => (
+            <div key={product.id} className="inv-mobile-card">
+              <div className="inv-mobile-card-top">
+                <div className="inv-mobile-card-product">
+                  <div className="inv-product-icon"><Package size={20} /></div>
+                  <div>
+                    <p className="inv-mobile-card-name">{product.name}</p>
+                    <p className="inv-mobile-card-batch">{product.batch}</p>
+                  </div>
+                </div>
+                <span className="inv-category-tag">{product.category}</span>
+              </div>
+
+              <div className="inv-mobile-card-grid">
+                <div className="inv-mobile-card-item">
+                  <label>AVAILABLE STOCK</label>
+                  <span>{product.availableStock}</span>
+                </div>
+                <div className="inv-mobile-card-item">
+                  <label>STOCK RECEIVED</label>
+                  <span className="inv-quantity-received">{product.stockReceived}</span>
+                </div>
+                <div className="inv-mobile-card-item">
+                  <label>STATUS</label>
+                  <div>
+                    <span className={`inv-status ${getStatusClass(product.status)}`}>{product.status}</span>
+                  </div>
+                </div>
+                <div className="inv-mobile-card-item">
+                  <label>RESERVED STOCK</label>
+                  <span className="inv-quantity-reserved">{product.reservedStock}</span>
+                </div>
+                <div className="inv-mobile-card-item">
+                  <label>ACTIONS</label>
+                  <div>
+                    <button className="inv-view-btn" onClick={() => setSelectedProduct(product)}>
+                      <Eye size={13} /> View
+                    </button>
+                  </div>
+                </div>
+                <div className="inv-mobile-card-item">
+                  <label>TOTAL STOCK</label>
+                  <span>{product.totalStock}</span>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
         <div className="inv-footer">
           <p>Showing {((currentPage - 1) * ITEMS_PER_PAGE) + 1} to {Math.min(currentPage * ITEMS_PER_PAGE, filtered.length)} of {filtered.length} actions</p>
           <div className="inv-pagination">
@@ -207,6 +310,7 @@ const Inventory = () => {
             <span>4 per page ▾</span>
           </div>
         </div>
+
       </div>
 
       <ProductDetailsModal
@@ -218,6 +322,21 @@ const Inventory = () => {
         product={manageProduct}
         onClose={() => setManageProduct(null)}
         onUpdate={handleProductUpdate}
+      />
+      <RecordStockModal
+        onClose={() => setShowRecordStock(false)}
+        visible={showRecordStock}
+        onAddProduct={handleAddProduct}
+      />
+      <AddProductModal
+        isOpen={showAddProduct}
+        onClose={() => setShowAddProduct(false)}
+        onAddProduct={handleAddProductFromForm}
+      />
+      <ToastNotification
+        message="Changes saved successfully"
+        show={showToast}
+        onClose={() => setShowToast(false)}
       />
 
     </div>
