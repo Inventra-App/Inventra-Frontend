@@ -1,5 +1,5 @@
 .inventory-page {
-  padding: 32px;
+  padding: 22px;
   display: flex;
   flex-direction: column;
   gap: 24px;
@@ -14,16 +14,17 @@
 
 .inventory-title {
   font-size: 1.5rem;
-  font-weight: 800;
+  font-weight: 700;
+  line-height: 32px;
   color: #111827;
-  margin: 0 0 10px 0;
+  margin: 0 0 13px 0;
 }
 
 .inventory-sub {
-  font-size: 0.93rem;
+  font-size: 16px;
   color: #6b7280;
-  font-weight: 500;
   margin: 0;
+  font-weight: 400;
 }
 
 .inventory-actions {
@@ -32,33 +33,35 @@
   align-items: center;
 }
 
-.inv-btn-outline {
+.inv-btn-green {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
   height: 44px;
-  padding: 0 20px;
-  border: 1.5px solid #4f46e5;
+  width: 224px;
+  border: none;
   border-radius: 10px;
-  background-color: #ffffff;
-  color: #4f46e5;
-  font-size: 0.9rem;
-  font-weight: 600;
+  background-color: #00A63E;
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 500;
   cursor: pointer;
 }
 
 .inv-btn-filled {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
   height: 44px;
-  padding: 0 20px;
+  width: 167px;
   border: none;
   border-radius: 10px;
-  background-color: #4f46e5;
+  background-color: #432DD7;
   color: #ffffff;
-  font-size: 0.9rem;
-  font-weight: 600;
+  font-size: 16px;
+  font-weight: 500;
   cursor: pointer;
 }
 
@@ -77,12 +80,13 @@
 
 .inventory-search input {
   width: 100%;
-  height: 48px;
-  border: 1.5px solid #e5e7eb;
-  border-radius: 12px;
+  height: 51px;
+  border: 1.9px solid #D1D5DC;
+  border-radius: 10px;
   padding: 0 16px 0 44px;
-  font-size: 0.95rem;
-  color: #111827;
+  font-size: 16px;
+  font-weight: 400;
+  color: #0A0A0A80;
   outline: none;
   background-color: #ffffff;
   box-sizing: border-box;
@@ -92,9 +96,88 @@
   border-color: #4f46e5;
 }
 
+.inventory-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+.inv-stat-card {
+  background-color: #ffffff;
+  border-radius: 14px;
+  padding: 24px;
+  width: 261px;
+  height: 104px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  border: 1.9px solid #F3F4F6;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+}
+
+.inv-stat-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.inv-stat-blue { background-color: #E0E7FF; color: #6366F1; }
+.inv-stat-orange { background-color: #FFEDD4; color: #F54900; }
+.inv-stat-green { background-color: #DCFCE7; color: #00A63E; }
+.inv-stat-red { background-color: #FFE2E2; color: #E7000B; }
+
+.inv-stat-label {
+  font-size: 14px;
+  color: #64748B;
+  font-weight: 400;
+  margin: 0 0 4px 0;
+}
+
+.inv-stat-value {
+  font-size: 24px;
+  font-weight: 700;
+  color: #0F172A;
+  margin: 0;
+}
+
 .inventory-table-wrapper {
   background-color: #ffffff;
   overflow-x: auto;
+  border: 1.5px solid #FFFFFF;
+  border-radius: 12px;
+}
+
+.inv-tabs {
+  display: flex;
+  gap: 0;
+  border-bottom: 2px solid #e5e7eb;
+  margin-bottom: 0;
+}
+
+.inv-tab {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 14px 20px;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #6b7280;
+  cursor: pointer;
+}
+
+.inv-tab-active {
+  color: #4f46e5;
+  background-color: #EEF2FF80;
+  font-weight: 700;
+  border-bottom: 2px solid #4f46e5;
 }
 
 .inventory-table {
@@ -103,21 +186,21 @@
 }
 
 .inventory-table thead tr {
-  border-bottom: 1px solid lightgray;
+  border-bottom: 1.54px solid #e5e7eb;
 }
 
 .inventory-table th {
   padding: 14px 20px;
   text-align: left;
-  font-size: 0.75rem;
-  font-weight: 800;
-  color: #9ca3af;
-  letter-spacing: 0.05em;
-  background-color: #f9fafb;
+  font-size: 11px;
+  font-weight: 500;
+  color: #64748B;
+  letter-spacing: 0.5px;
+  background-color: white;
 }
 
 .inventory-table tbody tr {
-  border-bottom: 1px solid lightgray;
+  border-bottom: 1.54px solid #e5e7eb;
   transition: background-color 0.15s ease;
 }
 
@@ -138,15 +221,15 @@
 .inv-product-cell {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
 }
 
 .inv-product-icon {
-  width: 36px;
-  height: 36px;
-  border-radius: 8px;
-  background-color: #ede9fe;
-  color: #7c3aed;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background-color: #F3F4F6;
+  color: #64748B;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -154,69 +237,134 @@
 }
 
 .inv-product-name {
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: #111827;
+  font-size: 13.5px;
+  width: 130px;
+  /* background-color: #0ea5e9; */
+  line-height: 20.3px;
+  font-weight: 500;
+  color: #0F172A;
   margin: 0 0 2px 0;
 }
 
 .inv-product-id {
-  font-size: 0.75rem;
-  color: #9ca3af;
+  font-size: 10.5px;
+  font-weight: 400;
+  color: #64748B;
   margin: 0;
 }
 
 .inv-category-tag {
   padding: 4px 12px;
-  border-radius: 20px;
+  border-radius: 9px;
   background-color: #f3f4f6;
-  color: #374151;
-  font-size: 0.8rem;
-  font-weight: 600;
+  color: #64748B;
+  font-size: 12px;
+  font-weight: 400;
 }
 
 .inv-quantity {
-  font-size: 0.95rem;
-  font-weight: 700;
-  color: #111827;
-}
-
-.inv-quantity-low {
-  color: #ef4444;
-}
-
-.inv-price {
-  font-size: 0.9rem;
+  font-size: 14px;
   font-weight: 600;
-  color: #111827;
+  color: #0F172A;
 }
 
-.inv-batches {
+.inv-quantity-zero { color: #155DFC; }
+.inv-quantity-received { color: #155DFC; }
+.inv-quantity-reserved { color: #00A63E; }
+
+.inv-status {
+  width: 90px;
+  height: 40px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.inv-status-instock { background-color: #DCFCE7; color: #16a34a; }
+.inv-status-lowstock { background-color: #fef9c3; color: #ca8a04; }
+.inv-status-outofstock { background-color: #fee2e2; color: #ef4444; }
+
+.inv-actions-cell {
   display: flex;
   align-items: center;
-  gap: 6px;
-  font-size: 0.875rem;
-  color: #6b7280;
-}
-
-.inv-alert-icon {
-  color: #f97316;
-}
-
-.inv-no-batch {
-  color: #d1d5db;
+  gap: 14px;
 }
 
 .inv-view-btn {
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 8px 14px;
-  border: 1.5px solid #e0e7ff;
-  border-radius: 8px;
-  background-color: #eef2ff;
-  color: #4f46e5;
-  font-size: 0.8rem;
-  font-weight: 600;
+  padding: 7px 14px;
+  border: 1px solid #e0e7ff;
+  border-radius: 8.4px;
+  background-color: #EEF2FF;
+  color: #6366F1;
+  font-size: 12px;
+  font-weight: 500;
   cursor: pointer;
+}
+
+.inv-manage-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8.4px;
+  background-color: #F3F4F6;
+  color: #64748B;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.inv-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.inv-footer p {
+  font-size: 10px;
+  font-weight: 500;
+  color: #64748B;
+  margin: 0;
+}
+
+.inv-pagination {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.inv-pagination button {
+  width: 32px;
+  height: 32px;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  background-color: #ffffff;
+  color: #374151;
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+.inv-pagination button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.inv-pagination button.active {
+  background-color: #C7D2FE;
+  color: #4F46E5;
+  border-radius: 4px;
+  border-color: #C7D2FE;
+}
+
+.inv-pagination span {
+  font-size: 10px;
+  font-weight: 700;
+  color: #6b7280;
+  margin-left: 8px;
 }
