@@ -8,6 +8,7 @@ const AddProductModal = ({ isOpen, onClose, onAddProduct }) => {
     category: '',
     unitPrice: '',
     initialQuantity: '',
+    quantityType: '',
     batchNumber: 'BTH-202606-HGM9',
     expiryDate: ''
   })
@@ -32,6 +33,7 @@ const AddProductModal = ({ isOpen, onClose, onAddProduct }) => {
       category: '',
       unitPrice: '',
       initialQuantity: '',
+      quantityType: '', 
       batchNumber: 'BTH-202606-HGM9',
       expiryDate: ''
     })
@@ -93,6 +95,18 @@ const AddProductModal = ({ isOpen, onClose, onAddProduct }) => {
               value={formData.initialQuantity}
               onChange={handleChange}
               placeholder="30"
+            />
+            <span className="field-hint">Leave empty or 0 to add stock later</span>
+          </div>
+
+          <div className="form-group">
+            <label>Quantity Type</label>
+            <input
+              type="text"
+              name="quantityType"
+              value={formData.quantityType}
+              onChange={handleChange}
+              placeholder="Cartons"
             />
             <span className="field-hint">Leave empty or 0 to add stock later</span>
           </div>

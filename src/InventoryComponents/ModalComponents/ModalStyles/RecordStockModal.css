@@ -306,3 +306,151 @@
   cursor: pointer;
   margin-top: 6px;
 }
+
+@media (max-width: 768px) {
+  .record-overlay {
+    background-color: #ffffff;
+    padding: 24px;
+  }
+
+  .record-modal {
+    min-height: auto;
+    background-color: #ffffff;
+    gap: 16px;
+  }
+
+  .record-modal-header {
+    padding: 0 0 16px 0;
+    border-bottom: 1px solid #E5E7EB;
+  }
+
+  .record-title {
+    font-size: 26px;
+    font-weight: 700;
+    color: #0F172A;
+    padding: 0;
+  }
+
+  .record-form {
+    padding: 0;
+    gap: 20px;
+  }
+
+  .record-card {
+    padding: 0;
+    border: none;
+    background-color: transparent;
+    gap: 24px;
+  }
+
+  .record-row {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .record-field label {
+    font-size: 15px;
+    font-weight: 600;
+    color: #0F172A;
+  }
+
+  .record-field input {
+    height: 50px;
+    border: 1.5px solid #D1D5DC;
+    border-radius: 10px;
+    font-size: 16px;
+    padding: 0 14px;
+  }
+
+  .record-batch-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .record-batch-row input {
+    height: 50px;
+    border: 1.5px solid #D1D5DC;
+    border-radius: 10px;
+    font-size: 16px;
+    padding: 0 14px;
+    width: 100%;
+  }
+
+  .record-generate-btn {
+    width: 100%;
+    height: 46px;
+    border-radius: 10px;
+    background-color: #E5E7EB;
+    border: none;
+    font-size: 16px;
+    font-weight: 500;
+    color: #0F172A;
+  }
+
+  .record-actions {
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+  }
+
+  .record-submit-btn,
+  .record-cancel-btn {
+    width: 100%;
+    height: 46px;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 500;
+  }
+
+  .record-submit-btn {
+    background-color: #432DD7;
+    order: 1;
+  }
+
+  .record-cancel-btn {
+    background-color: #E5E7EB;
+    color: #0F172A;
+    order: 2;
+  }
+
+  .record-success-modal {
+    width: 100%;
+    max-width: 100%;
+    padding: 24px 16px;
+  }
+}
+
+@media (max-width: 468px) {
+  .record-overlay {
+    padding: 16px;
+  }
+
+  .record-title {
+    font-size: 22px;
+  }
+
+  .record-field label {
+    font-size: 14px;
+  }
+
+  .record-field input,
+  .record-batch-row input {
+    height: 48px;
+    font-size: 15px;
+    border-radius: 8px;
+  }
+
+  .record-generate-btn {
+    height: 44px;
+    font-size: 15px;
+    border-radius: 8px;
+  }
+
+  .record-submit-btn,
+  .record-cancel-btn {
+    height: 44px;
+    font-size: 14px;
+    border-radius: 8px;
+  }
+}

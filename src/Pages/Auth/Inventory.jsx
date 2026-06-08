@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Plus, Search, Package, AlertTriangle, Truck, XCircle, Eye, Pencil, ChevronDown } from 'lucide-react'
+import { Plus, Search, Package, ClipboardPlus, AlertTriangle, Truck, XCircle, Eye, Pencil, ChevronDown, User, Clock } from 'lucide-react'
 import './Css/Inventory.css'
 import ProductDetailsModal from '../../Components/ProductDetailsModal'
 import ManageStockModal from '../../Components/ManageStockModal'
@@ -27,6 +27,52 @@ const initialProducts = [
 
 const Inventory = () => {
   const [productList, setProductList] = useState(initialProducts)
+  const [stockEntries, setStockEntries] = useState([
+    {
+      id: 'entry-001',
+      productName: 'banana',
+      batch: 'BTH-202606-C6T1',
+      quantity: 50,
+      expiryDate: 'Jun 25, 2026',
+      deliveryDate: 'Jun 02, 2026',
+      supplier: 'Vintage fruits',
+      user: 'Admin User',
+      timestamp: new Date('2026-06-02T10:33:00'),
+    },
+    {
+      id: 'entry-002',
+      productName: 'Fresh Milk (1Ltr)',
+      batch: 'BTH-202606-M2K9',
+      quantity: 100,
+      expiryDate: 'Jul 10, 2026',
+      deliveryDate: 'Jun 02, 2026',
+      supplier: 'FrieslandCampina',
+      user: 'Admin User',
+      timestamp: new Date('2026-06-02T09:15:00'),
+    },
+  ])
+  const [stockHistory, setStockHistory] = useState([
+    {
+      id: 'hist-001',
+      productName: 'banana',
+      action: 'Received',
+      units: '+50 units',
+      note: 'new',
+      user: 'Admin User',
+      type: 'received',
+      timestamp: new Date('2026-06-02T10:33:00'),
+    },
+    {
+      id: 'hist-002',
+      productName: 'banana',
+      action: 'Adjusted',
+      units: '+30 units',
+      note: 'refill',
+      user: 'Admin User',
+      type: 'adjusted',
+      timestamp: new Date('2026-06-02T10:31:00'),
+    },
+  ])
   const [search, setSearch] = useState('')
   const [activeTab, setActiveTab] = useState('All Products')
   const [currentPage, setCurrentPage] = useState(1)
@@ -57,7 +103,7 @@ const Inventory = () => {
 
   const totalProducts = productList.length
   const lowStockItems = productList.filter((p) => p.status === 'Low Stock').length
-  const stockEntry = productList.filter((p) => p.stockReceived > 0).length
+  const stockEntry = stockEntries.length
   const outOfStock = productList.filter((p) => p.status === 'Out of Stock').length
 
   const getStatusClass = (status) => {
@@ -67,8 +113,9 @@ const Inventory = () => {
   }
 
   const getTabIcon = (tabName) => {
-    if (tabName === 'Stock Entry') return <Truck size={18} className="inv-dropdown-icon-left" />
+    if (tabName === 'Stock Entry') return <ClipboardPlus size={18} className="inv-dropdown-icon-left" />
     if (tabName === 'Low Stock') return <AlertTriangle size={18} className="inv-dropdown-icon-left" />
+    if (tabName === 'Stock History') return <Clock size={18} className="inv-dropdown-icon-left" />
     if (tabName === 'Out of Stock') return <XCircle size={18} className="inv-dropdown-icon-left" />
     return <Package size={18} className="inv-dropdown-icon-left" />
   }
@@ -82,8 +129,21 @@ const Inventory = () => {
     }
   }
 
-  const handleAddProduct = (newProduct) => {
+  const handleAddProduct = (newProduct, entryData) => {
     setProductList((prev) => [newProduct, ...prev])
+    if (entryData) {
+      setStockEntries((prev) => [entryData, ...prev])
+      setStockHistory((prev) => [{
+        id: `hist-${Date.now()}`,
+        productName: entryData.productName,
+        action: 'Received',
+        units: `+${entryData.quantity} units`,
+        note: 'new',
+        user: entryData.user,
+        type: 'received',
+        timestamp: entryData.timestamp,
+      }, ...prev])
+    }
   }
 
   const handleAddProductFromForm = (newProductData) => {
@@ -176,11 +236,14 @@ const Inventory = () => {
               onClick={() => { setActiveTab(tab); setCurrentPage(1) }}
             >
               {tab === 'All Products' && <Package size={16} />}
-              {tab === 'Stock Entry' && <Truck size={16} />}
+              {tab === 'Stock Entry' && <ClipboardPlus size={16} />}
               {tab === 'Low Stock' && <AlertTriangle size={16} />}
-              {tab === 'Stock History' && <Package size={16} />}
+              {tab === 'Stock History' && <Clock size={16} />}
               {tab === 'Out of Stock' && <XCircle size={16} />}
-              {tab}
+              <span>{tab}</span>
+              {tab === 'Low Stock' && lowStockItems > 0 && (
+                <span className="inv-tab-badge">{lowStockItems}</span>
+              )}
             </button>
           ))}
         </div>
@@ -201,115 +264,247 @@ const Inventory = () => {
           </div>
         </div>
 
-        <table className="inventory-table">
-          <thead>
-            <tr>
-              <th>PRODUCT</th>
-              <th>CATEGORY</th>
-              <th>AVAILABLE STOCK</th>
-              <th>STOCK RECEIVED</th>
-              <th>RESERVED STOCK</th>
-              <th>TOTAL STOCK</th>
-              <th>STATUS</th>
-              <th>ACTIONS</th>
-            </tr>
-          </thead>
-          <tbody>
-            {paginated.map((product) => (
-              <tr key={product.id}>
-                <td>
-                  <div className="inv-product-cell">
-                    <div className="inv-product-icon"><Package size={20} /></div>
-                    <div>
-                      <p className="inv-product-name">{product.name}</p>
-                      <p className="inv-product-id">{product.batch}</p>
+        {activeTab === 'Stock Entry' ? (
+          <div className="stock-entry-list">
+            {stockEntries.length === 0 ? (
+              <p className="stock-entry-empty">No stock entries recorded yet.</p>
+            ) : (
+              stockEntries.map((entry) => (
+                <div key={entry.id} className="stock-entry-card">
+                  <div className="stock-entry-card-top">
+                    <div className="stock-entry-card-left">
+                      <div className="stock-entry-icon">
+                        <Truck size={18} />
+                      </div>
+                      <div>
+                        <p className="stock-entry-name">{entry.productName}</p>
+                        <p className="stock-entry-meta">Batch: {entry.batch} • Quantity: {entry.quantity} units</p>
+                        <p className="stock-entry-meta">Expiry: {entry.expiryDate}</p>
+                        <div className="stock-entry-user">
+                          <User size={13} />
+                          <span>{entry.user}</span>
+                        </div>
+                        <div className="stock-entry-user">
+                          <User size={13} />
+                          <span>Supplier: {entry.supplier}</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="stock-entry-time">
+                      <p>{entry.timestamp.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</p>
+                      <p>{entry.timestamp.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}</p>
                     </div>
                   </div>
-                </td>
-                <td><span className="inv-category-tag">{product.category}</span></td>
-                <td><span className="inv-quantity">{product.availableStock}</span></td>
-                <td><span className={`inv-quantity ${product.stockReceived > 0 ? 'inv-quantity-received' : 'inv-quantity-zero'}`}>{product.stockReceived}</span></td>
-                <td><span className="inv-quantity inv-quantity-reserved">{product.reservedStock}</span></td>
-                <td><span className="inv-quantity">{product.totalStock}</span></td>
-                <td><span className={`inv-status ${getStatusClass(product.status)}`}>{product.status}</span></td>
-                <td>
-                  <div className="inv-actions-cell">
-                    <button className="inv-view-btn" onClick={() => setSelectedProduct(product)}><Eye size={14} /> View</button>
-                    <button className="inv-manage-btn" onClick={() => setManageProduct(product)}><Pencil size={14} /> Manage stock</button>
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+                </div>
+              ))
+            )}
+          </div>
 
-        <div className="inv-mobile-cards">
-          {paginated.map((product) => (
-            <div key={product.id} className="inv-mobile-card">
-              <div className="inv-mobile-card-top">
-                <div className="inv-mobile-card-product">
-                  <div className="inv-product-icon"><Package size={20} /></div>
-                  <div>
-                    <p className="inv-mobile-card-name">{product.name}</p>
-                    <p className="inv-mobile-card-batch">{product.batch}</p>
+        ) : activeTab === 'Stock History' ? (
+          <div className="stock-entry-list">
+            {stockHistory.length === 0 ? (
+              <p className="stock-entry-empty">No stock history recorded yet.</p>
+            ) : (
+              stockHistory.map((item) => (
+                <div key={item.id} className="stock-entry-card">
+                  <div className="stock-entry-card-top">
+                    <div className="stock-entry-card-left">
+                      <div className={`stock-entry-icon ${item.type === 'received' ? 'stock-icon-green' : 'stock-icon-purple'}`}>
+                        {item.type === 'received' ? <Truck size={18} /> : <Clock size={18} />}
+                      </div>
+                      <div>
+                        <p className="stock-entry-name">{item.productName}</p>
+                        <p className="stock-entry-meta">{item.action} • {item.units}</p>
+                        <p className="stock-history-note">{item.note}</p>
+                        <div className="stock-entry-user">
+                          <User size={13} />
+                          <span>{item.user}</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="stock-entry-time">
+                      <p>{item.timestamp.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</p>
+                      <p>{item.timestamp.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}</p>
+                    </div>
                   </div>
                 </div>
-                <span className="inv-category-tag">{product.category}</span>
+              ))
+            )}
+          </div>
+
+        ) : activeTab === 'Out of Stock' ? (
+          <>
+            <div className="inv-desktop-out-of-stock-container">
+              <table className="inventory-table text-muted-headers">
+                <thead>
+                  <tr>
+                    <th>PRODUCT</th>
+                    <th>CATEGORY</th>
+                    <th>CURRENT STOCK</th>
+                    <th>STOCK RECEIVED</th>
+                    <th>TOTAL STOCK</th>
+                    <th>STATUS</th>
+                    <th>ACTIONS</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {paginated.map((product) => (
+                    <tr key={product.id}>
+                      <td>
+                        <div className="inv-product-cell">
+                          <div className="inv-product-icon"><Package size={20} /></div>
+                          <div>
+                            <p className="inv-product-name">{product.name}</p>
+                            <p className="inv-product-id">{product.batch}</p>
+                          </div>
+                        </div>
+                      </td>
+                      <td><span className="inv-category-tag">{product.category}</span></td>
+                      <td><span className="inv-quantity">{product.availableStock}</span></td>
+                      <td><span className={`inv-quantity ${product.stockReceived > 0 ? 'inv-quantity-received' : 'inv-quantity-zero'}`}>{product.stockReceived}</span></td>
+                      <td><span className="inv-quantity text-total-stock-green">{product.totalStock}</span></td>
+                      <td><span className={`inv-status ${getStatusClass(product.status)}`}>{product.status}</span></td>
+                      <td>
+                        <div className="inv-actions-cell">
+                          <button className="inv-view-btn" onClick={() => setSelectedProduct(product)}><Eye size={14} /> View</button>
+                          <button className="inv-adjust-btn" onClick={() => setManageProduct(product)}><Pencil size={14} /> Adjust</button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            <div className="inv-footer">
+              <p>Showing {((currentPage - 1) * ITEMS_PER_PAGE) + 1} to {Math.min(currentPage * ITEMS_PER_PAGE, filtered.length)} of {filtered.length} actions</p>
+              <div className="inv-pagination">
+                <button onClick={handlePrev} disabled={currentPage === 1}>‹</button>
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                  <button
+                    key={page}
+                    className={currentPage === page ? 'active' : ''}
+                    onClick={() => setCurrentPage(page)}
+                  >
+                    {page}
+                  </button>
+                ))}
+                <button onClick={handleNext} disabled={currentPage === totalPages}>›</button>
+                <span>4 per page ▾</span>
               </div>
+            </div>
+          </>
 
-              <div className="inv-mobile-card-grid">
-                <div className="inv-mobile-card-item">
-                  <label>AVAILABLE STOCK</label>
-                  <span>{product.availableStock}</span>
-                </div>
-                <div className="inv-mobile-card-item">
-                  <label>STOCK RECEIVED</label>
-                  <span className="inv-quantity-received">{product.stockReceived}</span>
-                </div>
-                <div className="inv-mobile-card-item">
-                  <label>STATUS</label>
-                  <div>
-                    <span className={`inv-status ${getStatusClass(product.status)}`}>{product.status}</span>
+        ) : (
+          <>
+            <table className="inventory-table">
+              <thead>
+                <tr>
+                  <th>PRODUCT</th>
+                  <th>CATEGORY</th>
+                  <th>AVAILABLE STOCK</th>
+                  <th>STOCK RECEIVED</th>
+                  <th>RESERVED STOCK</th>
+                  <th>TOTAL STOCK</th>
+                  <th>STATUS</th>
+                  <th>ACTIONS</th>
+                </tr>
+              </thead>
+              <tbody>
+                {paginated.map((product) => (
+                  <tr key={product.id}>
+                    <td>
+                      <div className="inv-product-cell">
+                        <div className="inv-product-icon"><Package size={20} /></div>
+                        <div>
+                          <p className="inv-product-name">{product.name}</p>
+                          <p className="inv-product-id">{product.batch}</p>
+                        </div>
+                      </div>
+                    </td>
+                    <td><span className="inv-category-tag">{product.category}</span></td>
+                    <td><span className="inv-quantity">{product.availableStock}</span></td>
+                    <td><span className={`inv-quantity ${product.stockReceived > 0 ? 'inv-quantity-received' : 'inv-quantity-zero'}`}>{product.stockReceived}</span></td>
+                    <td><span className="inv-quantity inv-quantity-reserved">{product.reservedStock}</span></td>
+                    <td><span className="inv-quantity">{product.totalStock}</span></td>
+                    <td><span className={`inv-status ${getStatusClass(product.status)}`}>{product.status}</span></td>
+                    <td>
+                      <div className="inv-actions-cell">
+                        <button className="inv-view-btn" onClick={() => setSelectedProduct(product)}><Eye size={14} /> View</button>
+                        <button className="inv-manage-btn" onClick={() => setManageProduct(product)}><Pencil size={14} /> Manage stock</button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+
+            <div className="inv-mobile-cards">
+              {paginated.map((product) => (
+                <div key={product.id} className="inv-mobile-card">
+                  <div className="inv-mobile-card-top">
+                    <div className="inv-mobile-card-product">
+                      <div className="inv-product-icon"><Package size={20} /></div>
+                      <div>
+                        <p className="inv-mobile-card-name">{product.name}</p>
+                        <p className="inv-mobile-card-batch">{product.batch}</p>
+                      </div>
+                    </div>
+                    <span className="inv-category-tag">{product.category}</span>
                   </div>
-                </div>
-                <div className="inv-mobile-card-item">
-                  <label>RESERVED STOCK</label>
-                  <span className="inv-quantity-reserved">{product.reservedStock}</span>
-                </div>
-                <div className="inv-mobile-card-item">
-                  <label>ACTIONS</label>
-                  <div>
+                  <div className="inv-mobile-card-grid">
+                    <div className="inv-mobile-card-item">
+                      <label>AVAILABLE STOCK</label>
+                      <span>{product.availableStock}</span>
+                    </div>
+                    <div className="inv-mobile-card-item">
+                      <label>STOCK RECEIVED</label>
+                      <span className="inv-quantity-received">{product.stockReceived}</span>
+                    </div>
+                    <div className="inv-mobile-card-item">
+                      <label>STATUS</label>
+                      <div><span className={`inv-status ${getStatusClass(product.status)}`}>{product.status}</span></div>
+                    </div>
+                    <div className="inv-mobile-card-item">
+                      <label>RESERVED STOCK</label>
+                      <span className="inv-quantity-reserved">{product.reservedStock}</span>
+                    </div>
+                    <div className="inv-mobile-card-item">
+                      <label>TOTAL STOCK</label>
+                      <span>{product.totalStock}</span>
+                    </div>
+                  </div>
+                  <div className="inv-mobile-card-actions">
                     <button className="inv-view-btn" onClick={() => setSelectedProduct(product)}>
                       <Eye size={13} /> View
                     </button>
+                    <button className="inv-manage-btn" onClick={() => setManageProduct(product)}>
+                      <Pencil size={13} /> Manage stock
+                    </button>
                   </div>
                 </div>
-                <div className="inv-mobile-card-item">
-                  <label>TOTAL STOCK</label>
-                  <span>{product.totalStock}</span>
-                </div>
+              ))}
+            </div>
+
+            <div className="inv-footer">
+              <p>Showing {((currentPage - 1) * ITEMS_PER_PAGE) + 1} to {Math.min(currentPage * ITEMS_PER_PAGE, filtered.length)} of {filtered.length} actions</p>
+              <div className="inv-pagination">
+                <button onClick={handlePrev} disabled={currentPage === 1}>‹</button>
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                  <button
+                    key={page}
+                    className={currentPage === page ? 'active' : ''}
+                    onClick={() => setCurrentPage(page)}
+                  >
+                    {page}
+                  </button>
+                ))}
+                <button onClick={handleNext} disabled={currentPage === totalPages}>›</button>
+                <span>4 per page ▾</span>
               </div>
             </div>
-          ))}
-        </div>
-
-        <div className="inv-footer">
-          <p>Showing {((currentPage - 1) * ITEMS_PER_PAGE) + 1} to {Math.min(currentPage * ITEMS_PER_PAGE, filtered.length)} of {filtered.length} actions</p>
-          <div className="inv-pagination">
-            <button onClick={handlePrev} disabled={currentPage === 1}>‹</button>
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-              <button
-                key={page}
-                className={currentPage === page ? 'active' : ''}
-                onClick={() => setCurrentPage(page)}
-              >
-                {page}
-              </button>
-            ))}
-            <button onClick={handleNext} disabled={currentPage === totalPages}>›</button>
-            <span>4 per page ▾</span>
-          </div>
-        </div>
+          </>
+        )}
 
       </div>
 

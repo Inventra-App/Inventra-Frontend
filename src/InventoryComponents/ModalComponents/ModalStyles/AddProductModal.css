@@ -45,7 +45,7 @@
 .close-btn {
   background: transparent;
   border: none;
-  color: ##0A0A0A;
+  color: #0A0A0A;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -55,11 +55,11 @@
 }
 
 .product-form {
-  padding: 16px 18px;
+  padding: 14px 18px;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
   flex: 1;
 }
 
@@ -155,4 +155,159 @@
   justify-content: center;
   gap: 4px;
   cursor: pointer;
+}
+
+@media (max-width: 768px) {
+  .modal-overlay {
+    background-color: rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(5px);
+    padding: 32px 24px;
+    align-items: center;
+  }
+
+  .form-container {
+    max-width: 350px;
+    width: 100%;
+    height: auto;
+    max-height: calc(100vh - 64px);
+    border-radius: 14px;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+  }
+
+  .form-header {
+    padding: 14px 16px;
+    border-bottom: 1px solid #E2E8F0;
+  }
+
+  .form-header h2 {
+    font-size: 16px;
+    font-weight: 700;
+  }
+
+  .product-form {
+    padding: 14px 16px;
+    gap: 12px;
+  }
+
+  .form-group {
+    gap: 4px;
+  }
+
+  .form-group label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #1E293B;
+  }
+
+  .form-group input {
+    height: 40px;
+    font-size: 14px;
+    border-radius: 8px;
+    padding: 0 10px;
+  }
+
+  .batch-input-wrapper {
+    gap: 6px;
+  }
+
+  .generate-btn {
+    height: 40px;
+    padding: 0 12px;
+    font-size: 13px;
+    border-radius: 8px;
+  }
+
+  .field-hint {
+    font-size: 11px;
+    margin-top: 1px;
+  }
+
+  .form-info-note {
+    background-color: #EFF6FF;
+    border: 1px solid #BFDBFE;
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 12px;
+    line-height: 1.4;
+    color: #1E40AF;
+    font-weight: 500;
+    margin-top: 2px;
+  }
+
+  .form-info-note strong {
+    color: #1E3A8A;
+    font-weight: 700;
+  }
+
+  .form-actions {
+    padding: 14px 16px;
+    border-top: 1px solid #E2E8F0;
+    gap: 10px;
+    flex-direction: row;
+  }
+
+  .btn-submit {
+    height: 40px;
+    font-size: 13px;
+    border-radius: 8px;
+    order: 1;
+  }
+
+  .btn-cancel {
+    height: 40px;
+    font-size: 13px;
+    border-radius: 8px;
+    order: 2;
+  }
+}
+
+@media (max-width: 468px) {
+  .modal-overlay {
+    padding: 24px 14px;
+  }
+
+  .form-container {
+    max-width: 320px;
+    max-height: calc(100vh - 48px);
+    border-radius: 12px;
+  }
+
+  .form-header {
+    padding: 12px 14px;
+  }
+
+  .form-header h2 {
+    font-size: 15px;
+  }
+
+  .product-form {
+    padding: 12px 14px;
+    gap: 10px;
+  }
+
+  .form-group label {
+    font-size: 12px;
+  }
+
+  .form-group input,
+  .generate-btn {
+    height: 38px;
+    font-size: 13px;
+  }
+
+  .form-info-note {
+    padding: 8px 10px;
+    font-size: 11px;
+  }
+
+  .form-actions {
+    padding: 12px 14px;
+    gap: 8px;
+  }
+
+  .btn-submit,
+  .btn-cancel {
+    height: 38px;
+    font-size: 12px;
+  }
 }

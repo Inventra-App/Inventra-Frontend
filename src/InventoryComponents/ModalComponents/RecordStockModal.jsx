@@ -30,7 +30,7 @@ const RecordStockModal = ({ onClose, visible, onAddProduct }) => {
   const isAllocated = totalAllocated === totalReceived && totalReceived > 0
 
   const handleSubmit = (e) => {
-    e.preventDefault()
+  e.preventDefault()
   const qty = parseInt(quantityReceived) || 0
   const avail = parseInt(availableStock) || 0
   const reserved = parseInt(reservedStock) || 0
@@ -39,7 +39,7 @@ const RecordStockModal = ({ onClose, visible, onAddProduct }) => {
   if (avail === 0) status = 'Out of Stock'
   else if (avail <= 5) status = 'Low Stock'
 
-  onAddProduct({
+  const newProduct = {
     id: `prod-${Date.now()}`,
     name: product,
     batch: batchNumber,
@@ -49,9 +49,23 @@ const RecordStockModal = ({ onClose, visible, onAddProduct }) => {
     reservedStock: reserved,
     totalStock: avail + reserved,
     status: status,
-  })
-    setSuccess(true)
   }
+
+  const entryData = {
+    id: `entry-${Date.now()}`,
+    productName: product,
+    batch: batchNumber,
+    quantity: qty,
+    expiryDate: expiryDate,
+    deliveryDate: deliveryDate,
+    supplier: supplierName,
+    user: 'Admin User',
+    timestamp: new Date(),
+  }
+
+  onAddProduct(newProduct, entryData)
+  setSuccess(true)
+}
 
 if (success) {
   return (
