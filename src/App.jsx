@@ -19,7 +19,7 @@ import ActivityLog from './Pages/Auth/ActivityLog'
 import UserMgm from './Pages/Auth/UserMgm'
 import Settings from './Pages/Auth/Settings'
 import Demo from './Pages/Auth/Demo'
-import PricingPlans from './Pages/PricingPlans'
+import PlanSetup from './Pages/Auth/PlanSetup'
 
 function App() {
   return (
@@ -38,7 +38,7 @@ function App() {
         <Route path='/resetpassword' element={<ForgetPassUi/>} />
         <Route path='/forgot-password' element={<ForgetPassUi/>} />
         <Route path='/demo' element={<Demo />} />
-        <Route path='/pricng-plans' element={<PricingPlans />} />
+        <Route path='/plan-setup/:plan' element={<PlanSetup />} />
 
 
         <Route element={<DashboardLayout />}>

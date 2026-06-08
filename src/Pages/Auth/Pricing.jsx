@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "./Css/Pricing.css";
 import Header from "../../Components/Header";
 import markCheck from "../../assets/markCheck.png";
@@ -11,6 +12,7 @@ import pricingPageCTA from "../../assets/PricingpageCTA.png";
 
 const Pricing = () => {
   const [billingCycle, setBillingCycle] = useState("monthly");
+  const navigate = useNavigate();
   const isYearly = billingCycle === "yearly";
 
   const freeFeatures = [
@@ -146,7 +148,7 @@ const Pricing = () => {
                   ))}
                 </ul>
               </div>
-              <button className="plan_btn plan_btn_featured" type="button">
+              <button className="plan_btn plan_btn_featured" type="button" onClick={() => navigate("/plan-setup/standard")}>
                 Start with Standard Plan
               </button>
             </article>
@@ -167,7 +169,7 @@ const Pricing = () => {
                   ))}
                 </ul>
               </div>
-              <button className="plan_btn" type="button">
+              <button className="plan_btn" type="button" onClick={() => navigate("/plan-setup/premium")}>
                 Start with Premium Plan
               </button>
             </article>
