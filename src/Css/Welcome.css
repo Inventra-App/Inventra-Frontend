@@ -10,19 +10,19 @@
 }
 
 .welcome-title-black {
-  font-size: 1.79rem;
-  font-weight: 750;
-  color: #1a1a1a;
+  font-size: 36px;
+  font-weight: 600;
+  color: #000000;
   text-transform: uppercase;
   margin: 0 auto;
-  line-height: 1.4;
-  max-width: 650px;
+  line-height: 1.1;
+  max-width: 807px;
 }
 
 .welcome-title-blue {
-  font-size: 1.79rem;
-  font-weight: 750;
-  color: #4f46e5;
+  font-size: 32px;
+  font-weight: 600;
+  color: #432DD7;
   text-transform: uppercase;
   margin: 0;
   line-height: 1.4;
@@ -44,7 +44,7 @@
 
 .welcome-laptop-img {
   width: 100%;
-  height: 340px;
+  height: 380px;
   object-fit: cover;
   border-radius: 12px;
   /* box-shadow: 0 16px 48px rgba(0, 0, 0, 0.15); */
@@ -55,8 +55,8 @@
 }
 
 .welcome-phone-img {
-  width: 100%;
-  height: 400px;
+  width: 90%;
+  height: 440px;
   object-fit: contain;
   border-radius: 28px;
   /* box-shadow: 0 16px 40px rgba(0, 0, 0, 0.2); */
