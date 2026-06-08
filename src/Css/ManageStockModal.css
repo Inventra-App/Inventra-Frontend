@@ -302,3 +302,99 @@
   font-weight: 500;
   cursor: pointer;
 }
+
+@media screen and (max-width: 768px) {
+  .manage-modal {
+    width: 90%;
+    max-width: 500px;
+    padding: 20px;
+  }
+
+  .manage-success-modal {
+    width: 90%;
+    max-width: 400px;
+    padding: 20px;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .manage-overlay {
+    align-items: flex-end;
+  }
+
+  .manage-modal,
+  .manage-success-modal {
+    width: 100%;
+    max-height: 92vh;
+    border-radius: 20px 20px 0 0;
+    padding: 20px 16px 32px 16px;
+    gap: 16px;
+    animation: manageMobileSlideUp 0.3s ease-out;
+    box-sizing: border-box;
+    overflow-y: auto;
+  }
+
+  @keyframes manageMobileSlideUp {
+    from {
+      transform: translateY(100%);
+    }
+    to {
+      transform: translateY(0);
+    }
+  }
+
+  .manage-stock-row {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .manage-move-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .manage-field-half {
+    width: 100%;
+  }
+
+  .manage-select-wrapper,
+  .manage-select-wrapper select {
+    width: 100%;
+  }
+
+  .manage-arrow {
+    align-self: center;
+    margin-bottom: 0;
+    transform: rotate(90deg);
+  }
+
+  .manage-field input {
+    height: 48px;
+    box-sizing: border-box;
+  }
+
+  .manage-actions {
+    margin-top: 16px;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 12px !important;
+    width: 100% !important;
+    height: auto !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+
+  .manage-cancel-btn,
+  .manage-confirm-btn {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    flex: none !important;
+    width: 100% !important;
+    height: 48px !important;
+    min-height: 48px !important;
+    font-size: 15px !important;
+    box-sizing: border-box !important;
+  }
+}
