@@ -1,6 +1,6 @@
 .settings-page {
   width: min(100%, 1120px);
-  margin: 0 auto;
+  margin: 50px auto 0;
   padding: 28px 24px 56px;
   color: #111827;
   font-family: Arial, Helvetica, sans-serif;
@@ -29,6 +29,11 @@
   display: grid;
   grid-template-columns: 257px 1fr;
   gap: 24px;
+  align-items: start;
+}
+
+.settings-layout-notification {
+  align-items: stretch;
 }
 
 .settings-sidebar-card,
@@ -74,17 +79,14 @@
 }
 
 .settings-security-card {
-  min-height: 452px;
   padding: 23px 25px 96px;
 }
 
 .settings-system-card {
-  min-height: 365px;
   padding: 23px 25px 92px;
 }
 
 .settings-permissions-card {
-  min-height: 725px;
   padding: 23px 25px 32px;
 }
 
@@ -214,6 +216,13 @@
 .settings-field textarea:focus {
   border-color: #432DD7;
   box-shadow: 0 0 0 3px rgba(67, 45, 215, 0.12);
+}
+
+.settings-error-text {
+  color: #dc2626;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.2;
 }
 
 .settings-security-form {
@@ -422,6 +431,52 @@
   padding: 3px;
   border-radius: 50%;
   background-color: #ffffff;
+}
+
+.settings-success-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1900;
+  background-color: rgba(15, 23, 42, 0.34);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 18px;
+}
+
+.settings-success-popup {
+  width: min(100%, 372px);
+  min-height: 130px;
+  padding: 28px 30px;
+  border: 1px solid #5ad3bb;
+  border-radius: 8px;
+  background-color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+}
+
+.settings-success-icon {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background-color: #1fb96d;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.settings-success-popup p {
+  max-width: 230px;
+  margin: 0;
+  color: #111827;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.35;
+  text-align: center;
 }
 
 @media (max-width: 900px) {
