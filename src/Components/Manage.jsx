@@ -23,32 +23,39 @@ const Manage = () => {
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
       >
-        <div
-          className={`manage-circle left-current ${
-            hovered ? "left-slide" : "" }`}
-        >
-          <img src={Img1} alt="" />
-        </div>
+        {/* Unified container that anchors the circles to each other */}
+        <div className="manage-images-inner">
+          <div
+            className={`manage-circle left-current ${
+              hovered ? "left-slide" : ""
+            }`}
+          >
+            <img src={Img1} alt="Current left" />
+          </div>
 
-        <div
-          className={`manage-circle right-current ${
-            hovered ? "right-fade" : "" }`}
-        >
-          <img src={Img2} alt="" />
-        </div>
+          <div
+            className={`manage-circle right-current ${
+              hovered ? "right-fade" : ""
+            }`}
+          >
+            <img src={Img2} alt="Current right" />
+          </div>
 
-        <div
-          className={`manage-circle left-new ${
-            hovered ? "show-new" : ""}`}
-        >
-          <img src={Img3} alt="" />
-        </div>
+          <div
+            className={`manage-circle left-new ${
+              hovered ? "show-new" : ""
+            }`}
+          >
+            <img src={Img3} alt="New left" />
+          </div>
 
-        <div
-          className={`manage-circle right-new ${
-            hovered ? "show-new" : ""}`}
-        >
-          <img src={Img4} alt="" />
+          <div
+            className={`manage-circle right-new ${
+              hovered ? "show-new" : ""
+            }`}
+          >
+            <img src={Img4} alt="New right" />
+          </div>
         </div>
       </div>
     </section>

@@ -41,15 +41,15 @@ const Hero = () => {
 
         <div className="hero-features">
           <div className="feature-item">
-            <CheckCircle size={20} />
+            <CheckCircle size={15} />
             <span>Real-time Tracking</span>
           </div>
           <div className="feature-item">
-            <CheckCircle size={20} />
+            <CheckCircle size={15} />
             <span>Reduce Losses</span>
           </div>
           <div className="feature-item">
-            <CheckCircle size={20} />
+            <CheckCircle size={15} />
             <span>Improve Efficiency</span>
           </div>
         </div>

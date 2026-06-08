@@ -5,9 +5,9 @@
 }
 
 .works-title {
-  font-size: 42px;
+  font-size: 36px;
   font-weight: 700;
-  color: #1a1a1a;
+  color: #000000;
   margin-bottom: 60px;
 }
 
@@ -36,7 +36,7 @@
   height: 52px;
   border-radius: 50%;
   color: #ffffff;
-  font-size: 1.2rem;
+  font-size: 16px;
   font-weight: 700;
   display: flex;
   align-items: center;
@@ -45,15 +45,17 @@
 }
 
 .works-step-title {
-  font-size: 1rem;
-  font-weight: 700;
-  color: #1a1a1a;
+  font-size: 14px;
+  font-weight: 600;
+  color: #000000;
   margin: 0 0 8px 0;
 }
 
 .works-step-desc {
-  font-size: 0.95rem;
-  color: #666666;
+  font-size: 12px;
+  font-weight: 400;
+  max-width: 165px;
+  color: #000000;
   line-height: 1.6;
   margin: 0;
 }

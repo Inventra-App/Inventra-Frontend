@@ -7,6 +7,7 @@
   align-items: center;
   overflow: hidden;
   background: white;
+  box-sizing: border-box;
 }
 
 .manage-left {
@@ -18,11 +19,12 @@
 }
 
 .manage-heading {
-  font-size: 64px;
+  font-size: 61px;
   line-height: 1.1;
   font-weight: 700;
   color: #111827;
   z-index: 2;
+  margin: 0;
 }
 
 .manage-heading span {
@@ -34,7 +36,7 @@
   position: absolute;
   width: 220px;
   height: 220px;
-  background: #F4A261;
+  background: #FFD6A8;
   border-radius: 50%;
   left: -180px;
   bottom: -180px;
@@ -44,13 +46,21 @@
 .manage-right {
   width: 50%;
   height: 420px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.manage-images-inner {
   position: relative;
+  width: 440px; 
+  height: 270px;
 }
 
 .manage-circle {
   position: absolute;
-  width: 280px;
-  height: 280px;
+  width: 270px;
+  height: 270px;
   border-radius: 50%;
   overflow: hidden;
   transition: all 2.8s ease;
@@ -62,30 +72,25 @@
   object-fit: cover;
 }
 
-
 .left-current {
-  left: 40px;
-  top: 90px;
+  left: 0;
   z-index: 4;
 }
 
 .right-current {
-  right: 40px;
-  top: 90px;
+  left: 170px; 
   z-index: 3;
 }
 
 .left-new {
-  left: 40px;
-  top: 90px;
+  left: 0;
   opacity: 0;
   transform: translateX(-40px);
   z-index: 2;
 }
 
 .right-new {
-  right: 40px;
-  top: 90px;
+  left: 170px;
   opacity: 0;
   transform: translateX(40px);
   z-index: 1;
@@ -113,13 +118,11 @@
     min-height: auto;
     gap: 32px;
     align-items: flex-start;
-    overflow: hidden;
   }
 
   .manage-left {
     width: 100%;
     min-height: auto;
-    position: relative;
   }
 
   .manage-heading {
@@ -136,9 +139,14 @@
 
   .manage-right {
     width: 100%;
-    height: 280px;
-    position: relative;
+    height: 200px;
+    justify-content: flex-start;
     pointer-events: none;
+  }
+
+  .manage-images-inner {
+    width: 320px;
+    height: 180px;
   }
 
   .manage-circle {
@@ -148,15 +156,11 @@
   }
 
   .left-current {
-    left: 20px;
-    top: 50px;
-    z-index: 4;
+    left: 0;
   }
 
   .right-current {
-    left: 140px;
-    top: 50px;
-    z-index: 3;
+    left: 120px;
   }
 
   .left-slide,
@@ -192,21 +196,24 @@
   }
 
   .manage-right {
-    height: 240px;
+    height: 180px;
+  }
+
+  .manage-images-inner {
+    width: 290px;
+    height: 160px;
   }
 
   .manage-circle {
-    width: 200px;
-    height: 200px;
+    width: 160px;
+    height: 160px;
   }
 
   .left-current {
-    left: 10px;
-    top: 40px;
+    left: 0;
   }
 
   .right-current {
-    left: 150px;
-    top: 40px;
+    left: 110px;
   }
 }

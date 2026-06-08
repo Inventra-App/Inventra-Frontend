@@ -12,22 +12,22 @@ const badges = [
 
 const details = [
   {
-    icon: <UserCircle size={26} />,
+    icon: <UserCircle size={22} />,
     title: 'Individual Staff Accounts',
     desc: 'Each Staff member operates with a unique login and role- based access.',
   },
   {
-    icon: <CalendarCheck size={26} />,
+    icon: <CalendarCheck size={22} />,
     title: 'Activity Tracking',
     desc: 'Monitor inventory changes, sales actions, stock updates and more in real-time',
   },
   {
-    icon: <Lock size={26} />,
+    icon: <Lock size={22} />,
     title: 'Secure Permissions',
     desc: 'Control what staff members can access based on their roles and responsibilities.',
   },
   {
-    icon: <Shield size={26} />,
+    icon: <Shield size={22} />,
     title: 'Operational Transparency',
     desc: 'Access complete action history and audit logs to ensure accountability in your business',
   },

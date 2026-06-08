@@ -7,6 +7,7 @@ import {
   User,
   TrendingUp,
   LayoutDashboard,
+  LayoutGrid,
   Check,
 } from "lucide-react";
 
@@ -70,7 +71,7 @@ const Features = () => {
 
         <div className="feature-card">
           <div className="icon-box purple">
-            <Package size={28} />
+            <Package size={24} />
           </div>
 
           <h3>Real-time Inventory</h3>
@@ -82,7 +83,7 @@ const Features = () => {
 
         <div className="feature-card">
           <div className="icon-box orange">
-            <Calendar size={28} />
+            <Calendar size={24} />
           </div>
 
           <h3>Expiry Management</h3>
@@ -95,7 +96,7 @@ const Features = () => {
 
         <div className="feature-card">
           <div className="icon-box green">
-            <ShoppingCart size={28} />
+            <ShoppingCart size={24} />
           </div>
 
           <h3>Sales Tracking</h3>
@@ -108,7 +109,7 @@ const Features = () => {
 
         <div className="feature-card">
           <div className="icon-box blue">
-            <User size={28} />
+            <User size={24} />
           </div>
 
           <h3>Staff Accountability</h3>
@@ -121,7 +122,7 @@ const Features = () => {
 
         <div className="feature-card">
           <div className="icon-box red">
-            <TrendingUp size={28} />
+            <TrendingUp size={24} />
           </div>
 
           <h3>Reports & Insights</h3>
@@ -134,7 +135,7 @@ const Features = () => {
 
         <div className="feature-card">
           <div className="icon-box gray">
-            <LayoutDashboard size={28} />
+            <Package size={24} />
           </div>
 
           <h3>Easy Dashboard</h3>
