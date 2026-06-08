@@ -203,7 +203,6 @@ const UserMgm = () => {
             </div>
             <p>Can manage inventory, view reports, receive goods, and monitor expiry alerts.</p>
           </div>
-
           <div className="permission-box cashier">
             <div className="permission-title">
            <img src={green} alt="" className='icon4'/>
