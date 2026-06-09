@@ -24,20 +24,24 @@
 }
 
 .footer-logo-img {
-  width: 36px;
-  height: 36px;
+  width: 32px;
+  height: 32px;
   object-fit: contain;
+  background: #4f46e5;
+  border-radius: 10px;
 }
 
 .footer-logo-text {
-  font-size: 1.3rem;
-  font-weight: 800;
-  color: #1a1a1a;
+  font-size: 24px;
+  font-weight: 700;
+  color: #111827;
 }
 
 .footer-brand-desc {
-  font-size: 0.85rem;
-  color: #666666;
+  font-size: 12px;
+  font-weight: 400;
+  max-width: 320px;
+  color: #000000;
   line-height: 1.8;
   margin: 0;
 }
@@ -47,9 +51,9 @@
 }
 
 .footer-col-title {
-  font-size: 1rem;
-  font-weight: 800;
-  color: #1a1a1a;
+  font-size: 16px;
+  font-weight: 700;
+  color: #111827;
   margin: 0 0 20px 0;
 }
 
@@ -63,9 +67,9 @@
 }
 
 .footer-col-list li {
-  font-size: 1rem;
-  font-weight: 500;
-  color: #666666;
+  font-size: 16px;
+  font-weight: 400;
+  color: #6B7280;
   cursor: pointer;
   transition: color 0.2s ease;
 }
@@ -81,9 +85,9 @@
 }
 
 .footer-bottom p {
-  font-size: 1rem;
-  font-weight: 500;
-  color: #888888;
+  font-size: 14px;
+  font-weight: 400;
+  color: #6B7280;
   margin: 0;
 }
 

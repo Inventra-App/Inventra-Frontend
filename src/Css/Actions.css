@@ -51,6 +51,16 @@
     font-weight: 400;
 }
 
+.actions-chevron {
+  color: #000000;
+  transition: transform 0.3s ease;
+  cursor: pointer;
+}
+
+.actions-chevron.open {
+  transform: rotate(180deg);
+}
+
 .actions-item {
   border-bottom: 1px solid #f0f0f0;
   padding: 20px 0;

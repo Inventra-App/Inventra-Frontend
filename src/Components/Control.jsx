@@ -1,8 +1,10 @@
 import React from 'react'
 import controlImage from '../assets/Control.png'
 import '../Css/Control.css'
+import { useNavigate } from 'react-router-dom'
 
 const Control = () => {
+  const nav = useNavigate();
   return (
     <div className="control-section">
 
@@ -15,14 +17,14 @@ const Control = () => {
           alerts, and seamless sales management- all in one platform.
         </p>
 
-        <button className="control-btn control-btn-desktop">See our Pricing</button>
+        <button className="control-btn control-btn-desktop" onClick={() => nav("/pricing")}>See our Pricing</button>
       </div>
 
       <div className="control-right">
         <img src={controlImage} alt="Control" className="control-img" />
       </div>
 
-      <button className="control-btn control-btn-mobile">See our Pricing</button>
+      <button className="control-btn control-btn-mobile" onClick={() => nav("/pricing")}>See our Pricing</button>
 
     </div>
   )

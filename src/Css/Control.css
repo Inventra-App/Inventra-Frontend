@@ -1,6 +1,6 @@
 .control-section {
   background-color: #0F172A;
-  padding: 60px 80px 0;
+  padding: 60px 0 0 80px ;
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
@@ -42,6 +42,17 @@
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.2s ease, opacity 0.2s ease;
+}
+
+.control-btn:hover {
+  background-color: #432DD7; 
+  color: white;
+  transform: translateY(-1px); 
+}
+
+.control-btn:active {
+  transform: translateY(0);
 }
 
 .control-btn-mobile {
@@ -58,7 +69,8 @@
 
 .control-img {
   width: 100%;
-  max-width: 480px;
+  max-width: 450px;
+  display: block;
   object-fit: contain;
   object-position: bottom;
 }
