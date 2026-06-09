@@ -1,0 +1,257 @@
+.signup-right {
+  width: 52%;
+  background-color: #E5E7EB80;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  height: 100vh;
+  box-sizing: border-box;
+}
+
+.signup-right-top {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 8px;
+  padding: 20px 40px;
+  font-size: 14px;
+  font-weight: 400;
+  color: #6B7280;
+}
+
+.signup-login-link {
+  color: #4f46e5;
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.signup-form-wrapper {
+  padding: 40px;
+  background-color: #ffffff;
+  border-radius: 16px;
+  margin: 0 auto 40px;
+  width: 100%;
+  max-width: 520px; 
+  box-sizing: border-box;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+}
+
+.signup-form-wrapper h2 {
+  font-size: 30px;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 8px;
+}
+
+.signup-form-wrapper > p {
+  font-size: 16px;
+  font-weight: 400;
+  color: #6b7280;
+  line-height: 1.6;
+  max-width: 390px;
+  margin-bottom: 32px;
+}
+
+.signup-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.signup-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.signup-field label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #111827;
+}
+
+.signup-field input {
+  height: 48px;
+  border: 1.8px solid #D1D5DC;
+  border-radius: 10px;
+  padding: 0 16px;
+  font-size: 16px;
+  font-weight: 400;
+  color: #111827;
+  outline: none;
+  background-color: #ffffff;
+  box-sizing: border-box;
+}
+
+.signup-field input:focus {
+  border-color: #4f46e5;
+}
+
+.signup-agree-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.signup-agree {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.9rem;
+  color: #6b7280;
+}
+
+.signup-agree label{
+  color: #6B7280;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.signup-link {
+  color: #4f46e5;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.signup-password-input-wrapper {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.signup-password-input-wrapper input {
+  width: 100%;
+  padding-right: 48px;
+}
+
+.signup-password-toggle-btn {
+  position: absolute;
+  right: 16px;
+  background: none;
+  border: none;
+  color: #9ca3af;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.signup-password-toggle-btn:hover {
+  color: #4f46e5;
+}
+
+.signup-btn {
+  height: 50px;
+  background-color: #432DD7;
+  color: #ffffff;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: opacity 0.2s ease, background-color 0.2s ease;
+}
+
+.signup-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.signup-error-text {
+  color: #ef4444;
+  font-size: 0.8rem;
+  font-weight: 500;
+  margin-top: 2px;
+}
+
+.signup-divider {
+  text-align: center;
+  color: #6B7280;
+  font-size: 14px;
+  font-weight: 400;
+  position: relative;
+}
+
+.signup-divider::before,
+.signup-divider::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  width: 40%;
+  height: 1px;
+  background-color: #e5e7eb;
+}
+
+.signup-divider::before { left: 0; }
+.signup-divider::after { right: 0; }
+
+.signup-google-btn {
+  height: 52px;
+  background-color: #ffffff;
+  border: 1.8px solid #D1D5DC;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 500;
+  color: #374151;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-sizing: border-box;
+}
+
+@media (max-width: 768px) {
+  .signup-right {
+    width: 100%;
+    background-color: #ffffff;
+  }
+
+  .signup-right-top {
+    display: none;
+  }
+
+  .signup-form-wrapper {
+    padding: 24px 20px 40px;
+    margin: 0;
+    border-radius: 0;
+    background-color: #ffffff;
+  }
+
+  .signup-form-wrapper h2 {
+    font-size: 1.6rem;
+  }
+
+  .signup-form-wrapper > p {
+    max-width: 100%;
+    font-size: 0.9rem;
+  }
+
+  .signup-field input {
+    height: 52px;
+    font-size: 1rem;
+  }
+
+  .signup-btn {
+    height: 56px;
+    font-size: 1rem;
+    border-radius: 12px;
+  }
+
+  .signup-google-btn {
+    height: 56px;
+  }
+}
+
+@media (max-width: 468px) {
+  .signup-form-wrapper {
+    padding: 20px 16px 40px;
+  }
+
+  .signup-form-wrapper h2 {
+    font-size: 1.4rem;
+  }
+}

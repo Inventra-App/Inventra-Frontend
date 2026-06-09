@@ -3,11 +3,13 @@ import { Shield, BarChart2, Users, Lock, CheckCircle, Clock, Check } from 'lucid
 import { useNavigate } from 'react-router-dom'
 import logo from '../../assets/Inventra Logo.png'
 import './Css/SignUpVerify.css'
+import Header from '../../Components/Header' 
 
 const SignUpVerify = () => {
   const [otp, setOtp] = useState(['', '', '', '', '', ''])
   const [timeLeft, setTimeLeft] = useState(165)
   const [showPopup, setShowPopup] = useState(false)
+  const [showResendToast, setShowResendToast] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState('')
   const inputRefs = useRef([])
@@ -76,8 +78,27 @@ const SignUpVerify = () => {
     }, 3000)
   }
 
+  const handleResendOtp = () => {
+    if (isSubmitting) return
+    setTimeLeft(165)
+    setShowResendToast(true)
+    setTimeout(() => {
+      setShowResendToast(false)
+    }, 4000)
+  }
+
   return (
     <div className="verify-page">
+      {showResendToast && (
+        <div className="verify-toast-notification">
+          OTP has been resent to your correct email address
+        </div>
+      )}
+      
+      <div className="verify-mobile-nav-container">
+        <Header />
+      </div>
+
       <div className="verify-left">
         <div className="verify-left-logo">
           <img src={logo} alt="Inventra" className="verify-logo-img" />
@@ -90,21 +111,21 @@ const SignUpVerify = () => {
 
           <div className="verify-features">
             <div className="verify-feature-item">
-              <div className="verify-feature-icon"><Shield size={20} /></div>
+              <div className="verify-feature-icon"><Shield size={20} color='#6366F1' /></div>
               <div>
                 <h4>Secure & Protected</h4>
                 <p>Your data is safe with enterprise grade security</p>
               </div>
             </div>
             <div className="verify-feature-item">
-              <div className="verify-feature-icon"><BarChart2 size={20} /></div>
+              <div className="verify-feature-icon"><BarChart2 size={20} color='#6366F1' /></div>
               <div>
                 <h4>Real-time Access</h4>
                 <p>Verify and access your dashboard</p>
               </div>
             </div>
             <div className="verify-feature-item">
-              <div className="verify-feature-icon"><Users size={20} /></div>
+              <div className="verify-feature-icon"><Users size={20} color='#6366F1' /></div>
               <div>
                 <h4>All in One Platform</h4>
                 <p>Manage inventory, sales, expiry, & staff accountability in one place</p>
@@ -123,7 +144,13 @@ const SignUpVerify = () => {
       <div className="verify-right">
         <div className="verify-right-top">
           <span>Didn't receive code?</span>
-          <button className="verify-resend-btn" disabled={isSubmitting}>Resend OTP</button>
+          <button 
+            className="verify-resend-btn" 
+            onClick={handleResendOtp} 
+            disabled={isSubmitting}
+          >
+            Resend OTP
+          </button>
         </div>
 
         <div className="verify-form-wrapper">
@@ -163,9 +190,9 @@ const SignUpVerify = () => {
           </button>
 
           <div className="verify-bottom-footer">
-            <div className="verify-trust-item"><Lock size={14} /><span>Secure Login</span></div>
-            <div className="verify-trust-item"><CheckCircle size={14} /><span>Data Protected</span></div>
-            <div className="verify-trust-item"><Clock size={14} /><span>24/7 Support</span></div>
+            <div className="verify-trust-item"><Lock size={14} color='#6B7280'/><span>Secure Login</span></div>
+            <div className="verify-trust-item"><CheckCircle size={14} color='#6B7280'/><span>Data Protected</span></div>
+            <div className="verify-trust-item"><Clock size={14} color='#6B7280'/><span>24/7 Support</span></div>
           </div>
         </div>
       </div>

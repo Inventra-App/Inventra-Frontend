@@ -109,9 +109,9 @@
 
 .loginLogo h2 {
   margin-top: 20px;
-  font-size: 25px;
+  font-size: 24px;
   line-height: 1;
-  font-weight: 800;
+  font-weight: 600;
   letter-spacing: 0;
 }
 
@@ -125,17 +125,18 @@
   color: #ffffff;
   font-size: 36px;
   line-height: 1.12;
-  font-weight: 850;
+  font-weight: 700;
   letter-spacing: 0;
   margin-top: 30px;
 }
 
 .heroText p {
   margin: 14px 0 0;
-  color: #afbdd3;
+  color: #94A3B8;
   font-size: 18px;
+  font-weight: 400;
   line-height: 1.55;
-  max-width: 560px;
+  max-width: 400px;
   margin-top: 30px;
 }
 
@@ -164,17 +165,18 @@
   color: #ffffff;
   font-size: 18px;
   line-height: 1.25;
-  font-weight: 800;
+  font-weight: 600;
   letter-spacing: 0;
   margin-top: 20px;
 }
 
 .loginFeatureCard p {
   margin: 6px 0 0;
-  color: #aab8ce;
-  font-size: 15px;
+  color: #94A3B8;
+  font-size: 14px;
+  font-weight: 400;
   line-height: 1.5;
-  max-width: 440px;
+  max-width: 360px;
 }
 
 .bottomInfo {
@@ -250,16 +252,14 @@
 
 .loginFormHeading {
   margin-bottom: clamp(20px, 3.6vh, 34px);
-  font-family: Arial, Helvetica, sans-serif;
 }
 
 .loginFormHeading h2 {
   margin: 0;
   color: #111827;
   font-size: 30px;
-  font-family: Arial, Helvetica, sans-serif;
   line-height: 1.15;
-  font-weight: 850;
+  font-weight: 700;
   letter-spacing: 0;
 }
 
@@ -267,6 +267,7 @@
   margin: 8px 0 0;
   color: #6b7280;
   font-size: 16px;
+  font-weight: 400;
   line-height: 1.4;
 }
 
@@ -290,7 +291,7 @@
   padding: 0 16px;
   color: #111827;
   background: #ffffff;
-  border: 1.5px solid #cfd5df;
+  border: 1.5px solid #D1D5DC;
   border-radius: 10px;
   outline: none;
   font: inherit;
