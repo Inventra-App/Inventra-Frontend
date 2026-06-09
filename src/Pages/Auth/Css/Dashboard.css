@@ -525,15 +525,15 @@
     display: block;
     position: fixed;
     top: 0;
-    right: 0;
+    left: 0;
     width: 80%;
     max-width: 320px;
     height: 100vh;
     background-color: #0b1426;
     z-index: 1001;
-    transform: translateX(100%);
+    transform: translateX(100vw);
     transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: -10px 0 30px rgba(0, 0, 0, 0.25);
+    box-shadow: 10px 0 30px rgba(0, 0, 0, 0.25);
     overflow-y: auto;
   }
 
@@ -567,6 +567,7 @@
     flex-direction: column;
     align-items: flex-start;
     gap: 12px;
+    padding: 16px;
   }
 
   .stat-card-left {
@@ -590,10 +591,6 @@
   .dashboard-alerts {
     grid-template-columns: 1fr;
     gap: 16px;
-  }
-
-  .stat-card {
-    padding: 16px;
   }
 
   .stat-value {

@@ -7,7 +7,7 @@ const statCards = [
   { label: 'Sales', value: 0, icon: <ShoppingCart size={20} />, color: 'green' },
   { label: 'Goods Received', value: 1, icon: <Truck size={20} />, color: 'purple' },
   { label: 'Products Created', value: 0, icon: <Package size={20} />, color: 'pink' },
-  { label: 'Inventory Updates', value: 0, icon: <RefreshCw size={20} />, color: 'orange' },
+  { label: 'Inventory Updates', value: 0, icon: <Package size={20} />, color: 'orange' },
 ]
 
 const activities = [

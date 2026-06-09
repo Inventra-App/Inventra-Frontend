@@ -290,7 +290,7 @@ letter-spacing: 0%;
 }
 
 .smater {
-  width: 435.1px;
+  width: 490.1px;
   height: 229.07px;
   display: flex;
   flex-direction: column;
@@ -300,17 +300,13 @@ letter-spacing: 0%;
 }
 
 .smater-text {
-  width: 373px;
-  height: 78px;
   color: #ffffff;
   font-weight: 400;
   font-size: 32.38px;
-  line-height: 100%;
+  line-height: 1.2;
 }
 
 .smater-text-container {
-  width: 435.1px;
-  height: 80.24px;
   display: flex;
   flex-direction: column;
   gap: 10.12px;
@@ -319,12 +315,11 @@ letter-spacing: 0%;
 }
 
 .smarter-text1 {
-  width: 415px;
-  height: 60px;
   color: #e5e7eb;
   font-weight: 400;
-  font-size: 16.19px;
-  line-height: 100%;
+  font-size: 16px;
+  line-height: 1.2;
+  margin-top: -10px;
 }
 
 .smarter-btn {
@@ -335,16 +330,16 @@ letter-spacing: 0%;
   padding: 10.12px;
   background-color: #ffffff;
   cursor: pointer;
-}
-
-.smarter-btn2 {
-  width: 115px;
-  height: 24px;
   color: #432dd7;
   font-weight: 700;
   font-size: 20.24px;
-  line-height: 100%;
-  margin-left: 45px;
+  transition: background-color 0.3s ease, transform 0.3s ease, opacity 0.3s ease;
+}
+
+.smarter-btn:hover {
+  background-color: #432DD7; 
+  color: white;
+  transform: translateY(-1px); 
 }
 
 .phone {

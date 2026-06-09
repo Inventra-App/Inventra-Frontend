@@ -3,6 +3,7 @@ import './Css/ContactUs.css'
 import Header from '../../Components/Header'
 import Footer from "../../Components/Footer"
 import  phone from "../../assets/phone.png"
+import { useNavigate } from 'react-router-dom'
 
 const ContactUs = () => {
   const [firstName, setFirstName] = useState("");
@@ -10,6 +11,7 @@ const ContactUs = () => {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [message, setMessage] = useState("");
   const [agreed, setAgreed] = useState(false);
+  const nav = useNavigate();
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -207,7 +209,7 @@ with Inventra</nav>
 monitor sales , and improve daily operations through <br />
 one smart and efficient platform</div>
 </nav>
-<button className='smarter-btn'><nav className='smarter-btn2'>Get Started</nav></button>
+<button className='smarter-btn' onClick={() => nav("/signup")}>Get Started</button>
               </div>
               <img src={phone} alt=""  className='phone'/>
             </div>

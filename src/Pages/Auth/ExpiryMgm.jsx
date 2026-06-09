@@ -3,7 +3,7 @@ import { AlertTriangle, Package, Calendar, Eye, Box, Truck, Trash2, X } from 'lu
 import './Css/ExpiryMgm.css'
 
 const statCards = [
-  { label: 'Total Alerts', value: 5, color: 'orange', bg: 'orange-bg' },
+  { label: 'Total Alerts', value: 5, color: 'white', bg: 'white-bg' },
   { label: 'Critical', value: 2, color: 'red', bg: 'red-bg' },
   { label: 'Warning', value: 2, color: 'orange', bg: 'orange-bg' },
   { label: 'Info', value: 1, color: 'yellow', bg: 'yellow-bg' },
@@ -62,7 +62,7 @@ const ExpiryMgm = () => {
 
       <div className="expiry-stats">
         {statCards.map((card, index) => (
-          <div key={index} className="expiry-stat-card">
+          <div key={index} className={`expiry-stat-card expiry-stat-card-${card.bg}`}>
             <div className={`expiry-stat-icon expiry-icon-${card.color}`}>
               <AlertTriangle size={20} />
             </div>
