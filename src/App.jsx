@@ -20,6 +20,7 @@ import UserMgm from './Pages/Auth/UserMgm'
 import Settings from './Pages/Auth/Settings'
 import Demo from './Pages/Auth/Demo'
 import PlanSetup from './Pages/Auth/PlanSetup'
+import PaymentSuccess from './Pages/Auth/PaymentSuccess'
 
 function App() {
   return (
@@ -39,6 +40,7 @@ function App() {
         <Route path='/forgot-password' element={<ForgetPassUi/>} />
         <Route path='/demo' element={<Demo />} />
         <Route path='/plan-setup/:plan' element={<PlanSetup />} />
+        <Route path='/payment-success' element={<PaymentSuccess />} />
 
 
         <Route element={<DashboardLayout />}>

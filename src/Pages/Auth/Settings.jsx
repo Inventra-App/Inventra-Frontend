@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Bell, Check, Database, Eye, Lock, Save, Shield, User } from 'lucide-react'
+import { Bell, Check, Database, Eye, Save, Shield, User } from 'lucide-react'
 import './Css/Settings.css'
 
 const isValidEmail = (value) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
@@ -286,58 +286,6 @@ const SystemSettings = ({ onSave }) => {
   )
 }
 
-const PermissionSettings = () => {
-  const managerPermissions = [
-    'Dashboard Access',
-    'Inventory Access',
-    'Manage Inventory',
-    'Sales (POS) Access',
-    'Goods Receiving Access',
-    'Expiry Management Access',
-    'Activity Log Access',
-    'User Management Access',
-    'Settings Access',
-  ]
-
-  return (
-    <section className='settings-content-card settings-permissions-card'>
-      <h3>Permission Management</h3>
-      <p>Configure access permissions for different user roles</p>
-
-      <div className='settings-permission-notice'>
-        <Shield size={18} />
-        <div>
-          <h4>Important Notice</h4>
-          <p>Changes to permissions will take effect when users log in next time. Admin permissions cannot be modified.</p>
-        </div>
-      </div>
-
-      <div className='settings-role-card'>
-        <div className='settings-role-header'>
-          <div className='settings-role-icon'>
-            <User size={21} />
-          </div>
-          <div>
-            <h4>Manager Role</h4>
-            <p>Store managers and supervisors</p>
-          </div>
-        </div>
-
-        <div className='settings-permission-grid'>
-          {managerPermissions.map((permission) => (
-            <div className='settings-permission-row' key={permission}>
-              <span>{permission}</span>
-              <button className='settings-permission-toggle' type='button' aria-label={`${permission} enabled`}>
-                <Check size={19} />
-              </button>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  )
-}
-
 const Settings = () => {
   const [activeSection, setActiveSection] = useState('notifications')
   const [showSavePopup, setShowSavePopup] = useState(false)
@@ -403,21 +351,12 @@ const Settings = () => {
             <span>System</span>
           </button>
 
-          <button
-            type='button'
-            className={activeSection === 'permissions' ? 'settings-menu-item active' : 'settings-menu-item'}
-            onClick={() => setActiveSection('permissions')}
-          >
-            <Lock size={19} />
-            <span>Permissions</span>
-          </button>
         </aside>
 
         {activeSection === 'profile' && <ProfileSettings onSave={handleSaveSuccess} />}
         {activeSection === 'notifications' && <NotificationSettings onSave={handleSaveSuccess} />}
         {activeSection === 'security' && <SecuritySettings onSave={handleSaveSuccess} />}
         {activeSection === 'system' && <SystemSettings onSave={handleSaveSuccess} />}
-        {activeSection === 'permissions' && <PermissionSettings />}
       </div>
 
       {showSavePopup && <SaveSuccessPopup message={savePopupMessage} />}

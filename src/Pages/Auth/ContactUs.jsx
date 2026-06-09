@@ -104,7 +104,7 @@ need support, our team is ready to assist you </p>
           </form>
 
           <section className='contact-info'>
-            <h3>Get in touch</h3>
+            <h3 className='contact-info h3'>Get in touch</h3>
 
             <div className='contact-info-item'>
               <p>Email:</p>
