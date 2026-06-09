@@ -47,11 +47,11 @@
   flex-shrink: 0;
 }
 
-.activity-stat-blue { background-color: #dbeafe; color: #2563eb; }
-.activity-stat-green { background-color: #dcfce7; color: #16a34a; }
-.activity-stat-purple { background-color: #ede9fe; color: #7c3aed; }
-.activity-stat-pink { background-color: #fce7f3; color: #db2777; }
-.activity-stat-orange { background-color: #ffedd5; color: #f97316; }
+.activity-stat-blue { background-color: #E0E7FF; color: #4F39F6; }
+.activity-stat-green { background-color: #DCFCE7; color: #00A63E; }
+.activity-stat-purple { background-color: #DBEAFE; color: #155DFC; }
+.activity-stat-pink { background-color: #F3E8FF; color: #9810FA; }
+.activity-stat-orange { background-color: #FFEDD4; color: #F54900; }
 
 .activity-stat-label {
   font-size: 0.8rem;
