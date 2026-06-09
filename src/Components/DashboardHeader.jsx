@@ -23,7 +23,7 @@ const DashboardHeader = () => {
 
   return (
     <div className="dash-header">
-      <h1>{pageTitles[pathname] || 'Inventra'}</h1>
+      {/* <h1>{pageTitles[pathname] || 'Inventra'}</h1> */}
       <span className="dash-header-date">{today}</span>
     </div>
   )

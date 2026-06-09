@@ -23,7 +23,6 @@ const Manage = () => {
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
       >
-        {/* Unified container that anchors the circles to each other */}
         <div className="manage-images-inner">
           <div
             className={`manage-circle left-current ${

@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import faqData from '../Components/faqData'
 import action from '../assets/Action.png'
+import { ChevronDown } from 'lucide-react' // Imported the clean chevron icon
 import '../Css/Actions.css'
 
 const Actions = () => {
@@ -39,7 +40,10 @@ const Actions = () => {
             <div key={index} className="actions-item">
               <div className="actions-question" onClick={() => toggle(index)}>
                 <span>{item.question}</span>
-                <span className="actions-chevron">{openIndex === index ? '∧' : '∨'}</span>
+                <ChevronDown 
+                  size={20} 
+                  className={`actions-chevron ${openIndex === index ? 'open' : ''}`} 
+                />
               </div>
               {openIndex === index && (
                 <p className="actions-answer">{item.answer}</p>
