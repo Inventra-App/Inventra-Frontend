@@ -156,19 +156,20 @@ const UserMgm = () => {
     showToast('New User has been created')
   }
 
- const activateUser = () => {
+ const toggleUserStatus = () => {
+  const newStatus = selectedUser.status === 'Active' ? 'Suspended' : 'Active'
   const updatedUsers = users.map((user) => {
     if (user.id === selectedUser.id) {
-      return { ...user, status: 'Active' }
+      return { ...user, status: newStatus }
     }
 
     return user
   })
 
   setUsers(updatedUsers)
-  setSelectedUser({ ...selectedUser, status: 'Active' })
+  setSelectedUser({ ...selectedUser, status: newStatus })
   closeModal()
-  showToast('User activated successfully')
+  showToast(newStatus === 'Active' ? 'User activated successfully' : 'User suspended successfully')
 }
 
   const saveRoleChange = (event) => {
@@ -535,9 +536,9 @@ const UserMgm = () => {
                 Change Role
               </button>
 
-              <button className="suspend-btn" type="button" onClick={() => setModal('suspend')}>
+              <button className={selectedUser.status === 'Active' ? 'suspend-btn danger-action' : 'suspend-btn activate-action'} type="button" onClick={() => setModal('suspend')}>
                 <img src={Icon1} alt="" />
-                Activate User
+                {selectedUser.status === 'Active' ? 'Suspend User' : 'Activate User'}
               </button>
             </div>
           </div>
@@ -550,11 +551,11 @@ const UserMgm = () => {
       <div className="confirm-icon">
         <CheckCircle2 size={22} />
       </div>
-      <h3>Activate User</h3>
-      <p>Activating <strong>{selectedUser.name.split(' ')[0]}</strong> will restore their access to the system. </p>
+      <h3>{selectedUser.status === 'Active' ? 'Suspend User' : 'Activate User'}</h3>
+      <p>{selectedUser.status === 'Active' ? 'Suspending' : 'Activating'} <strong>{selectedUser.name.split(' ')[0]}</strong> {selectedUser.status === 'Active' ? 'will revoke their access to the system.' : 'will restore their access to the system.'} </p>
       <div className="confirm-actions">
         <button className="neutral-btn"type="button" onClick={() => setModal('details')} > Cancel </button>
-        <button className="primary-btns" type="button" onClick={activateUser}> Activate User </button>
+        <button className="primary-btns" type="button" onClick={toggleUserStatus}> {selectedUser.status === 'Active' ? 'Suspend User' : 'Activate User'} </button>
       </div>
     </div>
   </div>
