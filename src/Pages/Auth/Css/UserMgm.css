@@ -801,6 +801,26 @@
   background: #b91c1c;
 }
 
+.activate-btn {
+  min-height: 42px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 700;
+  background: #16a34a;
+  color: #ffffff;
+}
+
+.activate-btn:hover {
+  background: #15803d;
+}
+
+.confirm-icon.activate-confirm-icon {
+  background: #dcfce7;
+  color: #16a34a;
+}
+
 .details-modal {
   width: min(100%, 330px);
   padding: 18px 14px 14px;

@@ -10,6 +10,7 @@ import {
   REGISTER,
 } from "redux-persist";
 import { combineReducers } from "redux";
+import storage from "./storage";
 import usersReducer from "./usersSlice";
 import apiReducer from "./apiSlice";
 
