@@ -9,8 +9,8 @@ import {
   PURGE,
   REGISTER,
 } from "redux-persist";
-import storage from "redux-persist/lib/storage";
 import { combineReducers } from "redux";
+import storage from "./storage";
 import usersReducer from "./usersSlice";
 import apiReducer from "./apiSlice";
 

@@ -6,6 +6,7 @@ import {
   ChevronDown,
   Copy,
   Lock,
+  Power,
   Settings,
   Shield,
   User,
@@ -84,6 +85,8 @@ const UserMgm = () => {
   const getRoleClass = (userRole) => {
     return userRole.toLowerCase()
   }
+
+  const isSuspended = (user) => Boolean(user) && user.status === 'Suspended'
 
   const closeModal = () => {
     setModal('')
@@ -170,6 +173,21 @@ const UserMgm = () => {
     setSelectedUser({ ...selectedUser, status: 'Suspended' })
     closeModal()
     showToast('User suspended successfully')
+  }
+
+  const activateUser = () => {
+    const updatedUsers = users.map((user) => {
+      if (user.id === selectedUser.id) {
+        return { ...user, status: 'Active' }
+      }
+
+      return user
+    })
+
+    setUsers(updatedUsers)
+    setSelectedUser({ ...selectedUser, status: 'Active' })
+    closeModal()
+    showToast('User activated successfully')
   }
 
   const saveRoleChange = (event) => {
@@ -505,7 +523,9 @@ const UserMgm = () => {
               <div className="detail-icon"><CheckCircle2 size={16} /></div>
               <div>
                 <span>Account Status</span>
-                <strong className={selectedUser.status === 'Suspended' ? 'suspended-value' : 'active-value'}>{selectedUser.status}</strong>
+                <strong className={isSuspended(selectedUser) ? 'suspended-value' : 'active-value'}>
+                  {isSuspended(selectedUser) ? 'User is Suspended' : 'Active'}
+                </strong>
               </div>
             </div>
 
@@ -533,10 +553,17 @@ const UserMgm = () => {
                 Change Role
               </button>
 
-              <button className="suspend-btn" type="button" onClick={() => setModal('suspend')}>
-                <AlertCircle size={14} />
-                Suspend User
-              </button>
+              {isSuspended(selectedUser) ? (
+                <button className="suspend-btn activate-action" type="button" onClick={() => setModal('activate')}>
+                  <Power size={14} />
+                  Activate User
+                </button>
+              ) : (
+                <button className="suspend-btn danger-action" type="button" onClick={() => setModal('suspend')}>
+                  <AlertCircle size={14} />
+                  Suspend User
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -546,13 +573,25 @@ const UserMgm = () => {
         <div className="user-modal-backdrop">
           <div className="confirm-modal">
             <div className="confirm-icon"><AlertCircle size={22} /></div>
-
             <h3>Suspend User</h3>
             <p>Suspending <strong>{selectedUser.name.split(' ')[0]}</strong> will remove their access to the system until reactivated.</p>
-
             <div className="confirm-actions">
               <button className="neutral-btn" type="button" onClick={() => setModal('details')}>Cancel</button>
               <button className="danger-btn" type="button" onClick={suspendUser}>Suspend User</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {modal === 'activate' && selectedUser && (
+        <div className="user-modal-backdrop">
+          <div className="confirm-modal">
+            <div className="confirm-icon activate-confirm-icon"><Power size={22} /></div>
+            <h3>Activate User</h3>
+            <p>Activating <strong>{selectedUser.name.split(' ')[0]}</strong> will restore their access to the system.</p>
+            <div className="confirm-actions">
+              <button className="neutral-btn" type="button" onClick={() => setModal('details')}>Cancel</button>
+              <button className="activate-btn" type="button" onClick={activateUser}>Activate User</button>
             </div>
           </div>
         </div>
@@ -562,7 +601,6 @@ const UserMgm = () => {
         <div className="user-modal-backdrop">
           <div className="user-modal reset-modal">
             <h3>Reset Password</h3>
-
             <div className="password-success-box">
               <CheckCircle2 size={22} />
               <div>
@@ -570,7 +608,6 @@ const UserMgm = () => {
                 <p>Share this temporary password with the staff member</p>
               </div>
             </div>
-
             <div className="temp-password-box">
               <label>Temporary Password</label>
               <div>
@@ -581,7 +618,6 @@ const UserMgm = () => {
                 </button>
               </div>
             </div>
-
             <button className="neutral-btn close-reset-btn" type="button" onClick={closeModal}>Close</button>
           </div>
         </div>
@@ -591,14 +627,12 @@ const UserMgm = () => {
         <div className="user-modal-backdrop">
           <form className="user-modal change-role-modal" onSubmit={saveRoleChange}>
             <h3>Change Role</h3>
-
             <div className="role-change-info">
               <strong>Staff Member</strong>
               <p>{selectedUser.name}</p>
               <strong>Current Role</strong>
               <p>{selectedUser.role === 'Staff' ? 'Inventory Staff' : selectedUser.role}</p>
             </div>
-
             <label>
               <span>New Role *</span>
               <div className="modal-select-wrap role-change-select">
@@ -610,7 +644,6 @@ const UserMgm = () => {
                 </select>
               </div>
             </label>
-
             <div className="modal-actions">
               <button className="neutral-btn" type="button" onClick={closeModal}>Cancel</button>
               <button className="primary-btn" type="submit">Save Changes</button>
