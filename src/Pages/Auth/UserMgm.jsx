@@ -23,6 +23,7 @@ import Icon5 from '../../assets/Icon (7).png'
 import manage from '../../assets/manage-roles-icon.png'
 import green from '../../assets/Icon green.png'
 import gray from '../../assets/Icon gray.png'
+
 const UserMgm = () => {
   const [users, setUsers] = useState([
     { id: 'user-001', name: 'Admin User', username: 'admin001', role: 'Admin', status: 'Active', isCurrent: true, joined: 'May 1st 2026', lastLogin: 'May 1st 2026' },
@@ -156,21 +157,20 @@ const UserMgm = () => {
     showToast('New User has been created')
   }
 
- const toggleUserStatus = () => {
-  const newStatus = selectedUser.status === 'Active' ? 'Suspended' : 'Active'
-  const updatedUsers = users.map((user) => {
-    if (user.id === selectedUser.id) {
-      return { ...user, status: newStatus }
-    }
+  const suspendUser = () => {
+    const updatedUsers = users.map((user) => {
+      if (user.id === selectedUser.id) {
+        return { ...user, status: 'Suspended' }
+      }
 
-    return user
-  })
+      return user
+    })
 
-  setUsers(updatedUsers)
-  setSelectedUser({ ...selectedUser, status: newStatus })
-  closeModal()
-  showToast(newStatus === 'Active' ? 'User activated successfully' : 'User suspended successfully')
-}
+    setUsers(updatedUsers)
+    setSelectedUser({ ...selectedUser, status: 'Suspended' })
+    closeModal()
+    showToast('User suspended successfully')
+  }
 
   const saveRoleChange = (event) => {
     event.preventDefault()
@@ -357,12 +357,12 @@ const UserMgm = () => {
                 <span className={`role-pill ${getRoleClass(user.role)}`}>{user.role}</span>
               </div>
 
-             <div className="table-field status-field">
-  <small className="mobile-field-label">Status</small>
-  <span className="status-text">
-    <span></span>{user.status}
-  </span>
-</div>
+              <div className="table-field status-field">
+                <small className="mobile-field-label">Status</small>
+                <span className={user.status === 'Suspended' ? 'status-text suspended' : 'status-text'}>
+                  <span></span>{user.status}
+                </span>
+              </div>
 
               {user.isCurrent ? (
                 <div className="table-field action-field">
@@ -502,15 +502,12 @@ const UserMgm = () => {
             </div>
 
             <div className="detail-item">
-  <div className="detail-icon"><CheckCircle2 size={16} /></div>
-  <div>
-    <span>Account Status</span>
-
-    <strong className="active-value">
-      {selectedUser.status}
-    </strong>
-  </div>
-</div>
+              <div className="detail-icon"><CheckCircle2 size={16} /></div>
+              <div>
+                <span>Account Status</span>
+                <strong className={selectedUser.status === 'Suspended' ? 'suspended-value' : 'active-value'}>{selectedUser.status}</strong>
+              </div>
+            </div>
 
             <div className="detail-item">
               <div className="detail-icon"><Calendar size={16} /></div>
@@ -536,30 +533,31 @@ const UserMgm = () => {
                 Change Role
               </button>
 
-              <button className={selectedUser.status === 'Active' ? 'suspend-btn danger-action' : 'suspend-btn activate-action'} type="button" onClick={() => setModal('suspend')}>
-                <img src={Icon1} alt="" />
-                {selectedUser.status === 'Active' ? 'Suspend User' : 'Activate User'}
+              <button className="suspend-btn" type="button" onClick={() => setModal('suspend')}>
+                <AlertCircle size={14} />
+                Suspend User
               </button>
             </div>
           </div>
         </div>
       )}
 
-     {modal === 'suspend' && selectedUser && (
-  <div className="user-modal-backdrop">
-    <div className="confirm-modal">
-      <div className="confirm-icon">
-        <CheckCircle2 size={22} />
-      </div>
-      <h3>{selectedUser.status === 'Active' ? 'Suspend User' : 'Activate User'}</h3>
-      <p>{selectedUser.status === 'Active' ? 'Suspending' : 'Activating'} <strong>{selectedUser.name.split(' ')[0]}</strong> {selectedUser.status === 'Active' ? 'will revoke their access to the system.' : 'will restore their access to the system.'} </p>
-      <div className="confirm-actions">
-        <button className="neutral-btn"type="button" onClick={() => setModal('details')} > Cancel </button>
-        <button className="primary-btns" type="button" onClick={toggleUserStatus}> {selectedUser.status === 'Active' ? 'Suspend User' : 'Activate User'} </button>
-      </div>
-    </div>
-  </div>
-)}
+      {modal === 'suspend' && selectedUser && (
+        <div className="user-modal-backdrop">
+          <div className="confirm-modal">
+            <div className="confirm-icon"><AlertCircle size={22} /></div>
+
+            <h3>Suspend User</h3>
+            <p>Suspending <strong>{selectedUser.name.split(' ')[0]}</strong> will remove their access to the system until reactivated.</p>
+
+            <div className="confirm-actions">
+              <button className="neutral-btn" type="button" onClick={() => setModal('details')}>Cancel</button>
+              <button className="danger-btn" type="button" onClick={suspendUser}>Suspend User</button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {modal === 'password' && selectedUser && (
         <div className="user-modal-backdrop">
           <div className="user-modal reset-modal">
