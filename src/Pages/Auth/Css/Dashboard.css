@@ -531,7 +531,7 @@
     height: 100vh;
     background-color: #0b1426;
     z-index: 1001;
-    transform: translateX(100vw);
+    transform: translateX(-100%);
     transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
     box-shadow: 10px 0 30px rgba(0, 0, 0, 0.25);
     overflow-y: auto;
