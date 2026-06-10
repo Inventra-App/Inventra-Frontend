@@ -783,6 +783,24 @@
   color: #ffffff;
 }
 
+.suspend-btn.activate-action {
+  background: #16a34a;
+  color: #ffffff;
+}
+
+.suspend-btn.activate-action:hover {
+  background: #15803d;
+}
+
+.suspend-btn.danger-action {
+  background: #dc2626;
+  color: #ffffff;
+}
+
+.suspend-btn.danger-action:hover {
+  background: #b91c1c;
+}
+
 .details-modal {
   width: min(100%, 330px);
   padding: 18px 14px 14px;
