@@ -56,6 +56,7 @@ function App() {
   return (
     <BrowserRouter>
       <ScrollToTop />
+
       <AnimatedRoutes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/pricing" element={<Pricing />} />
@@ -72,6 +73,7 @@ function App() {
         <Route path="/demo" element={<Demo />} />
         <Route path="/plan-setup/:plan" element={<PlanSetup />} />
         <Route path="/payment-success" element={<PaymentSuccess />} />
+        <Route path="*" element={null} />
       </AnimatedRoutes>
 
       <Routes>
@@ -84,6 +86,7 @@ function App() {
           <Route path="/users" element={<UserMgm />} />
           <Route path="/settings" element={<Settings />} />
         </Route>
+        <Route path="*" element={null} />
       </Routes>
     </BrowserRouter>
   );

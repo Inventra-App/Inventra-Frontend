@@ -9,14 +9,19 @@ import {
   PURGE,
   REGISTER,
 } from "redux-persist";
-import storage from "redux-persist/lib/storage";
 import { combineReducers } from "redux";
 import usersReducer from "./usersSlice";
 import apiReducer from "./apiSlice";
 
+const nativeLocalStorage = {
+  getItem: (key) => Promise.resolve(localStorage.getItem(key)),
+  setItem: (key, value) => Promise.resolve(localStorage.setItem(key, value)),
+  removeItem: (key) => Promise.resolve(localStorage.removeItem(key)),
+};
+
 const persistConfig = {
   key: "root",
-  storage,
+  storage: nativeLocalStorage,
 };
 
 const rootReducer = combineReducers({
