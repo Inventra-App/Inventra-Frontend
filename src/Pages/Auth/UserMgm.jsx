@@ -23,6 +23,7 @@ import Icon5 from '../../assets/Icon (7).png'
 import manage from '../../assets/manage-roles-icon.png'
 import green from '../../assets/Icon green.png'
 import gray from '../../assets/Icon gray.png'
+import { VscError } from "react-icons/vsc";
 const UserMgm = () => {
   const [users, setUsers] = useState([
     { id: 'user-001', name: 'Admin User', username: 'admin001', role: 'Admin', status: 'Active', isCurrent: true, joined: 'May 1st 2026', lastLogin: 'May 1st 2026' },
@@ -549,7 +550,7 @@ const UserMgm = () => {
   <div className="user-modal-backdrop">
     <div className="confirm-modal">
       <div className="confirm-icon">
-        <CheckCircle2 size={22} />
+        <VscError />
       </div>
       <h3>{selectedUser.status === 'Active' ? 'Suspend User' : 'Activate User'}</h3>
       <p>{selectedUser.status === 'Active' ? 'Suspending' : 'Activating'} <strong>{selectedUser.name.split(' ')[0]}</strong> {selectedUser.status === 'Active' ? 'will revoke their access to the system.' : 'will restore their access to the system.'} </p>

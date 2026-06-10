@@ -769,7 +769,7 @@
   color: #101828;
 }
 .primary-btns{
-  background: green;
+  background: #dc2626;
   color: #ffffff;
    min-height: 42px;
   border: none;
@@ -961,12 +961,12 @@
 }
 
 .confirm-icon {
-  width: 42px;
-  height: 42px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   margin: 0 auto 16px;
-  background: rgb(133, 228, 133);
-  color: green;
+  background:rgb(224, 105, 105);
+  color: red;
   display: flex;
   align-items: center;
   justify-content: center;
