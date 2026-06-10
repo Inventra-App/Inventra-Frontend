@@ -6,6 +6,7 @@ const apiSlice = createSlice({
     accessToken: null,
     refreshToken: null,
     user: null,
+    registrationEmail: "", 
   },
   reducers: {
     setAccessToken: (state, action) => {
@@ -17,8 +18,11 @@ const apiSlice = createSlice({
     setUser: (state, action) => {
       state.user = action.payload;
     },
+    setRegistrationEmail: (state, action) => {
+      state.registrationEmail = action.payload;
+    },
   },
 });
 
-export const { setAccessToken, setRefreshToken, setUser } = apiSlice.actions;
+export const { setAccessToken, setRefreshToken, setUser, setRegistrationEmail } = apiSlice.actions;
 export default apiSlice.reducer;

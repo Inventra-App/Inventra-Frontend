@@ -1,9 +1,9 @@
 import React from 'react'
 import '../Css/Inventra.css'
-import supermarket from '../assets/Supermarket1.jpg'
-import warehouse from '../assets/Warehouse.jpg'
-import pharmacy from '../assets/Pharmacy.jpg'
-import retail from '../assets/Retail.jpg'
+import supermarket from '../assets/Supermarket1.jpg?url'
+import warehouse from '../assets/Warehouse.jpg?url'
+import pharmacy from '../assets/Pharmacy.jpg?url'
+import retail from '../assets/Retail.jpg?url'
 
 const Inventra = () => {
   return (
