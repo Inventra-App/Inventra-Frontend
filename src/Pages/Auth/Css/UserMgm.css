@@ -752,7 +752,6 @@
 }
 
 .neutral-btn,
-.primary-btn,
 .danger-btn,
 .full-primary-btn,
 .change-role-btn,
@@ -769,8 +768,17 @@
   background: #e5e7eb;
   color: #101828;
 }
+.primary-btns{
+  background: green;
+  color: #ffffff;
+   min-height: 42px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 700;
+}
 
-.primary-btn,
 .full-primary-btn,
 .change-role-btn {
   background: #4f35f5;
@@ -779,7 +787,7 @@
 
 .danger-btn,
 .suspend-btn {
-  background: #ef000b;
+  background: green;
   color: #ffffff;
 }
 
@@ -939,8 +947,8 @@
   height: 42px;
   border-radius: 50%;
   margin: 0 auto 16px;
-  background: #ffe1e5;
-  color: #ff1f35;
+  background: rgb(133, 228, 133);
+  color: green;
   display: flex;
   align-items: center;
   justify-content: center;
