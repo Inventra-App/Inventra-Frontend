@@ -771,6 +771,17 @@
 }
 
 .primary-btn,
+.primary-btns{
+  background: #dc2626;
+  color: #ffffff;
+   min-height: 42px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 700;
+}
+
 .full-primary-btn,
 .change-role-btn {
   background: #4f35f5;
@@ -973,8 +984,8 @@
 }
 
 .confirm-icon {
-  width: 42px;
-  height: 42px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   margin: 0 auto 16px;
   background: #ffe1e5;
