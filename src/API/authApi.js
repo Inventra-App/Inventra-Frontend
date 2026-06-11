@@ -1,0 +1,34 @@
+import API from "./axios";
+
+
+export const signupAdmin = async (data) => {
+  const res = await API.post("/user", data);
+  console.log("=== RAW AXIOS RESPONSE OBJECT ===", res);
+  return res.data;
+};
+
+export const verifySignupEmail = async (payload) => {
+  const res = await API.post("/verify", payload);
+  console.log("=== OTP VERIFICATION RAW RESPONSE ===", res);
+  return res.data;
+};
+
+export const loginAdmin = async (data) => {
+  const res = await API.post("/login", data);
+  return res.data;
+};
+
+export const resendOtp = async (email) => {
+  const res = await API.post("/resend-otp", { email });
+  return res.data;
+};
+
+export const forgetPassword = async (data) => {
+  const res = await API.post("/forgot", data);
+  return res.data;
+};
+
+export const resetPassword = async (data) => {
+  const res = await API.post("/reset", data);
+  return res.data;
+};

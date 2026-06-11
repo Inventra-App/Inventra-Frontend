@@ -25,7 +25,7 @@ const Hero = () => {
         </p>
 
         <div className="hero-buttons">
-          <button className="primary-btn" onClick={() => nav("/signup")}>
+          <button style={{backgroundColor:"#432DD7"}} className="primary-btn" onClick={() => nav("/signup")}>
             <Rocket size={18} />
             Get Started
           </button>

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import "../Css/Header.css";
 import { NavLink, useNavigate } from "react-router-dom";
-import logo from '../assets/Inventra Logo.png'
+// import logo from '../assets/Inventra Logo.png?url'
 
 const Header = () => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -10,7 +10,8 @@ const Header = () => {
   return (
     <header className="header">
       <div className="header-logo">
-        <img src={logo} className="logo-icon" alt="" />
+        <img src="/Inventra Logo.png" alt="Logo" />
+        {/* <img src={logo} className="logo-icon" alt="" /> */}
         <h2>Inventra</h2>
       </div>
 

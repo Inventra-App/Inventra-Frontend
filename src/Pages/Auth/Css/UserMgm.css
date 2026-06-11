@@ -752,6 +752,7 @@
 }
 
 .neutral-btn,
+.primary-btn,
 .danger-btn,
 .full-primary-btn,
 .change-role-btn,
@@ -768,6 +769,8 @@
   background: #e5e7eb;
   color: #101828;
 }
+
+.primary-btn,
 .primary-btns{
   background: #dc2626;
   color: #ffffff;
@@ -787,7 +790,7 @@
 
 .danger-btn,
 .suspend-btn {
-  background: green;
+  background: #ef000b;
   color: #ffffff;
 }
 
@@ -807,6 +810,26 @@
 
 .suspend-btn.danger-action:hover {
   background: #b91c1c;
+}
+
+.activate-btn {
+  min-height: 42px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 700;
+  background: #16a34a;
+  color: #ffffff;
+}
+
+.activate-btn:hover {
+  background: #15803d;
+}
+
+.confirm-icon.activate-confirm-icon {
+  background: #dcfce7;
+  color: #16a34a;
 }
 
 .details-modal {
@@ -965,8 +988,8 @@
   height: 40px;
   border-radius: 50%;
   margin: 0 auto 16px;
-  background:rgb(224, 105, 105);
-  color: red;
+  background: #ffe1e5;
+  color: #ff1f35;
   display: flex;
   align-items: center;
   justify-content: center;

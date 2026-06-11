@@ -1,19 +1,30 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { Shield, BarChart2, Users, Lock, CheckCircle, Clock, Check } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
-import logo from '../../assets/Inventra Logo.png'
+import { useSelector } from 'react-redux' 
+import { resendOtp, verifySignupEmail } from '../../API/authApi'
 import './Css/SignUpVerify.css'
 import Header from '../../Components/Header' 
+import toast from 'react-hot-toast'
 
 const SignUpVerify = () => {
+  const completeState = useSelector((state) => state);
+  console.log("👉 CURRENT REDUX STATE ACCESSED BY VERIFY PAGE:", completeState);
   const [otp, setOtp] = useState(['', '', '', '', '', ''])
   const [timeLeft, setTimeLeft] = useState(165)
   const [showPopup, setShowPopup] = useState(false)
-  const [showResendToast, setShowResendToast] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState('')
   const inputRefs = useRef([])
   const navigate = useNavigate()
+  const email = useSelector((state) => state.apiInfo?.registrationEmail || "");
+
+  const getMaskedEmail = () => {
+    if (!email) return "your email address";
+    const [local, domain] = email.split('@');
+    if (local.length <= 2) return `${local}***@${domain}`;
+    return `${local.slice(0, 2)}******@${domain}`;
+  };
 
   useEffect(() => {
     if (timeLeft <= 0) return
@@ -57,51 +68,90 @@ const SignUpVerify = () => {
     inputRefs.current[Math.min(paste.length - 1, 5)].focus()
   }
 
-  const handleVerify = (e) => {
+  const handleVerify = async (e) => {
     e.preventDefault()
-    
     if (isSubmitting) return
 
-    const isOtpComplete = otp.every(digit => digit !== '')
+    if (!email) {
+      setError("Registration email context missing. Please sign up again.");
+      toast.error("Registration email missing.");
+      return;
+    }
 
-    if (!isOtpComplete) {
+    const otpCode = otp.join("")
+    if (otpCode.length !== 6) {
       setError('Please fill in all 6 verification digits')
       return
     }
 
-    setIsSubmitting(true)
-    setShowPopup(true)
-    
-    setTimeout(() => {
-      setShowPopup(false)
-      navigate('/login')
-    }, 3000)
+    try {
+      setIsSubmitting(true)
+      setError('')
+      const payload = {
+        email: email,
+        otp: otpCode,
+      }
+
+      console.log("=== SENDING OTP PAYLOAD ===", payload)
+      const res = await verifySignupEmail(payload)
+
+      setShowPopup(true)
+      toast.success(res?.message || "Account verified successfully!");
+
+      setTimeout(() => {
+        setShowPopup(false)
+        navigate('/login')
+      }, 3000)
+
+    } catch (err) {
+      console.error("OTP VERIFICATION ERROR:", err)
+      const serverErrorMessage = err.response?.data?.message || "Invalid or expired OTP";
+      setError(serverErrorMessage)
+      toast.error(serverErrorMessage)
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
-  const handleResendOtp = () => {
+  const handleResendOtp = async () => {
     if (isSubmitting) return
-    setTimeLeft(165)
-    setShowResendToast(true)
-    setTimeout(() => {
-      setShowResendToast(false)
-    }, 4000)
+    if (!email) {
+      toast.error("Cannot resend. Email context missing.");
+      return;
+    }
+
+    try {
+      setIsSubmitting(true)
+      setError('')
+
+      console.log(`Triggered resend OTP request packet for: ${email}`)
+      const res = await resendOtp(email);
+      console.log("=== RESEND OTP DATA SUBSET ===", res);
+      
+      setTimeLeft(165)
+      setOtp(['', '', '', '', '', ''])
+      toast.success(res?.message || "OTP has been resent to your email address!");
+    } catch (err) {
+      console.error("RESEND ROUTE API ERROR:", err);
+
+      const serverErrorMessage = err.response?.data?.message || "Failed to resend validation token.";
+      toast.error(serverErrorMessage);
+      setError(serverErrorMessage);
+
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
     <div className="verify-page">
-      {showResendToast && (
-        <div className="verify-toast-notification">
-          OTP has been resent to your correct email address
-        </div>
-      )}
-      
       <div className="verify-mobile-nav-container">
         <Header />
       </div>
 
       <div className="verify-left">
         <div className="verify-left-logo">
-          <img src={logo} alt="Inventra" className="verify-logo-img" />
+          <img src="/Inventra Logo.png" alt="Logo" />
           <span>Inventra</span>
         </div>
 
@@ -155,7 +205,7 @@ const SignUpVerify = () => {
 
         <div className="verify-form-wrapper">
           <h2>Verify Your Account</h2>
-          <p>We've sent a 6-digit OTP to your email address <span className="verify-email">ao******@gmail.com</span></p>
+          <p>We've sent a 6-digit OTP to your email address <span className="verify-email">{getMaskedEmail()}</span></p>
 
           <div className="verify-otp-container">
             <div className="verify-otp-group">
@@ -171,6 +221,7 @@ const SignUpVerify = () => {
                   onChange={(e) => handleOtpChange(index, e.target.value)}
                   onKeyDown={(e) => handleKeyDown(index, e)}
                   onPaste={handlePaste}
+                  disabled={isSubmitting}
                 />
               ))}
             </div>

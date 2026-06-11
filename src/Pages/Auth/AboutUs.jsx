@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import Footer from '../../Components/Footer';
 import './Css/AboutUs.css';
 import Header from '../../Components/Header';
@@ -25,6 +25,8 @@ import { motion } from "framer-motion";
 const AboutUs = () => {
   const [hovered, setHovered] = useState(false);
   const sliderRef = useRef(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(true);
 
   const images = {
     first: anto,
@@ -33,22 +35,53 @@ const AboutUs = () => {
     fourth: ourvission
   };
 
-  const handleMouseDown = (e) => {
+  const getCardScrollAmount = () => {
     const slider = sliderRef.current;
-    let startX = e.pageX;
-    let scrollLeft = slider.scrollLeft;
+    if (!slider) return 0;
+    const firstCard = slider.querySelector('.review-card');
+    if (!firstCard) return 0;
+    const cardWidth = firstCard.getBoundingClientRect().width;
+    const gap = parseFloat(getComputedStyle(slider).columnGap || getComputedStyle(slider).gap) || 20;
+    return cardWidth + gap;
+  };
 
-    const handleMouseMove = (e) => {
-      slider.scrollLeft = scrollLeft - (e.pageX - startX);
+  const updateScrollButtons = () => {
+    const slider = sliderRef.current;
+    if (!slider) return;
+    setCanScrollLeft(slider.scrollLeft > 1);
+    setCanScrollRight(slider.scrollLeft + slider.clientWidth < slider.scrollWidth - 1);
+  };
+
+  const handlePrev = () => {
+    const slider = sliderRef.current;
+    if (!slider) return;
+    slider.scrollBy({ left: -getCardScrollAmount(), behavior: 'smooth' });
+  };
+
+  const handleNext = () => {
+    const slider = sliderRef.current;
+    if (!slider) return;
+    slider.scrollBy({ left: getCardScrollAmount(), behavior: 'smooth' });
+  };
+
+  useEffect(() => {
+    const slider = sliderRef.current;
+    if (!slider) return;
+    updateScrollButtons();
+    slider.addEventListener('scroll', updateScrollButtons);
+    window.addEventListener('resize', updateScrollButtons);
+    return () => {
+      slider.removeEventListener('scroll', updateScrollButtons);
+      window.removeEventListener('resize', updateScrollButtons);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-    const handleMouseUp = () => {
-      document.removeEventListener("mousemove", handleMouseMove);
-      document.removeEventListener("mouseup", handleMouseUp);
-    };
-
-    document.addEventListener("mousemove", handleMouseMove);
-    document.addEventListener("mouseup", handleMouseUp);
+  // Block native horizontal scroll gestures (mouse wheel, trackpad, touch)
+  const handleWheel = (e) => {
+    if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
+      e.preventDefault();
+    }
   };
 
   return (
@@ -199,7 +232,14 @@ const AboutUs = () => {
             </div>
           </div>
         </article>
-        <div ref={sliderRef} className="reviews-container" onMouseDown={handleMouseDown}>
+        <div className="customerReview-right">
+        <div
+          ref={sliderRef}
+          className="reviews-container"
+          onWheel={handleWheel}
+          onTouchMove={(e) => e.preventDefault()}
+          onScroll={updateScrollButtons}
+        >
           <div className="review-card">
             <div className="review-content">
               <div className="reviewer-info">
@@ -277,11 +317,31 @@ const AboutUs = () => {
             </div>
           </div>
         </div>
+        <div className="review-nav" role="group" aria-label="Testimonial navigation">
+          <button
+            type="button"
+            className="review-nav-btn"
+            onClick={handlePrev}
+            disabled={!canScrollLeft}
+            aria-label="Previous testimonial"
+          >
+            <span className="review-nav-icon" aria-hidden="true">&#8249;</span>
+          </button>
+          <button
+            type="button"
+            className="review-nav-btn"
+            onClick={handleNext}
+            disabled={!canScrollRight}
+            aria-label="Next testimonial"
+          >
+            <span className="review-nav-icon" aria-hidden="true">&#8250;</span>
+          </button>
+        </div>
         <div className="review-dots" aria-hidden="true">
           <span className="review-dot active"></span>
           <span className="review-dot"></span>
           <span className="review-dot"></span>
-          <span className="review-dot"></span>
+        </div>
         </div>
       </section>
 
