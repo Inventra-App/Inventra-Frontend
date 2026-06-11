@@ -96,7 +96,7 @@ const SignUpVerify = () => {
       const res = await verifySignupEmail(payload)
 
       setShowPopup(true)
-      toast.success(res?.message || "Account verified successfully!");
+      // toast.success(res?.message || "Account verified successfully!");
 
       setTimeout(() => {
         setShowPopup(false)

@@ -200,6 +200,37 @@
   box-shadow: 0 13px 22px rgba(79, 47, 240, 0.36);
 }
 
+.modal-relative {
+  position: relative !important;
+}
+
+
+.modalTopBackBtn {
+  position: absolute;
+  top: 24px;
+  left: 24px;
+  background: none;
+  border: none;
+  color: #64748b; 
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+}
+
+.modalTopBackBtn:hover {
+  background-color: #f1f5f9; 
+  color: #1e293b;
+}
+
+.modalTopBackBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
 .otpInputs {
   width: 100%;
   margin-top: 26px;
