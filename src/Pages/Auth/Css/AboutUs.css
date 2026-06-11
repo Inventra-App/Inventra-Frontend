@@ -431,10 +431,10 @@
 }
 
 .reviews-container {
-  width: 980px;
+  width: 100%;
+  max-width: 980px;
   height: 265px;
   margin-top: 164px;
-  margin-left: 25px;
   display: flex;
   gap: 20px;
   overflow-x: auto;
@@ -463,6 +463,68 @@
 .review-dot.active {
   width: 22px;
   background-color: #432dd7;
+}
+
+/* Right side wrapper for the testimonial cards + custom navigation */
+.customerReview-right {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+/* Custom circular purple navigation arrows for the testimonial carousel */
+.review-nav {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 60px;
+  margin-top: 28px;
+  padding-bottom: 8px;
+}
+
+.review-nav-btn {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  border: none;
+  background-color: #432dd7;
+  color: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 6px 18px rgba(67, 45, 215, 0.25);
+  transition: transform 0.2s ease, background-color 0.2s ease, opacity 0.2s ease;
+  flex-shrink: 0;
+}
+
+.review-nav-btn:hover:not(:disabled) {
+  background-color: #3722b8;
+  transform: translateY(-1px);
+}
+
+.review-nav-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.review-nav-btn:disabled {
+  background-color: #b9b3ee;
+  color: #ffffff;
+  cursor: not-allowed;
+  opacity: 0.6;
+  box-shadow: none;
+}
+
+.review-nav-icon {
+  font-size: 38px;
+  line-height: 1;
+  font-weight: 400;
+  color: #ffffff;
+  display: inline-block;
+  transform: translateY(-2px);
 }
 
 .review-card {
@@ -902,6 +964,11 @@
   .review-dots {
     display: flex;
     margin-top: 6px;
+  }
+
+  /* On mobile, use the original 3 dots and hide the arrow buttons */
+  .review-nav {
+    display: none;
   }
 
   .review-card {
