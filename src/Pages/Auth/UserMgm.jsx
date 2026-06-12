@@ -62,6 +62,74 @@ const UserMgm = () => {
 
   const roles = ['Admin', 'Manager', 'Cashier', 'Staff']
 
+  // Default permission state per role (used when no custom config exists yet)
+  const defaultRolePermissions = {
+    Admin: {
+      'Dashboard': true,
+      'Inventory': true,
+      'Incoming Stock': true,
+      'Low Stock Management': true,
+      'Sales (POS)': true,
+      'Expiry Management': false,
+      'Reports': true,
+      'User Management': false,
+      'Settings': true,
+      'Activity Logs': true,
+    },
+    Staff: {
+      'Dashboard': true,
+      'Inventory': true,
+      'Incoming Stock': true,
+      'Low Stock Management': true,
+      'Sales (POS)': false,
+      'Expiry Management': true,
+      'Reports': false,
+      'User Management': false,
+      'Settings': false,
+      'Activity Logs': false,
+    },
+    Cashier: {
+      'Dashboard': true,
+      'Inventory': true,
+      'Incoming Stock': false,
+      'Low Stock Management': true,
+      'Sales (POS)': true,
+      'Expiry Management': false,
+      'Reports': true,
+      'User Management': false,
+      'Settings': false,
+      'Activity Logs': false,
+    },
+  }
+
+  const roleDisplayName = {
+    Admin: 'Admin',
+    Staff: 'Inventory Staff',
+    Cashier: 'Cashier',
+  }
+
+  // Active role being managed in the Role & Permissions page
+  const [activePermissionRole, setActivePermissionRole] = useState('Admin')
+
+  // Persist custom permission toggles per role
+  const [rolePermissions, setRolePermissions] = useState(defaultRolePermissions)
+
+  const getActivePermissionMap = () => {
+    return rolePermissions[activePermissionRole] || {}
+  }
+
+  const togglePermission = (permission) => {
+    setRolePermissions((prev) => {
+      const currentRoleMap = { ...(prev[activePermissionRole] || {}) }
+      currentRoleMap[permission] = !currentRoleMap[permission]
+      return { ...prev, [activePermissionRole]: currentRoleMap }
+    })
+  }
+
+  const saveActivePermissions = () => {
+    showToast(`${roleDisplayName[activePermissionRole]} permissions saved`)
+  }
+
   const roleText = {
     Admin: 'Full system access. Can manage users, view all reports, and configure system settings.',
     Manager: 'Can manage inventory, view reports, receive goods, and monitor expiry alerts.',
@@ -228,17 +296,29 @@ const UserMgm = () => {
         </div>
 
         <div className="role-select-grid">
-          <button className="role-select-card active" type="button">
+          <button
+            className={`role-select-card${activePermissionRole === 'Admin' ? ' active' : ''}`}
+            type="button"
+            onClick={() => setActivePermissionRole('Admin')}
+          >
             <span className="role-select-icon admin"><Shield size={22} /></span>
             <strong>Admin</strong>
             <small>Full system access</small>
           </button>
-          <button className="role-select-card" type="button">
+          <button
+            className={`role-select-card${activePermissionRole === 'Staff' ? ' active' : ''}`}
+            type="button"
+            onClick={() => setActivePermissionRole('Staff')}
+          >
             <span className="role-select-icon manager"><Users size={22} /></span>
             <strong>Inventory Staff</strong>
             <small>Inventory management</small>
           </button>
-          <button className="role-select-card" type="button">
+          <button
+            className={`role-select-card${activePermissionRole === 'Cashier' ? ' active' : ''}`}
+            type="button"
+            onClick={() => setActivePermissionRole('Cashier')}
+          >
             <span className="role-select-icon cashier"><Users size={22} /></span>
             <strong>Cashier</strong>
             <small>Sales operations</small>
@@ -246,20 +326,28 @@ const UserMgm = () => {
         </div>
 
         <section className="manage-permissions-card">
-          <h3>Admin Permissions</h3>
+          <h3>{roleDisplayName[activePermissionRole]} Permissions</h3>
 
           <div className="permission-toggle-list">
-            {permissions.map((permission) => (
-              <label className="permission-toggle-row" key={permission}>
-                <span>{permission}</span>
-                <input type="checkbox" defaultChecked={!['Expiry Management', 'User Management'].includes(permission)} />
-                <i aria-hidden="true"></i>
-              </label>
-            ))}
+            {permissions.map((permission) => {
+              const activeMap = getActivePermissionMap()
+              const isChecked = Boolean(activeMap[permission])
+              return (
+                <label className="permission-toggle-row" key={`${activePermissionRole}-${permission}`}>
+                  <span>{permission}</span>
+                  <input
+                    type="checkbox"
+                    checked={isChecked}
+                    onChange={() => togglePermission(permission)}
+                  />
+                  <i aria-hidden="true"></i>
+                </label>
+              )
+            })}
           </div>
 
           <div className="save-permissions-row">
-            <button type="button" onClick={() => setPage('users')}>Save Permissions</button>
+            <button type="button" onClick={saveActivePermissions}>Save Permissions</button>
           </div>
         </section>
       </div>
