@@ -285,6 +285,15 @@
   font-weight: 650;
 }
 
+.loginField span.login-error-text {
+  color: #ff0000;
+  font-size: 0.85rem;
+  font-weight: 500;
+  display: block;
+  margin-top: 6px;
+  text-align: left;
+}
+
 .loginField input {
   width: 100%;
   height: clamp(44px, 6vh, 52px);
@@ -477,15 +486,6 @@
 
 .login-input-error {
   border-color: #ff0000 !important;
-}
-
-.login-error-text {
-  color: #ff0000;
-  font-size: 0.85rem;
-  font-weight: 500;
-  display: block;
-  margin-top: 6px;
-  text-align: left;
 }
 
 @media (max-height: 760px) and (min-width: 821px) {

@@ -17,7 +17,8 @@ const SignUpRight = ({ nav }) => {
   const {
     register,
     handleSubmit,
-    watch,
+    setError,
+    clearErrors,
     formState: { errors, isSubmitting },
   } = useForm({
     resolver: zodResolver(signupSchema),
@@ -33,11 +34,12 @@ const SignUpRight = ({ nav }) => {
     }
   })
 
-  const isAgreed = watch("agree")
-
   const onSubmit = async (data) => {
     if (!data.agree) {
-      toast.error("You must agree to the Terms and Privacy Policy to proceed.")
+      setError("agree", {
+        type: "manual",
+        message: "You must agree to the Terms and Privacy Policy to proceed."
+      })
       return
     }
 
@@ -159,7 +161,11 @@ const SignUpRight = ({ nav }) => {
               <input 
                 type="checkbox" 
                 id="agree" 
-                {...register("agree")} 
+                {...register("agree", {
+                  onChange: (e) => {
+                    if (e.target.checked) clearErrors("agree")
+                  }
+                })} 
               />
               <label htmlFor="agree">
                 I agree to the <a href="/terms" className="signup-link">Terms and Privacy Policy</a>
@@ -171,7 +177,7 @@ const SignUpRight = ({ nav }) => {
           <button 
             type="submit" 
             className="signup-btn" 
-            disabled={isSubmitting || !isAgreed}
+            disabled={isSubmitting}
           >
             {isSubmitting ? 'Creating Account...' : 'Create Account'}
           </button>
