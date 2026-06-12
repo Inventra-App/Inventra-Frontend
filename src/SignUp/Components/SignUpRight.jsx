@@ -17,6 +17,7 @@ const SignUpRight = ({ nav }) => {
   const {
     register,
     handleSubmit,
+    watch,
     formState: { errors, isSubmitting },
   } = useForm({
     resolver: zodResolver(signupSchema),
@@ -32,29 +33,23 @@ const SignUpRight = ({ nav }) => {
     }
   })
 
+  const isAgreed = watch("agree")
+
   const onSubmit = async (data) => {
-    console.log("=== SIGNUP SUBMISSION STARTED ===")
-    console.log("Form validated data payload:", data)
-    
+    if (!data.agree) {
+      toast.error("You must agree to the Terms and Privacy Policy to proceed.")
+      return
+    }
+
     try {
       const { agree, ...backendPayload } = data;
-
       const response = await signupAdmin(backendPayload);
-      console.log("👉 BACKEND DATA RECEIVED:", response);
-
       dispatch(setRegistrationEmail(data.email));
-      console.log("Saved email to Redux store:", data.email);
-
       toast.success(response?.message || "Welcome to Inventra! Check your email for OTP.");
-
       nav("/signupverify");
     } catch (error) {
-      console.error("SIGNUP ERROR DETECTED:", error);
-
       const errorMessage = error.response?.data?.message || "Signup failed. Please try again.";
       toast.error(errorMessage);
-    } finally {
-      console.log("=== SIGNUP PROCESS CYCLE COMPLETE ===");
     }
   };
 
@@ -173,7 +168,11 @@ const SignUpRight = ({ nav }) => {
             {errors.agree && <span className="signup-error-text">{errors.agree.message}</span>}
           </div>
 
-          <button type="submit" className="signup-btn" disabled={isSubmitting}>
+          <button 
+            type="submit" 
+            className="signup-btn" 
+            disabled={isSubmitting || !isAgreed}
+          >
             {isSubmitting ? 'Creating Account...' : 'Create Account'}
           </button>
 
