@@ -34,7 +34,10 @@ const ForgetPassUi = () => {
       setErrors((prev) => ({ ...prev, email: "Email address is required" }));
       return;
     } else if (!/\S+@\S+\.\S+/.test(email)) {
-      setErrors((prev) => ({ ...prev, email: "Please enter a valid email address" }));
+      setErrors((prev) => ({
+        ...prev,
+        email: "Please enter a valid email address",
+      }));
       return;
     }
 
@@ -93,7 +96,10 @@ const ForgetPassUi = () => {
   const handleOtpSubmit = async () => {
     const otpString = otp.join("");
     if (otpString.length < 6) {
-      setErrors((prev) => ({ ...prev, otp: "Please enter the complete 6-digit verification code" }));
+      setErrors((prev) => ({
+        ...prev,
+        otp: "Please enter the complete 6-digit verification code",
+      }));
       return;
     }
     
@@ -133,8 +139,10 @@ const ForgetPassUi = () => {
 
   const validatePasswords = (name, value) => {
     let newErrors = { ...errors };
-    const currentNewPass = name === "newPassword" ? value : passwordFields.newPassword;
-    const currentConfirmPass = name === "confirmPassword" ? value : passwordFields.confirmPassword;
+    const currentNewPass =
+      name === "newPassword" ? value : passwordFields.newPassword;
+    const currentConfirmPass =
+      name === "confirmPassword" ? value : passwordFields.confirmPassword;
 
     if (name === "newPassword") {
       if (!value) {
@@ -166,11 +174,13 @@ const ForgetPassUi = () => {
     setTouched({ newPassword: true, confirmPassword: true });
 
     const newErrors = {};
-    if (!passwordFields.newPassword) newErrors.newPassword = "New password is required";
+    if (!passwordFields.newPassword)
+      newErrors.newPassword = "New password is required";
     if (passwordFields.newPassword && passwordFields.newPassword.length < 6) {
       newErrors.newPassword = "Password must be at least 6 characters long";
     }
-    if (!passwordFields.confirmPassword) newErrors.confirmPassword = "Please confirm your password";
+    if (!passwordFields.confirmPassword)
+      newErrors.confirmPassword = "Please confirm your password";
     if (passwordFields.newPassword !== passwordFields.confirmPassword) {
       newErrors.confirmPassword = "Passwords do not match";
     }
@@ -269,10 +279,12 @@ const ForgetPassUi = () => {
               />
             ))}
           </div>
-          {errors.otp && <span className="forgot-error-text otp-error">{errors.otp}</span>}
+          {errors.otp && (
+            <span className="forgot-error-text otp-error">{errors.otp}</span>
+          )}
 
-          <button 
-            className="forgotPrimaryBtn" 
+          <button
+            className="forgotPrimaryBtn"
             onClick={handleOtpSubmit}
             disabled={isSubmitting}
           >
@@ -299,23 +311,27 @@ const ForgetPassUi = () => {
             <label className="forgotEmailField">
               <span>New password</span>
               <div className="forgot-password-wrapper">
-                <input 
-                  type={showNewPassword ? "text" : "password"} 
+                <input
+                
+                  type={showNewPassword ? "text" : "password"}
                   name="newPassword"
-                  placeholder="••••••••" 
+                  placeholder="••••••••"
                   value={passwordFields.newPassword}
                   onChange={handlePasswordChange}
                   onBlur={handlePasswordBlur}
-                  className={touched.newPassword && errors.newPassword ? "forgot-input-error" : ""}
+                  className={
+                    touched.newPassword && errors.newPassword
+                      ? "forgot-input-error"
+                      : ""
+                  }
                   disabled={isSubmitting}
                 />
-                <button
-                  type="button"
+                <span
                   className="forgot-password-toggle"
                   onClick={() => setShowNewPassword(!showNewPassword)}
                 >
                   {showNewPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                </button>
+                </span>
               </div>
               {touched.newPassword && errors.newPassword && (
                 <span className="forgot-error-text">{errors.newPassword}</span>
@@ -325,26 +341,35 @@ const ForgetPassUi = () => {
             <label className="forgotEmailField">
               <span>Re-enter password</span>
               <div className="forgot-password-wrapper">
-                <input 
-                  type={showConfirmPassword ? "text" : "password"} 
+                <input
+                  type={showConfirmPassword ? "text" : "password"}
                   name="confirmPassword"
-                  placeholder="••••••••" 
+                  placeholder="••••••••"
                   value={passwordFields.confirmPassword}
                   onChange={handlePasswordChange}
                   onBlur={handlePasswordBlur}
-                  className={touched.confirmPassword && errors.confirmPassword ? "forgot-input-error" : ""}
+                  className={
+                    touched.confirmPassword && errors.confirmPassword
+                      ? ""
+                      : ""
+                  }
                   disabled={isSubmitting}
                 />
-                <button
-                  type="button"
+                <span
                   className="forgot-password-toggle"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                 >
-                  {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                </button>
+                  {showConfirmPassword ? (
+                    <EyeOff size={18} />
+                  ) : (
+                    <Eye size={18} />
+                  )}
+                </span>
               </div>
               {touched.confirmPassword && errors.confirmPassword && (
-                <span className="forgot-error-text">{errors.confirmPassword}</span>
+                <span className="forgot-error-text">
+                  {errors.confirmPassword}
+                </span>
               )}
             </label>
 
@@ -402,7 +427,9 @@ const ForgetPassUi = () => {
                 if (errors.email) setErrors((prev) => ({ ...prev, email: "" }));
               }}
               onBlur={() => setTouched((prev) => ({ ...prev, email: true }))}
-              className={touched.email && errors.email ? "forgot-input-error" : ""}
+              className={
+                touched.email && errors.email ? "forgot-input-error" : ""
+              }
               disabled={isSubmitting}
             />
             {touched.email && errors.email && (
