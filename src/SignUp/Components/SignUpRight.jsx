@@ -163,7 +163,7 @@ const SignUpRight = ({ nav }) => {
                 id="agree" 
                 {...register("agree", {
                   onChange: (e) => {
-                    if (e.target.checked) clearErrors("agree")
+                    if (e.target.checked) clearErrors("agree");
                   }
                 })} 
               />
