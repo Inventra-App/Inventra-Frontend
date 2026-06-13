@@ -13,6 +13,8 @@ import {
 } from "lucide-react";
 import "./Css/Login.css";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-hot-toast";
+import { loginAdmin } from "../../API/authApi"; 
 
 const Login = () => {
   const nav = useNavigate();
@@ -62,7 +64,7 @@ const Login = () => {
     validateField(name, value);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (isSubmitting) return;
 
@@ -76,14 +78,53 @@ const Login = () => {
       return;
     }
 
-    setIsSubmitting(true);
-    setTimeout(() => {
-      setIsLoggingIn(true);
-    }, 700);
+    try {
+      setIsSubmitting(true);
+      setErrors({});
 
-    setTimeout(() => {
-      nav("/dashboard");
-    }, 1800);
+      const payload = {
+        email: formData.email.trim(),
+        password: formData.password
+      };
+
+      console.log("=== LOGIN REQUEST ===", { email: payload.email });
+      const res = await loginAdmin(payload);
+      console.log("=== LOGIN SUCCESS ===", res);
+
+      if (res.token) {
+        localStorage.setItem("inventra_token", res.token);
+      }
+
+      toast.success(res.message || "Login Successful");
+
+      setIsLoggingIn(true);
+      setTimeout(() => {
+        nav("/dashboard");
+      }, 1000);
+
+    } catch (error) {
+      console.error("=== LOGIN ERROR ===", error);
+      
+      const status = error.response?.status;
+      const serverMessage = error.response?.data?.message;
+
+      if (status === 403 && serverMessage?.toLowerCase().includes("locked")) {
+        try {
+          const timestamp = serverMessage.match(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z/g);
+          if (timestamp) {
+            const localTime = new Date(timestamp[0]).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            toast.error(`Account locked. Please try again after ${localTime}`);
+            return;
+          }
+        } catch (e) {
+          console.error("Error parsing lock timestamp", e);
+        }
+      }
+
+      toast.error(serverMessage || "Something went wrong. Please check your credentials.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleGoogleLogin = () => {
@@ -218,6 +259,7 @@ const Login = () => {
               onChange={handleChange}
               onBlur={handleBlur}
               className={touched.email && errors.email ? "login-input-error" : ""}
+              disabled={isSubmitting}
             />
             {touched.email && errors.email && <span className="login-error-text">{errors.email}</span>}
           </div>
@@ -233,11 +275,13 @@ const Login = () => {
                 onChange={handleChange}
                 onBlur={handleBlur}
                 className={touched.password && errors.password ? "login-input-error" : ""}
+                disabled={isSubmitting}
               />
               <button
                 type="button"
                 className="login-password-toggle-btn"
                 onClick={() => setShowPassword(!showPassword)}
+                disabled={isSubmitting}
               >
                 {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
               </button>
@@ -252,6 +296,7 @@ const Login = () => {
                 name="rememberMe"
                 checked={formData.rememberMe}
                 onChange={handleChange}
+                disabled={isSubmitting}
               />
               <span>Remember Me</span>
             </label>
@@ -276,7 +321,7 @@ const Login = () => {
             className={`googleLogin ${isGoogleLoading ? "googleLoginLoading" : ""}`}
             type="button"
             onClick={handleGoogleLogin}
-            disabled={isGoogleLoading}
+            disabled={isSubmitting || isGoogleLoading}
           >
             {isGoogleLoading ? (
               <span className="googleButtonLoader" aria-label="Loading"></span>

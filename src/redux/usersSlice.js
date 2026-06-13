@@ -11,6 +11,7 @@ const usersSlice = createSlice({
       const newUser = action.payload;
       state.signedUpUsers.push(newUser);
     },
+    
 
     setInventory: (state, action) => {
       state.inventoryItems = action.payload;

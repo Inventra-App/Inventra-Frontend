@@ -539,6 +539,16 @@
   background: #dcfce7;
 }
 
+.role-select-card.active.manager {
+  background: #eff6ff;
+  border-color: #a9d0ff;
+}
+
+.role-select-card.active.cashier {
+  background: #effdf4;
+  border-color: #9cf0bb;
+}
+
 .role-select-card strong {
   font-size: 14px;
   font-weight: 700;
