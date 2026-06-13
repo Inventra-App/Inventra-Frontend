@@ -286,29 +286,40 @@
 .forgot-password-wrapper {
   position: relative;
   width: 100%;
-  display: flex;
-  align-items: center;
+  display: block;
 }
 
 .forgot-password-wrapper input {
-  padding-right: 44px;
+  width: 100%;
+  padding-right: 48px;
 }
 
 .forgot-password-toggle {
   position: absolute;
-  right: 14px;
-  background: none;
+  top: 50%;
+  right: 12px;
+  transform: translateY(-50%);
+  width: 32px;
+  height: 32px;
+  background: transparent;
   border: none;
   color: #9ca3af;
   cursor: pointer;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
   padding: 0;
+  z-index: 2;
 }
 
 .forgot-password-toggle:hover {
   color: #4b2fe2;
+}
+
+.forgot-password-toggle:focus-visible {
+  outline: 2px solid #4b2fe2;
+  outline-offset: 2px;
+  border-radius: 4px;
 }
 
 .forgotPassForm button:disabled,
@@ -324,9 +335,9 @@
 }
 
 .forgot-error-text {
-  color: #ff0000;
-  font-size: 13px;
-  font-weight: 500;
+  color: #ff0000 !important;
+  font-size: 10px;
+  font-weight: 500 !important;
   display: block;
   margin-top: 6px;
   text-align: left;
