@@ -4,34 +4,44 @@ const usersSlice = createSlice({
   name: "users",
   initialState: {
     signedUpUsers: [], 
-    inventoryItems: [],
+    inventoryItems: [],  
+    stockEntries: [], 
+    stockHistory: [],     
   },
   reducers: {
-    signUp: (state, action) => {
-      const newUser = action.payload;
-      state.signedUpUsers.push(newUser);
-    },
-    
-
     setInventory: (state, action) => {
       state.inventoryItems = action.payload;
     },
+    setStockEntries: (state, action) => {
+      state.stockEntries = action.payload;
+    },
+    setStockHistory: (state, action) => {
+      state.stockHistory = action.payload;
+    },
     addInventoryItem: (state, action) => {
-      state.inventoryItems.push(action.payload);
+      state.inventoryItems.unshift(action.payload);
     },
     updateInventoryItem: (state, action) => {
       const { id, updatedData } = action.payload;
-      const index = state.inventoryItems.findIndex(item => item.id === id);
+      const index = state.inventoryItems.findIndex(item => item._id === id || item.id === id);
       if (index !== -1) {
         state.inventoryItems[index] = { ...state.inventoryItems[index], ...updatedData };
       }
     },
     deleteInventoryItem: (state, action) => {
       const id = action.payload;
-      state.inventoryItems = state.inventoryItems.filter(item => item.id !== id);
+      state.inventoryItems = state.inventoryItems.filter(item => (item._id !== id && item.id !== id));
     }
   },
 });
 
-export const { signUp, setInventory, addInventoryItem, updateInventoryItem, deleteInventoryItem } = usersSlice.actions;
+export const { 
+  setInventory, 
+  setStockEntries, 
+  setStockHistory, 
+  addInventoryItem, 
+  updateInventoryItem, 
+  deleteInventoryItem 
+} = usersSlice.actions;
+
 export default usersSlice.reducer;

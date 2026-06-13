@@ -190,14 +190,13 @@ const ForgetPassUi = () => {
       return;
     }
 
-    const otpCode = otp.join("");
-
     try {
       setIsSubmitting(true);
+      
       const payload = {
         email: email.trim(),
-        otp: otpCode,
-        password: passwordFields.newPassword
+        password: passwordFields.newPassword,
+        confirmPassword: passwordFields.confirmPassword 
       };
       
       await resetPassword(payload);
@@ -207,11 +206,6 @@ const ForgetPassUi = () => {
       console.error(error);
       const apiMessage = error.response?.data?.message || "Failed to update password. Try again.";
       toast.error(apiMessage);
-      
-      if (apiMessage.toLowerCase().includes("otp") || apiMessage.toLowerCase().includes("code")) {
-        setStep("otp");
-        setErrors({ otp: apiMessage });
-      }
     } finally {
       setIsSubmitting(false);
     }
@@ -312,7 +306,6 @@ const ForgetPassUi = () => {
               <span>New password</span>
               <div className="forgot-password-wrapper">
                 <input
-                
                   type={showNewPassword ? "text" : "password"}
                   name="newPassword"
                   placeholder="••••••••"
@@ -350,7 +343,7 @@ const ForgetPassUi = () => {
                   onBlur={handlePasswordBlur}
                   className={
                     touched.confirmPassword && errors.confirmPassword
-                      ? ""
+                      ? "forgot-input-error"
                       : ""
                   }
                   disabled={isSubmitting}
