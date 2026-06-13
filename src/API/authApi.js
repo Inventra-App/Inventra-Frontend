@@ -32,3 +32,8 @@ export const resetPassword = async (data) => {
   const res = await API.post("/reset", data);
   return res.data;
 };
+
+export const verifyPasswordOtp = async (payload) => {
+  const res = await API.post("/p/verify", payload);
+  return res.data;
+};

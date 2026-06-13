@@ -1,7 +1,7 @@
 import React, { useRef, useState } from "react";
 import { ChevronLeft, Eye, EyeOff } from "lucide-react";
 import { toast } from "react-hot-toast";
-import { forgetPassword, resetPassword } from "../API/authApi";
+import { forgetPassword, resetPassword, verifyPasswordOtp } from "../API/authApi";
 import forgetImg from "../assets/ForgetImg1.png";
 import codeImg from "../assets/ForgetImg2.png";
 import resetImg from "../assets/ForgetImg3.png";
@@ -44,17 +44,11 @@ const ForgetPassUi = () => {
     try {
       setIsSubmitting(true);
       setErrors({});
-
       const payload = { email: email.trim() };
-      console.log("=== FORGOT PASSWORD REQUEST ===", payload);
-
-      const res = await forgetPassword(payload);
-      console.log("=== FORGOT PASSWORD SUCCESS ===", res);
-
+      await forgetPassword(payload);
       setStep("sent");
       setTouched({});
     } catch (error) {
-      console.error("FORGOT PASSWORD ERROR:", error);
       toast.error(error.response?.data?.message || "Something went wrong. Please try again.");
     } finally {
       setIsSubmitting(false);
@@ -82,7 +76,24 @@ const ForgetPassUi = () => {
     }
   };
 
-  const handleOtpSubmit = () => {
+  const handleOtpPaste = (event) => {
+    event.preventDefault();
+    const pastedData = event.clipboardData.getData("text").replace(/\D/g, "").slice(0, 6);
+    
+    if (pastedData) {
+      const nextOtp = [...otp];
+      for (let i = 0; i < pastedData.length; i++) {
+        nextOtp[i] = pastedData[i];
+      }
+      setOtp(nextOtp);
+      setErrors((prev) => ({ ...prev, otp: "" }));
+
+      const lastFilledIndex = Math.min(pastedData.length, otpRefs.current.length - 1);
+      otpRefs.current[lastFilledIndex]?.focus();
+    }
+  };
+
+  const handleOtpSubmit = async () => {
     const otpString = otp.join("");
     if (otpString.length < 6) {
       setErrors((prev) => ({
@@ -92,8 +103,23 @@ const ForgetPassUi = () => {
       return;
     }
     
-    setStep("password");
-    setErrors({});
+    try {
+      setIsSubmitting(true);
+      setErrors({});
+      
+      await verifyPasswordOtp({
+        email: email.trim(),
+        otp: otpString
+      });
+
+      setStep("password");
+    } catch (error) {
+      const apiMessage = error.response?.data?.message || error.message || "Invalid verification code. Please try again.";
+      setErrors((prev) => ({ ...prev, otp: apiMessage }));
+      toast.error(apiMessage);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handlePasswordChange = (e) => {
@@ -166,35 +192,26 @@ const ForgetPassUi = () => {
 
     const otpCode = otp.join("");
 
-    if (otpCode === "123456") {
-      console.log("=== STAGING BYPASS TRIGGERED: TESTING SUCCESS LAYOUT ===");
-      setIsSubmitting(true);
-      setTimeout(() => {
-        setIsSubmitting(false);
-        setStep("success");
-        setErrors({});
-      }, 1200);
-      return;
-    }
-
     try {
       setIsSubmitting(true);
-      
       const payload = {
         email: email.trim(),
         otp: otpCode,
         password: passwordFields.newPassword
       };
       
-      console.log("=== RESET PASSWORD REQUEST ===", payload);
-      const res = await resetPassword(payload);
-      console.log("=== RESET PASSWORD SUCCESS ===", res);
-
+      await resetPassword(payload);
       setStep("success");
       setErrors({});
     } catch (error) {
-      console.error("RESET PASSWORD ERROR:", error);
-      toast.error(error.response?.data?.message || "Failed to update password. Try again.");
+      console.error(error);
+      const apiMessage = error.response?.data?.message || "Failed to update password. Try again.";
+      toast.error(apiMessage);
+      
+      if (apiMessage.toLowerCase().includes("otp") || apiMessage.toLowerCase().includes("code")) {
+        setStep("otp");
+        setErrors({ otp: apiMessage });
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -255,6 +272,7 @@ const ForgetPassUi = () => {
                 value={digit}
                 onChange={(event) => handleOtpChange(index, event.target.value)}
                 onKeyDown={(event) => handleOtpKeyDown(index, event)}
+                onPaste={handleOtpPaste}
                 aria-label={`Digit ${index + 1}`}
                 className={errors.otp ? "forgot-input-error" : ""}
                 disabled={isSubmitting}
@@ -270,7 +288,7 @@ const ForgetPassUi = () => {
             onClick={handleOtpSubmit}
             disabled={isSubmitting}
           >
-            Continue
+            {isSubmitting ? "Verifying..." : "Continue"}
           </button>
         </section>
       );
