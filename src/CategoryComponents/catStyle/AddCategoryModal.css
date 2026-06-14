@@ -1,0 +1,167 @@
+.cat-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 99999;
+  animation: catFadeIn 0.2s ease-out;
+}
+
+.cat-modal-container {
+  background-color: #ffffff;
+  width: 100%;
+  max-width: 520px;
+  border-radius: 16px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  margin: 16px;
+  animation: catSlideUp 0.25s ease-out;
+}
+
+.cat-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.cat-modal-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.cat-modal-title-icon {
+  color: #432DD7;
+}
+
+.cat-modal-title h2 {
+  font-size: 20px;
+  font-weight: 600;
+  color: #101828;
+  margin: 0;
+}
+
+.cat-modal-close-btn {
+  background: none;
+  border: none;
+  color: #99A1AF;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.cat-modal-close-btn:hover {
+  background-color: #f1f5f9;
+  color: #475569;
+}
+
+.cat-modal-form {
+  padding: 24px;
+}
+
+.cat-modal-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.cat-modal-field label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #364153;
+}
+
+.cat-modal-required {
+  color: #d92d20;
+}
+
+.cat-modal-field input,
+.cat-modal-field textarea {
+  width: 100%;
+  padding: 10px 14px;
+  background-color: #F3F3F5;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  font-weight: 400;
+  font-size: 14px;
+  color: #717182;
+  outline: none;
+  box-sizing: border-box;
+  transition: all 0.2s ease;
+}
+
+.cat-modal-field input:focus,
+.cat-modal-field textarea:focus {
+  background-color: #ffffff;
+  border-color: #432DD7;
+  box-shadow: 0 0 0 3px rgba(67, 45, 215, 0.1);
+}
+
+.cat-modal-field textarea {
+  resize: vertical;
+}
+
+.cat-modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 28px;
+  border-top: 1px solid #f1f5f9;
+  padding-top: 20px;
+}
+
+.cat-modal-btn-cancel {
+  padding: 10px 18px;
+  border: 1px solid #D1D5DC;
+  border-radius: 10px;
+  background-color: #ffffff;
+  color: #364153;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.cat-modal-btn-cancel:hover {
+  background-color: #f9fafb;
+  border-color: #cbd5e1;
+}
+
+.cat-modal-btn-save {
+  padding: 10px 18px;
+  border: none;
+  border-radius: 10px;
+  background-color: #432DD7;
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.cat-modal-btn-save:hover {
+  background-color: #3522b5;
+}
+
+@keyframes catFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes catSlideUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}

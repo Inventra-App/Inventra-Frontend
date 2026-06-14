@@ -1,0 +1,156 @@
+.cat-status-select {
+  width: 100%;
+  height: 44px;
+  padding: 0 40px 0 16px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  font-weight: 500;
+  font-size: 18px;
+  color: #0F172A;
+  outline: none;
+  background-color: #ffffff;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23717182' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  background-size: 16px;
+}
+
+.cat-status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 12px;
+  border-radius: 11px;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.cat-status-badge.in-stock {
+  background-color: #DCFCE7;
+  color: #10B981;
+}
+
+.cat-status-badge.low-stock {
+  background-color: #FFEDD4;
+  color: #9F2D00;
+}
+
+.cat-status-badge.out-of-stock {
+  background-color: #FEF2F2;
+  color: #EF4444;
+}
+
+.cat-mobile-info-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  color: #4A5565;
+  margin-top: 8px;
+}
+
+.cat-mobile-info-row.text-highlight {
+  font-weight: 500;
+  color: #0F172A;
+}
+
+@media (max-width: 768px) {
+  .cat-page {
+    padding: 16px;
+  }
+
+  .cat-search-bar-row {
+    flex-direction: column;
+    gap: 12px;
+    align-items: stretch;
+  }
+
+  .cat-search-wrapper {
+    width: 100%;
+  }
+
+  .cat-select-wrapper {
+    width: 100%;
+  }
+
+  .cat-table-container {
+    display: none;
+  }
+
+  .cat-mobile-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 4px;
+  }
+
+  .cat-mobile-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 16px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  }
+
+  .cat-mobile-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    border-bottom: 1px dashed #e2e8f0;
+    padding-bottom: 10px;
+    margin-bottom: 6px;
+  }
+
+  .cat-mobile-index {
+    font-size: 12px;
+    font-weight: 600;
+    color: #94a3b8;
+    display: block;
+    margin-bottom: 2px;
+  }
+
+  .cat-mobile-name {
+    font-size: 16px;
+    font-weight: 600;
+    color: #0f172a;
+    margin: 0;
+  }
+
+  .cat-mobile-pagination {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 16px;
+    padding: 12px;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+  }
+}
+
+@media (max-width: 468px) {
+  .cat-page {
+    padding: 12px;
+  }
+
+  .cat-breadcrumb {
+    font-size: 13px;
+  }
+
+  .cat-mobile-card {
+    padding: 14px;
+  }
+
+  .cat-mobile-name {
+    font-size: 15px;
+  }
+
+  .cat-status-badge {
+    padding: 2px 8px;
+    font-size: 12px;
+  }
+
+  .cat-mobile-info-row {
+    font-size: 13px;
+  }
+}

@@ -24,6 +24,7 @@ import Settings from "./Pages/Auth/Settings";
 import Demo from "./Pages/Auth/Demo";
 import PlanSetup from "./Pages/Auth/PlanSetup";
 import PaymentSuccess from "./Pages/Auth/PaymentSuccess";
+import CategoriesList from "./Pages/Auth/CategoriesList";
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -80,6 +81,7 @@ function App() {
         <Route element={<DashboardLayout />}>
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/inventory" element={<Inventory />} />
+          <Route path="/inventory/categories" element={<CategoriesList />} />
           <Route path="/sales" element={<Sales />} />
           <Route path="/expiry" element={<ExpiryMgm />} />
           <Route path="/activity" element={<ActivityLog />} />

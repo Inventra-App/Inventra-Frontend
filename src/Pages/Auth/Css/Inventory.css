@@ -33,6 +33,28 @@
   align-items: center;
 }
 
+.inv-btn-outline {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 44px;
+  width: 140px;
+  border: 1.87px solid #D1D5DC;
+  border-radius: 10px;
+  background-color: #ffffff;
+  color: #475569;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.inv-btn-outline:hover {
+  background-color: #f9fafb;
+  border-color: #d1d5db;
+}
+
 .inv-btn-green {
   display: flex;
   align-items: center;
