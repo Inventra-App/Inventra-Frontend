@@ -2,44 +2,117 @@ import React, { useState } from 'react'
 import './Css/ContactUs.css'
 import Header from '../../Components/Header'
 import Footer from "../../Components/Footer"
-import  phone from "../../assets/phone.png"
+import phone from "../../assets/phone.png"
 import { useNavigate } from 'react-router-dom'
+import { sendFeedBack } from '../../API/countactUsApi'
 
 const ContactUs = () => {
+  // Form state
   const [firstName, setFirstName] = useState("");
   const [email, setEmail] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [message, setMessage] = useState("");
   const [agreed, setAgreed] = useState(false);
+
+  // UI state for the API call
+  const [isLoading, setIsLoading] = useState(false);
+  const [successMsg, setSuccessMsg] = useState("");
+  const [errorMsg, setErrorMsg] = useState("");
+  const [fieldErrors, setFieldErrors] = useState({});
+
   const nav = useNavigate();
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  // Reset messages (used when the user starts typing again)
+  const clearMessages = () => {
+    setSuccessMsg("");
+    setErrorMsg("");
+    setFieldErrors({});
+  };
 
-    if (!firstName || !email || !phoneNumber || !message) {
-      alert("Please fill all fields");
-      return;
+  // Simple validation: returns an object of errors.
+  // Empty object means everything is okay.
+  const validateForm = () => {
+    const errors = {};
+
+    if (!firstName.trim()) {
+      errors.firstName = "First name is required";
     }
 
-    const emailRegex = /\S+@\S+\.\S+/;
+    if (!email.trim()) {
+      errors.email = "Email is required";
+    } else if (!/\S+@\S+\.\S+/.test(email)) {
+      errors.email = "Enter a valid email address";
+    }
 
-    if (!emailRegex.test(email)) {
-      alert("Enter a valid email");
-      return;
+    if (!phoneNumber.trim()) {
+      errors.phoneNumber = "Phone number is required";
+    }
+
+    if (!message.trim()) {
+      errors.message = "Message is required";
     }
 
     if (!agreed) {
-      alert("You must agree to the privacy policy");
+      errors.agreed = "You must agree to the privacy policy";
+    }
+
+    return errors;
+  };
+
+  // Called when the form is submitted
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    clearMessages();
+
+    // 1) Validate locally first
+    const errors = validateForm();
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors);
       return;
     }
 
-    alert("Message sent successfully");
+    // 2) Build the payload and call the API
+    const payload = { firstName, email, phoneNumber, message };
+    setIsLoading(true);
 
-    setFirstName("");
-    setEmail("");
-    setPhoneNumber("");
-    setMessage("");
-    setAgreed(false);
+    try {
+      const response = await sendFeedBack(payload);
+
+      // 3) Success — confirm to the user and reset the form
+      console.log("Contact-us response:", response);
+      setSuccessMsg("Message sent successfully. We'll get back to you soon!");
+      setFirstName("");
+      setEmail("");
+      setPhoneNumber("");
+      setMessage("");
+      setAgreed(false);
+    } catch (error) {
+      // 4) Failure — show a friendly error message
+      console.error("Contact-us error:", error);
+
+      // 4a) Backend replied with an error (4xx / 5xx)
+      if (error?.response) {
+        const backendMessage =
+          error.response.data?.message ||
+          error.response.data?.error ||
+          `Server responded with ${error.response.status}. Please try again.`;
+        setErrorMsg(backendMessage);
+      }
+      // 4b) Request was sent but timed out (server slow / waking up)
+      else if (error?.code === "ECONNABORTED") {
+        setErrorMsg(
+          "The server is taking too long to respond. It may be waking up — please wait a moment and try again."
+        );
+      }
+      // 4c) Network / browser-level failure (no response at all)
+      else {
+        setErrorMsg(
+          "Could not reach the server. Please check your connection and try again."
+        );
+      }
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -53,15 +126,27 @@ const ContactUs = () => {
 need support, our team is ready to assist you </p>
           </div>
 
-          <form className='contact-form' onSubmit={handleSubmit}>
+          {/* Success / error banners */}
+          {successMsg && <div className="contact-success">{successMsg}</div>}
+          {errorMsg && <div className="contact-error">{errorMsg}</div>}
+
+          <form className='contact-form' onSubmit={handleSubmit} noValidate>
             <label className='contact-field'>
               <span>First Name</span>
               <input
                 type='text'
                 placeholder='Chibuzor'
                 value={firstName}
-                onChange={(e) => setFirstName(e.target.value)}
+                onChange={(e) => {
+                  setFirstName(e.target.value);
+                  clearMessages();
+                }}
+                className={fieldErrors.firstName ? "input-error" : ""}
+                disabled={isLoading}
               />
+              {fieldErrors.firstName && (
+                <small className="field-error">{fieldErrors.firstName}</small>
+              )}
             </label>
 
             <label className='contact-field'>
@@ -70,8 +155,16 @@ need support, our team is ready to assist you </p>
                 type='email'
                 placeholder='you@company.com'
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  clearMessages();
+                }}
+                className={fieldErrors.email ? "input-error" : ""}
+                disabled={isLoading}
               />
+              {fieldErrors.email && (
+                <small className="field-error">{fieldErrors.email}</small>
+              )}
             </label>
 
             <label className='contact-field'>
@@ -80,8 +173,16 @@ need support, our team is ready to assist you </p>
                 type='tel'
                 placeholder='+234'
                 value={phoneNumber}
-                onChange={(e) => setPhoneNumber(e.target.value)}
+                onChange={(e) => {
+                  setPhoneNumber(e.target.value);
+                  clearMessages();
+                }}
+                className={fieldErrors.phoneNumber ? "input-error" : ""}
+                disabled={isLoading}
               />
+              {fieldErrors.phoneNumber && (
+                <small className="field-error">{fieldErrors.phoneNumber}</small>
+              )}
             </label>
 
             <label className='contact-field'>
@@ -89,20 +190,37 @@ need support, our team is ready to assist you </p>
               <textarea
                 placeholder='Leave us a message...'
                 value={message}
-                onChange={(e) => setMessage(e.target.value)}
+                onChange={(e) => {
+                  setMessage(e.target.value);
+                  clearMessages();
+                }}
+                className={fieldErrors.message ? "input-error" : ""}
+                disabled={isLoading}
               ></textarea>
+              {fieldErrors.message && (
+                <small className="field-error">{fieldErrors.message}</small>
+              )}
             </label>
 
             <label className='privacy-check'>
               <input
                 type='checkbox'
                 checked={agreed}
-                onChange={(e) => setAgreed(e.target.checked)}
+                onChange={(e) => {
+                  setAgreed(e.target.checked);
+                  clearMessages();
+                }}
+                disabled={isLoading}
               />
               <span>i agree with your friendly <u>privacy policy</u></span>
             </label>
+            {fieldErrors.agreed && (
+              <small className="field-error">{fieldErrors.agreed}</small>
+            )}
 
-            <button type='submit' className='contact-submit'>Send message</button>
+            <button type='submit' className='contact-submit' disabled={isLoading}>
+              {isLoading ? "Sending..." : "Send message"}
+            </button>
           </form>
 
           <section className='contact-info'>
@@ -144,15 +262,23 @@ need support, our team is ready to assist you </p>
                 </div>
               </div>
             </div>
-            <form className='content-left contact-side-form' onSubmit={handleSubmit}>
+            <form className='content-left contact-side-form' onSubmit={handleSubmit} noValidate>
               <label className='contact-field'>
                 <span>First Name</span>
                 <input
                   type='text'
                   placeholder='Chibuzor'
                   value={firstName}
-                  onChange={(e) => setFirstName(e.target.value)}
+                  onChange={(e) => {
+                    setFirstName(e.target.value);
+                    clearMessages();
+                  }}
+                  className={fieldErrors.firstName ? "input-error" : ""}
+                  disabled={isLoading}
                 />
+                {fieldErrors.firstName && (
+                  <small className="field-error">{fieldErrors.firstName}</small>
+                )}
               </label>
 
               <label className='contact-field'>
@@ -161,8 +287,16 @@ need support, our team is ready to assist you </p>
                   type='email'
                   placeholder='you@company.com'
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={(e) => {
+                    setEmail(e.target.value);
+                    clearMessages();
+                  }}
+                  className={fieldErrors.email ? "input-error" : ""}
+                  disabled={isLoading}
                 />
+                {fieldErrors.email && (
+                  <small className="field-error">{fieldErrors.email}</small>
+                )}
               </label>
 
               <label className='contact-field'>
@@ -171,8 +305,16 @@ need support, our team is ready to assist you </p>
                   type='tel'
                   placeholder='+234'
                   value={phoneNumber}
-                  onChange={(e) => setPhoneNumber(e.target.value)}
+                  onChange={(e) => {
+                    setPhoneNumber(e.target.value);
+                    clearMessages();
+                  }}
+                  className={fieldErrors.phoneNumber ? "input-error" : ""}
+                  disabled={isLoading}
                 />
+                {fieldErrors.phoneNumber && (
+                  <small className="field-error">{fieldErrors.phoneNumber}</small>
+                )}
               </label>
 
               <label className='contact-field'>
@@ -180,20 +322,37 @@ need support, our team is ready to assist you </p>
                 <textarea
                   placeholder='Leave us a message...'
                   value={message}
-                  onChange={(e) => setMessage(e.target.value)}
+                  onChange={(e) => {
+                    setMessage(e.target.value);
+                    clearMessages();
+                  }}
+                  className={fieldErrors.message ? "input-error" : ""}
+                  disabled={isLoading}
                 ></textarea>
+                {fieldErrors.message && (
+                  <small className="field-error">{fieldErrors.message}</small>
+                )}
               </label>
 
               <label className='privacy-check'>
                 <input
                   type='checkbox'
                   checked={agreed}
-                  onChange={(e) => setAgreed(e.target.checked)}
+                  onChange={(e) => {
+                    setAgreed(e.target.checked);
+                    clearMessages();
+                  }}
+                  disabled={isLoading}
                 />
                 <span>i agree with your friendly <u>privacy policy</u></span>
               </label>
+              {fieldErrors.agreed && (
+                <small className="field-error">{fieldErrors.agreed}</small>
+              )}
 
-              <button type='submit' className='contact-submit'>Send message</button>
+              <button type='submit' className='contact-submit' disabled={isLoading}>
+                {isLoading ? "Sending..." : "Send message"}
+              </button>
             </form>
           </div>
         </article>

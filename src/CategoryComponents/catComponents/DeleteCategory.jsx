@@ -1,15 +1,17 @@
 import React from 'react'
-import { createPortal } from 'react-dom'
 import { Trash2 } from 'lucide-react'
-import '../catStyle/DeleteCategory.css'
+import '../../CategoryComponents/catStyle/DeleteCategory.css'
 
 const DeleteCategory = ({ isOpen, onClose, onConfirm, categoryName }) => {
   if (!isOpen) return null
 
-  return createPortal(
-    <div className="cat-modal-overlay">
-      <div className="cat-delete-container">
-        
+  const handleOverlayClick = (e) => {
+    if (e.target === e.currentTarget) onClose()
+  }
+
+  return (
+    <div className="cat-modal-overlay" onClick={handleOverlayClick}>
+      <div className="cat-delete-container" onClick={(e) => e.stopPropagation()}>
         <div className="cat-delete-icon-wrapper">
           <div className="cat-delete-icon-circle">
             <Trash2 size={28} />
@@ -22,22 +24,30 @@ const DeleteCategory = ({ isOpen, onClose, onConfirm, categoryName }) => {
         </p>
 
         <div className="cat-delete-target-box">
-          <span className="cat-delete-target-label">Category Name:</span>
-          <span className="cat-delete-target-value">{categoryName}</span>
+          <span className="cat-delete-target-label">Category:</span>
+          <span className="cat-delete-target-value">
+            {categoryName || 'Untitled'}
+          </span>
         </div>
 
         <div className="cat-delete-footer">
-          <button type="button" className="cat-delete-btn-cancel" onClick={onClose}>
+          <button
+            type="button"
+            className="cat-delete-btn-cancel"
+            onClick={onClose}
+          >
             Cancel
           </button>
-          <button type="button" className="cat-delete-btn-confirm" onClick={onConfirm}>
-            Delete Category
+          <button
+            type="button"
+            className="cat-delete-btn-confirm"
+            onClick={onConfirm}
+          >
+            Delete
           </button>
         </div>
-
       </div>
-    </div>,
-    document.body
+    </div>
   )
 }
 

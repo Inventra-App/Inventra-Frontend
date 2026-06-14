@@ -54,6 +54,107 @@
   color: #0F172A;
 }
 
+.cat-view-back-row {
+  margin-bottom: 16px;
+}
+
+.cat-view-back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: 1px solid #D1D5DC;
+  border-radius: 10px;
+  padding: 8px 14px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #364153;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.cat-view-back-btn:hover {
+  background-color: #F1F5F9;
+  border-color: #CBD5E1;
+}
+
+.cat-view-card {
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 28px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.cat-view-card-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #e2e8f0;
+  margin-bottom: 20px;
+}
+
+.cat-view-icon-circle {
+  width: 56px;
+  height: 56px;
+  background-color: #EEF2FF;
+  color: #432DD7;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.cat-view-card-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: #0F172A;
+  margin: 0 0 4px 0;
+}
+
+.cat-view-card-subtitle {
+  font-size: 14px;
+  color: #4A5565;
+  margin: 0;
+}
+
+.cat-view-info-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.cat-view-info-item {
+  background-color: #F8FAFC;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.cat-view-info-full {
+  grid-column: 1 / -1;
+}
+
+.cat-view-info-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #4A5565;
+  margin-bottom: 8px;
+}
+
+.cat-view-info-value {
+  font-size: 16px;
+  font-weight: 600;
+  color: #0F172A;
+  margin: 0;
+  word-break: break-word;
+}
+
 @media (max-width: 768px) {
   .cat-page {
     padding: 16px;
@@ -126,6 +227,14 @@
     border: 1px solid #e2e8f0;
     border-radius: 10px;
   }
+
+  .cat-view-card {
+    padding: 20px;
+  }
+
+  .cat-view-info-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 468px) {
@@ -152,5 +261,9 @@
 
   .cat-mobile-info-row {
     font-size: 13px;
+  }
+
+  .cat-view-card-title {
+    font-size: 18px;
   }
 }

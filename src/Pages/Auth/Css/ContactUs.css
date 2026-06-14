@@ -648,3 +648,48 @@ letter-spacing: 0%;
     margin-top: -4px;
   }
 }
+
+/* Contact form feedback (success / error / field errors) */
+.contact-success {
+  width: min(100%, 720px);
+  margin: 0 auto;
+  padding: 12px 16px;
+  border: 1px solid #bbf7d0;
+  background-color: #f0fdf4;
+  color: #166534;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  text-align: center;
+}
+
+.contact-error {
+  width: min(100%, 720px);
+  margin: 0 auto;
+  padding: 12px 16px;
+  border: 1px solid #fecaca;
+  background-color: #fef2f2;
+  color: #b91c1c;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  text-align: center;
+}
+
+.contact-field .input-error,
+.contact-side-form .input-error {
+  border-color: #ef4444;
+  background-color: #fef2f2;
+}
+
+.field-error {
+  color: #b91c1c;
+  font-size: 13px;
+  font-weight: 500;
+  margin-top: 2px;
+}
+
+.contact-submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

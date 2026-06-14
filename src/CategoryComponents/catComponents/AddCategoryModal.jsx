@@ -1,73 +1,131 @@
-import React, { useState } from 'react'
-import { createPortal } from 'react-dom'
-import { X, FolderPlus } from 'lucide-react'
-import '../catStyle/AddCategoryModal.css'
+import React, { useState, useEffect } from 'react'
+import { X, Plus, Loader2 } from 'lucide-react'
+import '../../CategoryComponents/catStyle/AddCategoryModal.css'
 
 const AddCategoryModal = ({ isOpen, onClose, onSave }) => {
-  const [categoryName, setCategoryName] = useState('')
-  const [description, setDescription] = useState('')
+  const [formData, setFormData] = useState({
+    name: '',
+    description: ''
+  })
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [error, setError] = useState('')
+
+  useEffect(() => {
+    if (isOpen) {
+      setFormData({ name: '', description: '' })
+      setError('')
+      setIsSubmitting(false)
+    }
+  }, [isOpen])
 
   if (!isOpen) return null
 
-  const handleSubmit = (e) => {
-    e.preventDefault()
-    if (!categoryName.trim()) return
-    
-    onSave({ name: categoryName, description })
-    setCategoryName('')
-    setDescription('')
-    onClose()
+  const handleChange = (e) => {
+    const { name, value } = e.target
+    setFormData((prev) => ({ ...prev, [name]: value }))
   }
 
-  return createPortal(
-    <div className="cat-modal-overlay">
-      <div className="cat-modal-container">
-        
-        <div className="cat-modal-header">
-          <div className="cat-modal-title">
-            <FolderPlus size={20} className="cat-modal-title-icon" />
-            <h2>Add Category</h2>
-          </div>
-          <button className="cat-modal-close-btn" onClick={onClose}>
+  const handleSubmit = (e) => {
+    e.preventDefault()
+    setError('')
+
+    if (!formData.name.trim()) {
+      setError('Category name is required.')
+      return
+    }
+
+    setIsSubmitting(true)
+
+    setTimeout(() => {
+      onSave({
+        name: formData.name.trim(),
+        description: formData.description.trim()
+      })
+      setIsSubmitting(false)
+    }, 250)
+  }
+
+  return (
+    <div className="cat-modal-overlay" onClick={onClose}>
+      <div className="cat-add-container" onClick={(e) => e.stopPropagation()}>
+        <div className="cat-add-header">
+          <h2 className="cat-add-title">Add New Category</h2>
+          <button
+            type="button"
+            className="cat-add-close-btn"
+            onClick={onClose}
+            disabled={isSubmitting}
+            aria-label="Close"
+          >
             <X size={20} />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="cat-modal-form">
-          <div className="cat-modal-field">
-            <label>Category Name <span className="cat-modal-required">*</span></label>
+        {error && (
+          <div className="cat-add-error-banner">
+            ⚠️ {error}
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} className="cat-add-form">
+          <div className="cat-add-form-group">
+            <label htmlFor="cat-name">Category Name *</label>
             <input
+              id="cat-name"
               type="text"
-              placeholder="Enter category name"
-              value={categoryName}
-              onChange={(e) => setCategoryName(e.target.value)}
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
+              placeholder="e.g. Beverages"
               required
+              disabled={isSubmitting}
+              autoFocus
             />
           </div>
 
-          <div className="cat-modal-field">
-            <label>Description</label>
+          <div className="cat-add-form-group">
+            <label htmlFor="cat-desc">Description</label>
             <textarea
-              placeholder="Enter category description"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
+              id="cat-desc"
+              name="description"
+              value={formData.description}
+              onChange={handleChange}
+              placeholder="Briefly describe this category (optional)"
               rows={4}
+              disabled={isSubmitting}
             />
           </div>
 
-          <div className="cat-modal-footer">
-            <button type="button" className="cat-modal-btn-cancel" onClick={onClose}>
+          <div className="cat-add-actions">
+            <button
+              type="button"
+              className="cat-add-btn-cancel"
+              onClick={onClose}
+              disabled={isSubmitting}
+            >
               Cancel
             </button>
-            <button type="submit" className="cat-modal-btn-save">
-              Save Category
+            <button
+              type="submit"
+              className="cat-add-btn-submit"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? (
+                <>
+                  <Loader2 size={18} className="cat-spin" style={{ marginRight: '6px' }} />
+                  Saving...
+                </>
+              ) : (
+                <>
+                  <Plus size={18} style={{ marginRight: '6px' }} />
+                  Add Category
+                </>
+              )}
             </button>
           </div>
         </form>
-
       </div>
-    </div>,
-    document.body
+    </div>
   )
 }
 
