@@ -1,11 +1,12 @@
 import React, { useState } from 'react'
-import { Plus, Search, Package, ClipboardPlus, AlertTriangle, Truck, XCircle, Eye, Pencil, ChevronDown, User, Clock } from 'lucide-react'
+import { Plus, Search, Package, ClipboardPlus, AlertTriangle, Truck, XCircle, Eye, Pencil, ChevronDown, User, Clock, FolderOpen, Folder } from 'lucide-react'
 import './Css/Inventory.css'
 import ProductDetailsModal from '../../Components/ProductDetailsModal'
 import ManageStockModal from '../../Components/ManageStockModal'
 import RecordStockModal from '../../InventoryComponents/ModalComponents/RecordStockModal'
 import AddProductModal from '../../InventoryComponents/ModalComponents/AddProductModal'
 import ToastNotification from '../../InventoryComponents/ModalComponents/ToastNotification'
+import { useNavigate } from 'react-router-dom'
 
 const ITEMS_PER_PAGE = 6
 const tabs = ['All Products', 'Stock Entry', 'Low Stock', 'Stock History', 'Out of Stock']
@@ -26,6 +27,7 @@ const initialProducts = [
 ]
 
 const Inventory = () => {
+  const navigate = useNavigate();
   const [productList, setProductList] = useState(initialProducts)
   const [stockEntries, setStockEntries] = useState([
     {
@@ -80,6 +82,7 @@ const Inventory = () => {
   const [manageProduct, setManageProduct] = useState(null)
   const [showRecordStock, setShowRecordStock] = useState(false)
   const [showAddProduct, setShowAddProduct] = useState(false)
+  const [showCategories, setShowCategories] = useState(false)
   const [showToast, setShowToast] = useState(false)
 
   const getTabFiltered = () => {
@@ -176,6 +179,9 @@ const Inventory = () => {
           <p className="inventory-sub">Manage your product inventory</p>
         </div>
         <div className="inventory-actions">
+          <button className="inv-btn-outline" onClick={() => navigate('/inventory/categories')}>
+            <Folder size={17} /> Categories
+          </button>
           <button className="inv-btn-green" onClick={() => setShowRecordStock(true)}>
             <Truck size={17} /> Record Stock Entry
           </button>
