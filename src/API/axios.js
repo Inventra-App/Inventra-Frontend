@@ -16,44 +16,15 @@ const API = axios.create({
   timeout: 30000, // 30 seconds
 });
 
-// Read the auth token from localStorage. Supports a few common key names
-// so we don't break if the login response was saved under a different field.
-const getStoredToken = () => {
-  return (
-    localStorage.getItem("inventra_token") ||
-    localStorage.getItem("inventra_access_token") ||
-    localStorage.getItem("accessToken") ||
-    localStorage.getItem("token")
-  );
-};
-
-// Attach the auth token (if any) to every request.
 API.interceptors.request.use((config) => {
-  const token = getStoredToken();
+  const token = localStorage.getItem("inventra_token"); 
+  console.log("Sending Token:", token);
+  
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
+  
   return config;
 });
-
-// Global response interceptor: on 401 (token rejected / expired) we
-// automatically clear the local session so the user isn't trapped with a
-// stale token. The component can still handle 401s specifically if needed.
-API.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    if (error?.response?.status === 401) {
-      // Token is invalid or expired — wipe it so the next request is
-      // anonymous (e.g. login). Don't redirect automatically here because
-      // the caller may want to handle it (e.g. show a toast on the login
-      // page where a 401 is expected when credentials are wrong).
-      localStorage.removeItem("inventra_token");
-      localStorage.removeItem("inventra_access_token");
-      localStorage.removeItem("accessToken");
-      localStorage.removeItem("token");
-    }
-    return Promise.reject(error);
-  }
-);
 
 export default API;

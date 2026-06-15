@@ -1,62 +1,42 @@
-import React, { useState, useEffect } from 'react'
-import { X, Plus, Loader2 } from 'lucide-react'
-import '../../CategoryComponents/catStyle/AddCategoryModal.css'
+import React, { useState } from 'react'
+import { createPortal } from 'react-dom'
+import { X, FolderPlus } from 'lucide-react'
+import { addCategory } from '../../API/inventoryApi'
+import '../catStyle/AddCategoryModal.css'
 
 const AddCategoryModal = ({ isOpen, onClose, onSave }) => {
-  const [formData, setFormData] = useState({
-    name: '',
-    description: ''
-  })
+  const [categoryName, setCategoryName] = useState('')
+  const [description, setDescription] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [error, setError] = useState('')
-
-  useEffect(() => {
-    if (isOpen) {
-      setFormData({ name: '', description: '' })
-      setError('')
-      setIsSubmitting(false)
-    }
-  }, [isOpen])
 
   if (!isOpen) return null
 
-  const handleChange = (e) => {
-    const { name, value } = e.target
-    setFormData((prev) => ({ ...prev, [name]: value }))
-  }
-
-  const handleSubmit = (e) => {
+const handleSubmit = async (e) => {
     e.preventDefault()
-    setError('')
-
-    if (!formData.name.trim()) {
-      setError('Category name is required.')
-      return
-    }
-
+    if (!categoryName.trim()) return
+    
     setIsSubmitting(true)
-
-    setTimeout(() => {
-      onSave({
-        name: formData.name.trim(),
-        description: formData.description.trim()
-      })
+    try {
+      await onSave({ name: categoryName, description })
+      
+      setCategoryName('')
+      setDescription('')
+      onClose()
+    } catch (error) {
+      console.error("Failed to add category:", error)
+    } finally {
       setIsSubmitting(false)
-    }, 250)
+    }
   }
-
-  return (
-    <div className="cat-modal-overlay" onClick={onClose}>
-      <div className="cat-add-container" onClick={(e) => e.stopPropagation()}>
-        <div className="cat-add-header">
-          <h2 className="cat-add-title">Add New Category</h2>
-          <button
-            type="button"
-            className="cat-add-close-btn"
-            onClick={onClose}
-            disabled={isSubmitting}
-            aria-label="Close"
-          >
+  return createPortal(
+    <div className="cat-modal-overlay">
+      <div className="cat-modal-container">
+        <div className="cat-modal-header">
+          <div className="cat-modal-title">
+            <FolderPlus size={20} className="cat-modal-title-icon" />
+            <h2>Add Category</h2>
+          </div>
+          <button className="cat-modal-close-btn" onClick={onClose}>
             <X size={20} />
           </button>
         </div>

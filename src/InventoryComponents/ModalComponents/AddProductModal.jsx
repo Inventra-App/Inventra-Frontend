@@ -1,48 +1,46 @@
 import React, { useState, useEffect } from 'react'
 import { X, Plus, Loader2 } from 'lucide-react'
-import { addInventoryItem } from '../../API/inventoryApi'
+import { addInventoryItem, getAllCategories } from '../../API/inventoryApi'
 import './ModalStyles/AddProductModal.css'
-
-const initialCategories = [
-  { id: 1, name: 'Beverages' },
-  { id: 2, name: 'Snacks' },
-  { id: 3, name: 'Dairy' },
-  { id: 4, name: 'Bakery' },
-  { id: 5, name: 'Frozen Foods' },
-  { id: 6, name: 'Canned Goods' },
-  { id: 7, name: 'Personal Care' },
-  { id: 8, name: 'Meat & Seafood' },
-  { id: 9, name: 'Produce' },
-  { id: 10, name: 'Household' }
-]
 
 const AddProductModal = ({ isOpen, onClose, onAddProduct }) => {
   const [formData, setFormData] = useState({
     productName: '',
-    categoryText: '',
+    categoryId: '',
     unitPrice: '',
     packageQuantity: '',
     unitPerPackage: '',
     packageType: '',
     expiryDate: ''
   })
-  
+
+  const [categories, setCategories] = useState([])
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [serverError, setServerError] = useState('')
+  const [batchNumber, setBatchNumber] = useState('SYSTEM GENERATED')
 
   useEffect(() => {
     if (isOpen) {
+      const fetchCats = async () => {
+        try {
+          const res = await getAllCategories()
+          setCategories(Array.isArray(res) ? res : (res.data || []))
+        } catch (err) {
+          console.error("Failed to fetch categories", err)
+        }
+      }
+      fetchCats()
       setFormData({
         productName: '',
-        categoryText: '',
+        categoryId: '',
         unitPrice: '',
         packageQuantity: '',
         unitPerPackage: '',
         packageType: '',
         expiryDate: ''
       })
+      setBatchNumber('SYSTEM GENERATED')
       setServerError('')
-      setIsSubmitting(false)
     }
   }, [isOpen])
 
@@ -61,7 +59,7 @@ const AddProductModal = ({ isOpen, onClose, onAddProduct }) => {
     try {
       const payload = {
         productName: formData.productName,
-        categoryId: formData.categoryText,
+        categoryId: formData.categoryId,
         unitPrice: Number(formData.unitPrice),
         packageQuantity: Number(formData.packageQuantity),
         unitPerPackage: Number(formData.unitPerPackage),
@@ -69,12 +67,34 @@ const AddProductModal = ({ isOpen, onClose, onAddProduct }) => {
         expiryDate: formData.expiryDate
       }
 
-      await addInventoryItem(payload)
-      onAddProduct()
+      const response = await addInventoryItem(payload)
+
+      const generatedBatch =
+        response?.data?.batch?.batchCode ||
+        response?.batch?.batchCode ||
+        'NEW-BATCH'
+
+      setBatchNumber(generatedBatch)
+
+      const selectedCategory = categories.find((cat) => cat._id === formData.categoryId)
+  const totalQty = Number(formData.packageQuantity) * Number(formData.unitPerPackage)
+
+onAddProduct({
+  id: response?.data?.productDetails?.productId || response?.productDetails?.productId || Date.now(),
+  name: formData.productName,
+  batch: generatedBatch,
+  category: selectedCategory?.categoryName || formData.categoryId,
+  availableStock: totalQty,
+  stockReceived: totalQty,
+  reservedStock: 0,
+  totalStock: totalQty,
+  status: totalQty > 10 ? 'In Stock' : totalQty > 0 ? 'Low Stock' : 'Out of Stock',
+})
+
       onClose()
     } catch (err) {
-      console.error("Inventory creation failure:", err)
-      setServerError(err?.response?.data?.message || err.message || "Failed to save product.")
+      const errorMsg = err?.response?.data?.message || "Failed to save product."
+      setServerError(errorMsg)
     } finally {
       setIsSubmitting(false)
     }
@@ -113,16 +133,16 @@ const AddProductModal = ({ isOpen, onClose, onAddProduct }) => {
           <div className="form-group">
             <label>Category *</label>
             <select
-              name="categoryText"
-              value={formData.categoryText}
+              name="categoryId"
+              value={formData.categoryId}
               onChange={handleChange}
               required
               disabled={isSubmitting}
               className="category-dropdown-select"
             >
-              <option value="" disabled hidden>Select a category</option>
-              {initialCategories.map((cat) => (
-                <option key={cat.id} value={cat.name}>{cat.name}</option>
+              <option value="" disabled>Select a category</option>
+              {categories.map((cat) => (
+                <option key={cat._id} value={cat._id}>{cat.categoryName}</option>
               ))}
             </select>
           </div>
@@ -185,16 +205,13 @@ const AddProductModal = ({ isOpen, onClose, onAddProduct }) => {
 
           <div className="form-group">
             <label>Batch Number</label>
-            <div className="batch-input-wrapper">
-              <input
-                type="text"
-                value="SYSTEM GENERATED"
-                readOnly 
-                disabled 
-                className="automated-batch-field"
-              />
-              <button type="button" className="generate-btn" disabled>Generate</button>
-            </div>
+            <input
+              type="text"
+              value={batchNumber}
+              readOnly
+              disabled
+              className="automated-batch-field"
+            />
           </div>
 
           <div className="form-group">
