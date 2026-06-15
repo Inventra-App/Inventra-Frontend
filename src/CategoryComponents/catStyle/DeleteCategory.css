@@ -118,6 +118,16 @@
   transition: all 0.2s ease;
 }
 
+.cat-delete-btn-confirm.loading {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.cat-delete-btn-confirm:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 .cat-delete-btn-confirm:hover {
   background-color: #B90810;
 }

@@ -1,42 +1,46 @@
 import React, { useState } from 'react'
 import { createPortal } from 'react-dom'
-import { X, FolderPlus } from 'lucide-react'
-import { addCategory } from '../../API/inventoryApi'
+import { X, FolderPlus, Loader2, Plus } from 'lucide-react'
 import '../catStyle/AddCategoryModal.css'
 
 const AddCategoryModal = ({ isOpen, onClose, onSave }) => {
-  const [categoryName, setCategoryName] = useState('')
-  const [description, setDescription] = useState('')
+  const [formData, setFormData] = useState({ name: '', description: '' })
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [error, setError] = useState(null)
 
   if (!isOpen) return null
 
-const handleSubmit = async (e) => {
+  const handleChange = (e) => {
+    const { name, value } = e.target
+    setFormData(prev => ({ ...prev, [name]: value }))
+  }
+
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    if (!categoryName.trim()) return
+    if (!formData.name.trim()) return
     
     setIsSubmitting(true)
+    setError(null)
     try {
-      await onSave({ name: categoryName, description })
-      
-      setCategoryName('')
-      setDescription('')
+      await onSave(formData)
+      setFormData({ name: '', description: '' })
       onClose()
-    } catch (error) {
-      console.error("Failed to add category:", error)
+    } catch (err) {
+      setError("Failed to add category. Please try again.")
     } finally {
       setIsSubmitting(false)
     }
   }
+
   return createPortal(
     <div className="cat-modal-overlay">
-      <div className="cat-modal-container">
-        <div className="cat-modal-header">
-          <div className="cat-modal-title">
-            <FolderPlus size={20} className="cat-modal-title-icon" />
+      <div className="cat-add-container">
+        <div className="cat-add-header">
+          <div className="cat-add-title">
+            <FolderPlus size={20} />
             <h2>Add Category</h2>
           </div>
-          <button className="cat-modal-close-btn" onClick={onClose}>
+          <button type="button" className="cat-add-close-btn" onClick={onClose}>
             <X size={20} />
           </button>
         </div>
@@ -105,7 +109,8 @@ const handleSubmit = async (e) => {
           </div>
         </form>
       </div>
-    </div>
+    </div>,
+    document.body
   )
 }
 
