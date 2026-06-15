@@ -1,12 +1,26 @@
-import React from 'react'
+import React, { useState } from 'react' // Import useState
 import { Trash2 } from 'lucide-react'
 import '../../CategoryComponents/catStyle/DeleteCategory.css'
 
 const DeleteCategory = ({ isOpen, onClose, onConfirm, categoryName }) => {
+  const [isDeleting, setIsDeleting] = useState(false); // New state
+
   if (!isOpen) return null
 
   const handleOverlayClick = (e) => {
-    if (e.target === e.currentTarget) onClose()
+    if (e.target === e.currentTarget && !isDeleting) onClose()
+  }
+
+  const handleDelete = async () => {
+    setIsDeleting(true);
+    try {
+      await onConfirm(); // Await the API call
+    } catch (error) {
+      console.error("Failed to delete", error);
+    } finally {
+      setIsDeleting(false);
+      onClose();
+    }
   }
 
   return (
@@ -35,15 +49,17 @@ const DeleteCategory = ({ isOpen, onClose, onConfirm, categoryName }) => {
             type="button"
             className="cat-delete-btn-cancel"
             onClick={onClose}
+            disabled={isDeleting}
           >
             Cancel
           </button>
           <button
             type="button"
-            className="cat-delete-btn-confirm"
-            onClick={onConfirm}
+            className={`cat-delete-btn-confirm ${isDeleting ? 'loading' : ''}`}
+            onClick={handleDelete}
+            disabled={isDeleting}
           >
-            Delete
+            {isDeleting ? 'Deleting...' : 'Delete'}
           </button>
         </div>
       </div>

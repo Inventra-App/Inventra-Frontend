@@ -55,7 +55,7 @@ export const addCategory = async (payload) => {
   return res.data;
 };
 
-export const deleteCategory = async (id) => {
-  const res = await API.delete(`category/${id}`);
+export const deleteCategory = async (categoryId) => {
+  const res = await API.delete(`d/category/${categoryId}`);
   return res.data;
 };
