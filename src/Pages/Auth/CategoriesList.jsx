@@ -1,29 +1,15 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Plus, Search, Eye, SquarePen, Trash2, ChevronLeft, ChevronRight } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import AddCategoryModal from '../../CategoryComponents/catComponents/AddCategoryModal'
 import DeleteCategory from '../../CategoryComponents/catComponents/DeleteCategory'
 import ViewCategory from '../../CategoryComponents/catComponents/ViewCategory'
+import { getAllCategories, addCategory, deleteCategory } from '../../API/inventoryApi'
 import './Css/CategoriesList.css'
-
-const initialCategories = [
-  { id: 1, name: 'Beverages', description: 'Soft drinks and carbonated beverages', totalProducts: 45 },
-  { id: 2, name: 'Snacks', description: 'Chips, crackers, and other snack items', totalProducts: 32 },
-  { id: 3, name: 'Dairy', description: 'Milk, cheese, yogurt, and dairy items', totalProducts: 28 },
-  { id: 4, name: 'Bakery', description: 'Bread, pastries, and baked goods', totalProducts: 19 },
-  { id: 5, name: 'Frozen Foods', description: 'Frozen meals, ice cream, and frozen items', totalProducts: 24 },
-  { id: 6, name: 'Canned Goods', description: 'Canned vegetables, fruits, and preserved foods', totalProducts: 37 },
-  { id: 7, name: 'Personal Care', description: 'Toiletries and personal hygiene products', totalProducts: 41 },
-  { id: 8, name: 'Meat & Seafood', description: 'Fresh meats, poultry, fish, and seafood', totalProducts: 15 },
-  { id: 9, name: 'Produce', description: 'Fresh fruits and seasonal vegetables', totalProducts: 52 },
-  { id: 10, name: 'Household', description: 'Cleaning supplies, paper towels, and laundry', totalProducts: 29 },
-  { id: 11, name: 'Baby Care', description: 'Diapers, wipes, baby food, and lotions', totalProducts: 12 },
-  { id: 12, name: 'Pet Supplies', description: 'Dog food, cat food, toys, and pet care', totalProducts: 18 }
-]
 
 const CategoriesList = () => {
   const navigate = useNavigate()
-  const [categories, setCategories] = useState(initialCategories)
+  const [categories, setCategories] = useState([])
   const [search, setSearch] = useState('')
   const [currentPage, setCurrentPage] = useState(1)
   const [itemsPerPage, setItemsPerPage] = useState(7)
@@ -31,6 +17,27 @@ const CategoriesList = () => {
   const [isDeleteOpen, setIsDeleteOpen] = useState(false)
   const [selectedCategory, setSelectedCategory] = useState(null)
   const [activeViewCategory, setActiveViewCategory] = useState(null)
+  const [notification, setNotification] = useState(null);
+
+  const showNotification = (message) => {
+    setNotification(message);
+    setTimeout(() => setNotification(null), 3000);
+  };
+
+   // In CategoriesList.jsx
+    useEffect(() => {
+    const fetchCategories = async () => {
+    try {
+      const res = await getAllCategories();
+      // The API returns { data: [...] } based on your screenshots
+      const categoriesData = res.data || res; 
+      setCategories(Array.isArray(categoriesData) ? categoriesData : []);
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+    }
+  };
+  fetchCategories();
+  }, []);
 
   if (activeViewCategory) {
     return (
@@ -42,20 +49,17 @@ const CategoriesList = () => {
   }
 
   const filteredCategories = categories.filter(cat =>
-    cat.name.toLowerCase().includes(search.toLowerCase())
+    (cat?.categoryName || "").toLowerCase().includes(search.toLowerCase())
   )
 
   const totalItems = filteredCategories.length
   const totalPages = Math.ceil(totalItems / itemsPerPage)
-
   const indexOfLastItem = currentPage * itemsPerPage
   const indexOfFirstItem = indexOfLastItem - itemsPerPage
   const currentCategories = filteredCategories.slice(indexOfFirstItem, indexOfLastItem)
 
   const handlePageChange = (pageNumber) => {
-    if (pageNumber >= 1 && pageNumber <= totalPages) {
-      setCurrentPage(pageNumber)
-    }
+    if (pageNumber >= 1 && pageNumber <= totalPages) setCurrentPage(pageNumber)
   }
 
   const handleItemsPerPageChange = (e) => {
@@ -63,32 +67,38 @@ const CategoriesList = () => {
     setCurrentPage(1)
   }
 
-  const handleSaveCategory = (newCat) => {
-    const freshCategory = {
-      id: Date.now(),
-      name: newCat.name,
-      description: newCat.description || 'No description provided',
-      totalProducts: 0
+  const handleSaveCategory = async (newCat) => {
+    try {
+      const res = await addCategory({ 
+        categoryName: newCat.name, 
+        description: newCat.description 
+      });
+      const saved = res.data || res;
+      setCategories((prev) => [saved, ...prev]);
+      setCurrentPage(1);
+      setIsModalOpen(false);
+      showNotification("Category added successfully!");
+    } catch (error) {
+      console.error("Error saving category:", error);
     }
-    setCategories([freshCategory, ...categories])
-    setCurrentPage(1)
-  }
+  };
 
   const handleOpenDelete = (category) => {
     setSelectedCategory(category)
     setIsDeleteOpen(true)
   }
 
-  const handleConfirmDelete = () => {
+  const handleConfirmDelete = async () => {
     if (!selectedCategory) return
-    const updated = categories.filter(cat => cat.id !== selectedCategory.id)
-    setCategories(updated)
-    const checkedTotalPages = Math.ceil(updated.length / itemsPerPage)
-    if (currentPage > checkedTotalPages && checkedTotalPages > 0) {
-      setCurrentPage(checkedTotalPages)
+    try {
+      await deleteCategory(selectedCategory._id);
+      setCategories(categories.filter(cat => cat._id !== selectedCategory._id));
+      setIsDeleteOpen(false);
+      setSelectedCategory(null);
+      showNotification("Category deleted successfully!");
+    } catch (error) {
+      console.error("Error deleting category:", error);
     }
-    setIsDeleteOpen(false)
-    setSelectedCategory(null)
   }
 
   return (
@@ -135,11 +145,11 @@ const CategoriesList = () => {
             </thead>
             <tbody>
               {currentCategories.map((category, index) => (
-                <tr key={category.id}>
+                <tr key={category._id}>
                   <td className="cat-name-num">{indexOfFirstItem + index + 1}</td>
-                  <td className="cat-name-cell">{category.name}</td>
+                  <td className="cat-name-cell">{category.categoryName}</td>
                   <td className="cat-desc-cell">{category.description}</td>
-                  <td><span className="cat-quantity">{category.totalProducts}</span></td>
+                  <td><span className="cat-quantity">{category.totalProducts || 0}</span></td>
                   <td>
                     <button className="cat-view-btn" onClick={() => setActiveViewCategory(category)}>
                       <Eye size={14} /> View
@@ -157,63 +167,21 @@ const CategoriesList = () => {
                   </td>
                 </tr>
               ))}
-              {currentCategories.length === 0 && (
-                <tr>
-                  <td colSpan="6" style={{ textAlign: 'center', padding: '24px', color: '#717182' }}>
-                    No categories found
-                  </td>
-                </tr>
-              )}
             </tbody>
           </table>
         </div>
-        
         <div className="cat-pagination-bar">
           <div className="cat-pagination-left">
             <span className="cat-pagination-info">
               Showing {totalItems === 0 ? 0 : indexOfFirstItem + 1} to {Math.min(indexOfLastItem, totalItems)} of {totalItems} categories
             </span>
-            <div className="cat-page-select-wrapper">
-              <label htmlFor="itemsPerPage">Display:</label>
-              <select 
-                id="itemsPerPage" 
-                value={itemsPerPage} 
-                onChange={handleItemsPerPageChange}
-                className="cat-page-select"
-              >
-                <option value={7}>7</option>
-                <option value={10}>10</option>
-                <option value={15}>15</option>
-                <option value={20}>20</option>
-              </select>
-            </div>
           </div>
-          
           {totalPages > 1 && (
             <div className="cat-pagination-controls">
-              <button 
-                className="cat-page-arrow-btn" 
-                onClick={() => handlePageChange(currentPage - 1)}
-                disabled={currentPage === 1}
-              >
+              <button className="cat-page-arrow-btn" onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1}>
                 <ChevronLeft size={18} />
               </button>
-              
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
-                <button
-                  key={pageNum}
-                  className={`cat-page-num-btn ${currentPage === pageNum ? 'active' : ''}`}
-                  onClick={() => handlePageChange(pageNum)}
-                >
-                  {pageNum}
-                </button>
-              ))}
-
-              <button 
-                className="cat-page-arrow-btn" 
-                onClick={() => handlePageChange(currentPage + 1)}
-                disabled={currentPage === totalPages}
-              >
+              <button className="cat-page-arrow-btn" onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages}>
                 <ChevronRight size={18} />
               </button>
             </div>
@@ -223,13 +191,13 @@ const CategoriesList = () => {
 
       <div className="cat-mobile-cards">
         {currentCategories.map((category, index) => (
-          <div key={category.id} className="cat-mobile-card">
+          <div key={category._id} className="cat-mobile-card">
             <div className="cat-mobile-card-header">
               <div>
                 <span className="cat-mobile-index">#{indexOfFirstItem + index + 1}</span>
-                <h3 className="cat-mobile-name">{category.name}</h3>
+                <h3 className="cat-mobile-name">{category.categoryName}</h3>
               </div>
-              <span className="cat-mobile-badge">{category.totalProducts} Products</span>
+              <span className="cat-mobile-badge">{category.totalProducts || 0} Products</span>
             </div>
             <p className="cat-mobile-desc">{category.description}</p>
             <div className="cat-mobile-actions">
@@ -237,9 +205,6 @@ const CategoriesList = () => {
                 <Eye size={14} /> View
               </button>
               <div className="cat-action-group">
-                <button className="cat-icon-btn edit">
-                  <SquarePen size={16} />
-                </button>
                 <button className="cat-icon-btn delete" onClick={() => handleOpenDelete(category)}>
                   <Trash2 size={16} />
                 </button>
@@ -254,13 +219,18 @@ const CategoriesList = () => {
         onClose={() => setIsModalOpen(false)} 
         onSave={handleSaveCategory}
       />
-
       <DeleteCategory
         isOpen={isDeleteOpen}
         onClose={() => setIsDeleteOpen(false)}
         onConfirm={handleConfirmDelete}
-        categoryName={selectedCategory ? selectedCategory.name : ''}
+        categoryName={selectedCategory ? selectedCategory.categoryName : ''}
       />
+      {notification && (
+        <>
+        <div className="cat-overlay" />
+        <div className="cat-notification">{notification}</div>
+        </>
+      )}
     </div>
   )
 }

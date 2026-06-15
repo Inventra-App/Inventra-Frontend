@@ -3,6 +3,8 @@
   display: flex;
   flex-direction: column;
   gap: 24px;
+  width: 100%;
+  max-width: 100vw;
   margin-top: 50px;
 }
 
