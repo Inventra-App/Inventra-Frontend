@@ -96,10 +96,9 @@
   padding: 12px 14px;
   border: 1px solid #D1D5DC;
   border-radius: 10px;
-  font-size: 15px;
-  font-family: inherit;
-  color: #0F172A;
-  background-color: #ffffff;
+  font-weight: 400;
+  font-size: 14px;
+  color: #101828;
   outline: none;
   box-sizing: border-box;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;

@@ -16,12 +16,12 @@ export const getExpiryAlerts = async () => {
 };
 
 export const getInventoryItems = async () => {
-  const res = await API.get("/product/getAll");
+  const res = await API.get("product/getAll");
   return res.data;
 };
 
 export const addInventoryItem = async (payload) => {
-  const res = await API.post("/inventory/product", payload);
+  const res = await API.post("product", payload);
   return res.data;
 };
 
@@ -32,5 +32,25 @@ export const updateInventoryItem = async (id, data) => {
 
 export const deleteInventoryItem = async (id) => {
   const res = await API.delete(`/inventory/product/${id}`);
+  return res.data;
+};
+
+export const getAllCategories = async () => {
+  const res = await API.get("allCategories");
+  return res.data;
+};
+
+export const getCategoryById = async (id) => {
+  const res = await API.get(`category/${id}`);
+  return res.data;
+};
+
+export const addCategory = async (payload) => {
+  const res = await API.post("category", payload);
+  return res.data;
+};
+
+export const deleteCategory = async (id) => {
+  const res = await API.delete(`category/${id}`);
   return res.data;
 };
