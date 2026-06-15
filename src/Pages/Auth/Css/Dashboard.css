@@ -147,6 +147,11 @@
   gap: 12px;
 }
 
+.dashboard-empty-alert {
+  padding: 12px 0;
+  text-align: center;
+}
+
 .expiry-item {
   padding: 18px 16px;
   border-radius: 12px;

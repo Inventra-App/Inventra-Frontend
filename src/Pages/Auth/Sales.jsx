@@ -1,5 +1,7 @@
-import React, { useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { ArrowLeft, Calendar, CheckCircle, Minus, Package, Plus, ShoppingCart, Trash2, User, X } from 'lucide-react'
+import { getInventoryItems } from '../../API/inventoryApi'
+import { countSalesPos, makeSalesPos } from '../../API/salesPosApi'
 import './Css/Sales.css'
 import calendar from '../../assets/calendar.png'
 import Container1 from '../../assets/Container (6).png'
@@ -7,78 +9,179 @@ import Container2 from '../../assets/Container (7).png'
 import Container3 from '../../assets/Container (8).png'
 import Container4 from '../../assets/Button.png'
 
+const getArrayPayload = (payload) => {
+  if (Array.isArray(payload)) return payload
+  if (Array.isArray(payload?.data)) return payload.data
+  if (Array.isArray(payload?.sales)) return payload.sales
+  if (Array.isArray(payload?.salesData)) return payload.salesData
+  if (Array.isArray(payload?.history)) return payload.history
+  if (Array.isArray(payload?.products)) return payload.products
+  if (Array.isArray(payload?.items)) return payload.items
+  return []
+}
+
+const getProductId = (product) => product?._id ?? product?.id ?? product?.productId ?? product?.productDetails?.productId ?? ''
+const getProductName = (product) => product?.productName ?? product?.name ?? product?.title ?? 'Unnamed Product'
+const getProductPrice = (product) => Number(product?.unitPrice ?? product?.price ?? product?.sellingPrice ?? product?.amount ?? 0)
+const getProductStock = (product) => Number(product?.availableStock ?? product?.quantity ?? product?.stock ?? 0)
+
+const normalizeProduct = (product) => ({
+  id: getProductId(product),
+  name: getProductName(product),
+  price: getProductPrice(product),
+  stock: getProductStock(product),
+})
+
+const normalizeSale = (sale) => {
+  const product = sale?.product ?? sale?.productDetails ?? sale?.item ?? {}
+  const name = sale?.productName ?? sale?.name ?? product?.productName ?? product?.name ?? 'Product'
+  const qty = Number(sale?.quantity ?? sale?.qty ?? sale?.totalQuantity ?? 0)
+  const price = Number(sale?.unitPrice ?? sale?.price ?? product?.unitPrice ?? product?.price ?? 0)
+  const total = Number(sale?.total ?? sale?.totalAmount ?? sale?.amount ?? price * qty)
+  const user = sale?.user?.name ?? sale?.cashier?.name ?? sale?.createdBy?.name ?? sale?.processedBy ?? 'Admin User'
+  const dateValue = sale?.createdAt ?? sale?.date ?? sale?.updatedAt ?? ''
+  const date = dateValue ? new Date(dateValue).toLocaleString('en-NG', { dateStyle: 'medium', timeStyle: 'short' }) : '-'
+
+  return {
+    id: sale?._id ?? sale?.id ?? `${name}-${date}`,
+    name,
+    qty,
+    price,
+    total,
+    user,
+    date,
+  }
+}
+
 const Sales = () => {
   const [selectedProduct, setSelectedProduct] = useState('')
+  const [cartItem, setCartItem] = useState(null)
   const [quantity, setQuantity] = useState(1)
-  const [showCartItem, setShowCartItem] = useState(true)
   const [showEmptyCartPopup, setShowEmptyCartPopup] = useState(false)
   const [showOrderModal, setShowOrderModal] = useState(false)
   const [showSaleSuccess, setShowSaleSuccess] = useState(false)
   const [showOrderHistory, setShowOrderHistory] = useState(false)
   const [selectedHistory, setSelectedHistory] = useState(null)
+  const [products, setProducts] = useState([])
+  const [historyItems, setHistoryItems] = useState([])
+  const [loadingProducts, setLoadingProducts] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [salesError, setSalesError] = useState('')
 
-  const productName = 'Fresh Milk'
-  const productPrice = 250
-  const subtotal = showCartItem ? productPrice * quantity : 0
-  const itemsInCart = showCartItem ? quantity : 0
-  const salesToday = showOrderHistory ? 2 : 0
-  const revenueToday = showOrderHistory ? 810 : 0
-  const historyItems = [
-    { name: 'Yogurt', qty: 2, price: 180, total: 360, user: 'Admin User', date: 'May 23, 2026 13:03' },
-    { name: 'White Bread', qty: 3, price: 150, total: 450, user: 'Admin User', date: 'May 23, 2026 13:03' },
-    { name: 'Fresh Milk', qty: 5, price: 250, total: 1250, user: 'Jane Cashier', date: 'May 20, 2026 10:15' },
-    { name: 'White Bread', qty: 2, price: 150, total: 300, user: 'Admin User', date: 'May 19, 2026 09:28' },
-  ]
+  const loadSales = async () => {
+    try {
+      const response = await countSalesPos()
+      setHistoryItems(getArrayPayload(response).map(normalizeSale))
+    } catch (error) {
+      console.error('Sales history fetch error:', error)
+      setHistoryItems([])
+    }
+  }
+
+  useEffect(() => {
+    const loadProducts = async () => {
+      setLoadingProducts(true)
+      try {
+        const response = await getInventoryItems()
+        setProducts(getArrayPayload(response).map(normalizeProduct).filter((product) => product.id))
+      } catch (error) {
+        console.error('POS products fetch error:', error)
+        setProducts([])
+      } finally {
+        setLoadingProducts(false)
+      }
+    }
+
+    const timerId = window.setTimeout(() => {
+      loadProducts()
+      loadSales()
+    }, 0)
+
+    return () => window.clearTimeout(timerId)
+  }, [])
+
+  const salesToday = historyItems.length
+  const revenueToday = historyItems.reduce((sum, item) => sum + item.total, 0)
+  const subtotal = cartItem ? cartItem.price * quantity : 0
+  const itemsInCart = cartItem ? quantity : 0
+
+  const selectedProductRecord = useMemo(() => {
+    const productValue = selectedProduct.trim().toLowerCase()
+    return products.find((product) => (
+      product.id.toLowerCase() === productValue || product.name.toLowerCase() === productValue
+    ))
+  }, [products, selectedProduct])
 
   const formatNaira = (amount) => {
-    return `\u20a6${amount.toLocaleString('en-NG', {
+    return `\u20a6${Number(amount || 0).toLocaleString('en-NG', {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     })}`
   }
 
   const increaseQuantity = () => {
-    setQuantity(quantity + 1)
+    setQuantity((currentQuantity) => currentQuantity + 1)
   }
 
   const reduceQuantity = () => {
-    if (quantity > 1) {
-      setQuantity(quantity - 1)
-    }
+    setQuantity((currentQuantity) => Math.max(1, currentQuantity - 1))
   }
 
   const addToCart = () => {
-    setShowCartItem(true)
+    if (!selectedProductRecord) return
+
+    setCartItem(selectedProductRecord)
     setQuantity(1)
     setSelectedProduct('')
+    setSalesError('')
   }
 
   const removeCartItem = () => {
-    setShowCartItem(false)
+    setCartItem(null)
   }
 
   const clearCart = () => {
-    setShowCartItem(false)
+    setCartItem(null)
     setShowEmptyCartPopup(true)
   }
 
   const completeSale = () => {
-    if (!showCartItem) {
+    if (!cartItem) {
       setShowEmptyCartPopup(true)
       return
     }
 
+    setSalesError('')
     setShowOrderModal(true)
   }
 
-  const proceedSale = () => {
-    setShowOrderModal(false)
-    setShowCartItem(false)
-    setShowSaleSuccess(true)
+  const proceedSale = async () => {
+    if (!cartItem || isSubmitting) return
 
-    setTimeout(() => {
-      setShowSaleSuccess(false)
-    }, 2500)
+    setIsSubmitting(true)
+    setSalesError('')
+
+    try {
+      await makeSalesPos({
+        id: cartItem.id,
+        quantity,
+      })
+
+      setShowOrderModal(false)
+      setCartItem(null)
+      setQuantity(1)
+      setShowSaleSuccess(true)
+      loadSales()
+
+      setTimeout(() => {
+        setShowSaleSuccess(false)
+      }, 2500)
+    } catch (error) {
+      console.error('Complete sale error:', error)
+      setSalesError(error?.response?.data?.message || 'Failed to complete sale. Please try again.')
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
@@ -132,18 +235,22 @@ const Sales = () => {
           <h3>Sales History</h3>
 
           <div className="sales-history-list">
-            {historyItems.map((item) => (
-              <button className="sales-history-item" type="button" key={`${item.name}-${item.date}`} onClick={() => setSelectedHistory(item)}>
-                <strong>{item.name}</strong>
-                <span>Qty: {item.qty} × {formatNaira(item.price)} = {formatNaira(item.total)}</span>
-                <small>
-                  <User size={13} />
-                  {item.user}
-                  <Calendar size={13} />
-                  {item.date}
-                </small>
-              </button>
-            ))}
+            {historyItems.length === 0 ? (
+              <p className="sales-empty-cart">No sales history to display</p>
+            ) : (
+              historyItems.map((item) => (
+                <button className="sales-history-item" type="button" key={item.id} onClick={() => setSelectedHistory(item)}>
+                  <strong>{item.name}</strong>
+                  <span>Qty: {item.qty} x {formatNaira(item.price)} = {formatNaira(item.total)}</span>
+                  <small>
+                    <User size={13} />
+                    {item.user}
+                    <Calendar size={13} />
+                    {item.date}
+                  </small>
+                </button>
+              ))
+            )}
           </div>
         </section>
       ) : (
@@ -156,12 +263,19 @@ const Sales = () => {
                 <input
                   id="product"
                   type="text"
+                  list="sales-products"
+                  placeholder={loadingProducts ? 'Loading products...' : 'Search product name'}
                   value={selectedProduct}
                   onChange={(event) => setSelectedProduct(event.target.value)}
                   aria-label="Select product"
                 />
+                <datalist id="sales-products">
+                  {products.map((product) => (
+                    <option key={product.id} value={product.name} />
+                  ))}
+                </datalist>
 
-                <button type="button" disabled={!selectedProduct.trim()} onClick={addToCart}>
+                <button type="button" disabled={!selectedProductRecord} onClick={addToCart}>
                   Add to Cart
                 </button>
               </div>
@@ -171,16 +285,16 @@ const Sales = () => {
               <h3>Cart Items</h3>
 
               <div className="sales-cart-list">
-                {!showCartItem ? (
+                {!cartItem ? (
                   <p className="sales-empty-cart">No items in cart</p>
                 ) : (
                   <div className="sales-cart-item">
                     <div className="sales-cart-product">
-                      <strong>{productName}</strong>
-                      <span>{formatNaira(productPrice)} each</span>
+                      <strong>{cartItem.name}</strong>
+                      <span>{formatNaira(cartItem.price)} each</span>
                     </div>
 
-                    <div className="sales-quantity-control" aria-label={`${productName} quantity`}>
+                    <div className="sales-quantity-control" aria-label={`${cartItem.name} quantity`}>
                       <button type="button" aria-label="Reduce quantity" onClick={reduceQuantity}>
                         -
                       </button>
@@ -191,13 +305,13 @@ const Sales = () => {
                     </div>
 
                     <strong className="sales-item-total">
-                      {formatNaira(productPrice * quantity)}
+                      {formatNaira(cartItem.price * quantity)}
                     </strong>
 
                     <button
                       className="sales-remove-item"
                       type="button"
-                      aria-label={`Remove ${productName}`}
+                      aria-label={`Remove ${cartItem.name}`}
                       onClick={removeCartItem}
                     >
                       <img src={Container4} alt="" />
@@ -228,8 +342,10 @@ const Sales = () => {
               <strong>{formatNaira(subtotal)}</strong>
             </div>
 
-            <button className="sales-complete-btn" type="button" onClick={completeSale}>
-              Complete Sale
+            {salesError && <p className="sales-error-message">{salesError}</p>}
+
+            <button className="sales-complete-btn" type="button" onClick={completeSale} disabled={isSubmitting}>
+              {isSubmitting ? 'Completing...' : 'Complete Sale'}
             </button>
 
             <button className="sales-clear-btn" type="button" onClick={clearCart}>
@@ -249,12 +365,12 @@ const Sales = () => {
         </div>
       )}
 
-      {showOrderModal && (
+      {showOrderModal && cartItem && (
         <div className="sales-order-backdrop">
           <div className="sales-order-modal">
             <div className="sales-order-header">
               <div className="sales-order-title-row">
-                <div className="sales-order-icon">₦</div>
+                <div className="sales-order-icon">{'\u20a6'}</div>
                 <div>
                   <h3>Order Confirmation</h3>
                   <p>Review before proceeding</p>
@@ -267,68 +383,42 @@ const Sales = () => {
             </div>
 
             <div className="sales-order-body">
-              <h4>ITEMS (5 PRODUCTS)</h4>
+              <h4>ITEMS ({quantity} PRODUCT{quantity === 1 ? '' : 'S'})</h4>
 
               <div className="sales-order-item">
                 <div>
-                  <strong>Fresh Milk</strong>
-                  <span>₦250.00 each</span>
+                  <strong>{cartItem.name}</strong>
+                  <span>{formatNaira(cartItem.price)} each</span>
                 </div>
                 <div className="sales-order-qty">
-                  <button type="button"><Minus size={15} /></button>
-                  <b>2</b>
-                  <button type="button"><Plus size={15} /></button>
+                  <button type="button" onClick={reduceQuantity}><Minus size={15} /></button>
+                  <b>{quantity}</b>
+                  <button type="button" onClick={increaseQuantity}><Plus size={15} /></button>
                 </div>
-                <strong>₦500.00</strong>
-                <button type="button" className="sales-order-delete"><Trash2 size={15} /></button>
-              </div>
-
-              <div className="sales-order-item">
-                <div>
-                  <strong>White Bread</strong>
-                  <span>₦150.00 each</span>
-                </div>
-                <div className="sales-order-qty">
-                  <button type="button"><Minus size={15} /></button>
-                  <b>2</b>
-                  <button type="button"><Plus size={15} /></button>
-                </div>
-                <strong>₦300.00</strong>
-                <button type="button" className="sales-order-delete"><Trash2 size={15} /></button>
-              </div>
-
-              <div className="sales-order-item">
-                <div>
-                  <strong>Yogurt</strong>
-                  <span>₦180.00 each</span>
-                </div>
-                <div className="sales-order-qty">
-                  <button type="button"><Minus size={15} /></button>
-                  <b>1</b>
-                  <button type="button"><Plus size={15} /></button>
-                </div>
-                <strong>₦180.00</strong>
-                <button type="button" className="sales-order-delete"><Trash2 size={15} /></button>
+                <strong>{formatNaira(subtotal)}</strong>
+                <button type="button" className="sales-order-delete" onClick={removeCartItem}><Trash2 size={15} /></button>
               </div>
 
               <div className="sales-order-total-box">
                 <div>
                   <span>Subtotal</span>
-                  <strong>₦1830.00</strong>
+                  <strong>{formatNaira(subtotal)}</strong>
                 </div>
                 <div>
                   <span>Total Qty</span>
-                  <strong>7 items</strong>
+                  <strong>{quantity} item{quantity === 1 ? '' : 's'}</strong>
                 </div>
                 <div>
                   <span>Discount</span>
-                  <strong className="sales-order-discount">₦0.00</strong>
+                  <strong className="sales-order-discount">{formatNaira(0)}</strong>
                 </div>
                 <div className="sales-order-total-line">
                   <span>Total Amount</span>
-                  <strong>₦1830.00</strong>
+                  <strong>{formatNaira(subtotal)}</strong>
                 </div>
               </div>
+
+              {salesError && <p className="sales-error-message">{salesError}</p>}
             </div>
 
             <div className="sales-order-actions">
@@ -336,9 +426,9 @@ const Sales = () => {
                 <ArrowLeft size={17} />
                 <span>Cancel</span>
               </button>
-              <button type="button" className="sales-order-proceed" onClick={proceedSale}>
+              <button type="button" className="sales-order-proceed" onClick={proceedSale} disabled={isSubmitting}>
                 <CheckCircle size={17} />
-                <span>Proceed</span>
+                <span>{isSubmitting ? 'Processing...' : 'Proceed'}</span>
               </button>
             </div>
           </div>
@@ -361,7 +451,7 @@ const Sales = () => {
                 </div>
                 <div>
                   <h3>{selectedHistory.name}</h3>
-                  <span># 29-NDKT4QBF9</span>
+                  <span># {selectedHistory.id}</span>
                   <small>Completed</small>
                 </div>
               </div>
@@ -381,7 +471,7 @@ const Sales = () => {
               <div className="sales-detail-grid">
                 <div>
                   <span>Product Name</span>
-                  <strong>Orange Juice</strong>
+                  <strong>{selectedHistory.name}</strong>
                 </div>
                 <div>
                   <span>Unit Price</span>
@@ -405,16 +495,15 @@ const Sales = () => {
               </div>
               <div className="sales-detail-info">
                 <span><Calendar size={14} /> Date & Time</span>
-                <strong>May 23, 2026</strong>
-                <small>13:06 PM</small>
+                <strong>{selectedHistory.date}</strong>
               </div>
             </div>
 
             <div className="sales-detail-breakdown">
               <h4>PRICE BREAKDOWN</h4>
               <div>
-                <span>Orange Juice × 3</span>
-                <strong>{formatNaira(1050)}</strong>
+                <span>{selectedHistory.name} x {selectedHistory.qty}</span>
+                <strong>{formatNaira(selectedHistory.total)}</strong>
               </div>
               <div>
                 <span>Discount</span>
@@ -422,7 +511,7 @@ const Sales = () => {
               </div>
               <div>
                 <span>Total Paid</span>
-                <strong className="sales-detail-blue">{formatNaira(1050)}</strong>
+                <strong className="sales-detail-blue">{formatNaira(selectedHistory.total)}</strong>
               </div>
             </div>
           </div>

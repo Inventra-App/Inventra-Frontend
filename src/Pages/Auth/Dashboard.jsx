@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react'
-import { Package, Activity, ShoppingCart, TrendingDown, Calendar } from 'lucide-react'
+import { Package, Activity, ShoppingCart, TrendingDown, Calendar, AlertTriangle } from 'lucide-react'
 import {
   getTotalStockUnits,
   getTotalProductsCount,
@@ -108,7 +108,7 @@ const Dashboard = () => {
     {
       label: 'Critical Alerts',
       value: '0',
-      sub: 'No critical alerts',
+      sub: 'Products expiring soon',
       icon: <TrendingDown size={22} />,
       color: 'red',
     },
@@ -160,7 +160,21 @@ const Dashboard = () => {
       </div>
 
       <div className="dashboard-alerts">
-        {/* Low Stock Alerts */}
+        <div className="alert-card">
+          <div className="alert-card-header">
+            <div className="alert-card-title">
+              <AlertTriangle size={18} className="alert-icon-orange" />
+              <h4>Expiry Alerts</h4>
+            </div>
+            <span className="alert-badge alert-badge-orange">0</span>
+          </div>
+          <div className="alert-list">
+            <p className="expiry-meta dashboard-empty-alert">
+              No expiry alerts to display.
+            </p>
+          </div>
+        </div>
+
         <div className="alert-card">
           <div className="alert-card-header">
             <div className="alert-card-title">
