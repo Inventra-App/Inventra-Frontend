@@ -1,4 +1,4 @@
-import API from "./axios"
+import API from "./axios";
 
 export const makeSalesPos = async (payload) => {
   const salePayload = Array.isArray(payload?.items)
@@ -12,11 +12,11 @@ export const makeSalesPos = async (payload) => {
         ],
       };
 
-  const res = await API.post("/pos/sale", salePayload); 
+  const res = await API.post("pos/sale", salePayload);
   return res.data;
 };
 
 export const countSalesPos = async () => {
-  const res = await API.get("/sales");
+  const res = await API.get("sales");
   return res.data;
 };
