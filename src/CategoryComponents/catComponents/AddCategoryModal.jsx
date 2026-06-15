@@ -41,42 +41,71 @@ const handleSubmit = async (e) => {
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="cat-modal-form">
-          <div className="cat-modal-field">
-            <label>Category Name <span className="cat-modal-required">*</span></label>
+        {error && (
+          <div className="cat-add-error-banner">
+            ⚠️ {error}
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} className="cat-add-form">
+          <div className="cat-add-form-group">
+            <label htmlFor="cat-name">Category Name *</label>
             <input
+              id="cat-name"
               type="text"
-              placeholder="Enter category name"
-              value={categoryName}
-              onChange={(e) => setCategoryName(e.target.value)}
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
+              placeholder="e.g. Beverages"
               required
               disabled={isSubmitting}
+              autoFocus
             />
           </div>
 
-          <div className="cat-modal-field">
-            <label>Description</label>
+          <div className="cat-add-form-group">
+            <label htmlFor="cat-desc">Description</label>
             <textarea
-              placeholder="Enter category description"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
+              id="cat-desc"
+              name="description"
+              value={formData.description}
+              onChange={handleChange}
+              placeholder="Briefly describe this category (optional)"
               rows={4}
               disabled={isSubmitting}
             />
           </div>
 
-          <div className="cat-modal-footer">
-            <button type="button" className="cat-modal-btn-cancel" onClick={onClose} disabled={isSubmitting}>
+          <div className="cat-add-actions">
+            <button
+              type="button"
+              className="cat-add-btn-cancel"
+              onClick={onClose}
+              disabled={isSubmitting}
+            >
               Cancel
             </button>
-            <button type="submit" className="cat-modal-btn-save" disabled={isSubmitting}>
-              {isSubmitting ? 'Saving...' : 'Save Category'}
+            <button
+              type="submit"
+              className="cat-add-btn-submit"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? (
+                <>
+                  <Loader2 size={18} className="cat-spin" style={{ marginRight: '6px' }} />
+                  Saving...
+                </>
+              ) : (
+                <>
+                  <Plus size={18} style={{ marginRight: '6px' }} />
+                  Add Category
+                </>
+              )}
             </button>
           </div>
         </form>
       </div>
-    </div>,
-    document.body
+    </div>
   )
 }
 
