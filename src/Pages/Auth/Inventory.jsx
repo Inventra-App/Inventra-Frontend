@@ -6,7 +6,7 @@ import ManageStockModal from '../../Components/ManageStockModal'
 import RecordStockModal from '../../InventoryComponents/ModalComponents/RecordStockModal'
 import AddProductModal from '../../InventoryComponents/ModalComponents/AddProductModal'
 import ToastNotification from '../../InventoryComponents/ModalComponents/ToastNotification'
-import { getInventoryItems } from '../../API/inventoryApi'
+import { getInventoryItems, addInventoryItem } from '../../API/inventoryApi'
 import { useNavigate } from 'react-router-dom'
 
 const ITEMS_PER_PAGE = 6
@@ -28,28 +28,41 @@ const Inventory = () => {
   const [showToast, setShowToast] = useState(false)
 
   const fetchProducts = useCallback(async () => {
-  setLoading(true)
-  try {
-    const res = await getInventoryItems()
-    const data = Array.isArray(res) ? res : (res.data || [])
-    
-    // Explicitly create a new array instance
-    const mapped = [...data] 
-      .filter(item => item.productDetails?.productName)
-      .map((item) => ({
-        id: item.productDetails?.productId || item._id || Date.now(),
-          name: item.productDetails?.productName || 'Unnamed Product',
-          batch: item.batch?.batchCode || 'N/A',
-          category: item.productDetails?.categoryName || 'Uncategorized',
-          availableStock: item.inventory?.availableStock ?? 0,
-          stockReceived: item.inventory?.stockReceived ?? 0,
-          reservedStock: item.inventory?.reservedStock ?? 0,
-          totalStock: item.inventory?.totalStock ?? 0,
-          status: item.inventory?.availableStock > 10 ? 'In Stock' : item.inventory?.availableStock > 0 ? 'Low Stock' : 'Out of Stock',
-        }))
-      setProductList([...mapped])
+    console.log('Initiating product fetch...')
+    setLoading(true)
+    try {
+      const res = await getInventoryItems({ _t: Date.now() }) 
+      console.log('Raw API response:', res)
+      const data = Array.isArray(res) ? res : (res.data || [])
+      
+      const mapped = data
+        .filter(item => item.productName) 
+        .map((item) => {
+          const pkgQty = Number(item.packageQuantity) || 0;
+          const unitsPerPkg = Number(item.unitPerPackage) || 1;
+          const totalQty = pkgQty * unitsPerPkg;
+          
+          return {
+            id: item._id || Date.now(),
+            name: item.productName || 'Unnamed Product',
+            category: item.categoryName || 'Uncategorized',
+            batch: item.SKU || 'N/A', 
+            availableStock: totalQty,
+            totalStock: totalQty, 
+            stockReceived: 0, 
+            reservedStock: 0, 
+            status: totalQty > (item.reorderLevel || 10) 
+                    ? 'In Stock' 
+                    : totalQty > 0 
+                      ? 'Low Stock' 
+                      : 'Out of Stock',
+          }
+        })
+        mapped.reverse()
+      console.log('Mapped product list:', mapped)
+      setProductList(mapped)
     } catch (err) {
-      console.error('Failed to fetch products', err)
+      console.error('Error fetching products:', err)
     } finally {
       setLoading(false)
     }
@@ -59,46 +72,55 @@ const Inventory = () => {
     fetchProducts()
   }, [fetchProducts])
 
-  const getTabFiltered = () => {
-    if (activeTab === 'Low Stock') return productList.filter((p) => p.status === 'Low Stock')
-    if (activeTab === 'Out of Stock') return productList.filter((p) => p.status === 'Out of Stock')
-    return productList
-  }
+const handleSaveNewProduct = (newProduct) => {
+  setProductList(prev => [newProduct, ...prev]);
+}
 
-  const tabFiltered = getTabFiltered()
+  const getTabFiltered = useCallback(() => {
+    if (activeTab === 'Low Stock') return productList.filter((p) => p.status === 'Low Stock');
+    if (activeTab === 'Out of Stock') return productList.filter((p) => p.status === 'Out of Stock');
+    return productList;
+  }, [activeTab, productList]);
+
+  const tabFiltered = getTabFiltered();
+  
   const filtered = tabFiltered.filter((p) =>
     (p.name || '').toLowerCase().includes(search.toLowerCase()) ||
     (p.category || '').toLowerCase().includes(search.toLowerCase())
-  )
+  );
 
-  const totalProducts = productList.length
-  const lowStockItems = productList.filter((p) => p.status === 'Low Stock').length
-  const stockEntry = stockEntries.length
-  const outOfStock = productList.filter((p) => p.status === 'Out of Stock').length
-  const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE)
-  const paginated = filtered.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE)
+  const totalProducts = productList.length;
+  const lowStockItems = productList.filter((p) => p.status === 'Low Stock').length;
+  const stockEntry = stockEntries.length;
+  const outOfStock = productList.filter((p) => p.status === 'Out of Stock').length;
+  const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
+  const paginated = filtered.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
 
   const handleProductUpdate = () => {
+    console.log('Product updated, refreshing list...')
     fetchProducts()
   }
 
   const handleAddProduct = () => {
+    console.log('Product added via modal, refreshing list...')
     fetchProducts()
   }
 
-  const handleAddProductFromForm = async () => {
-    await fetchProducts()
-    setShowToast(true)
+  const handlePrev = () => {
+    console.log('Navigating to previous page')
+    setCurrentPage((prev) => Math.max(prev - 1, 1))
   }
-
-  const handlePrev = () => setCurrentPage((prev) => Math.max(prev - 1, 1))
-  const handleNext = () => setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+  
+  const handleNext = () => {
+    console.log('Navigating to next page')
+    setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+  }
   
   const getStatusClass = (status) => {
     switch (status) {
-      case 'In Stock': return 'inv-status-green'
-      case 'Low Stock': return 'inv-status-orange'
-      case 'Out of Stock': return 'inv-status-red'
+      case 'In Stock': return 'inv-status-instock'
+      case 'Low Stock': return 'inv-status-lowstock'
+      case 'Out of Stock': return 'inv-status-outofstock'
       default: return ''
     }
   }
@@ -148,8 +170,8 @@ const Inventory = () => {
             </tr>
           </thead>
           <tbody>
-            {paginated.map((product) => (
-              <tr key={product.id}>
+            {paginated.map((product, index) => (
+              <tr key={product.id || index}>
                 <td>
                   <div className="inv-product-cell">
                     <div className="inv-product-icon"><Package size={20} /></div>
@@ -498,7 +520,7 @@ const Inventory = () => {
       <AddProductModal
         isOpen={showAddProduct}
         onClose={() => setShowAddProduct(false)}
-        onAddProduct={handleAddProductFromForm}
+        onAddProduct={handleSaveNewProduct}
       />
       <ToastNotification
         message="Product added successfully"
