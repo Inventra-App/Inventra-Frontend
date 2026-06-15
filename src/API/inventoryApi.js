@@ -10,6 +10,11 @@ export const getTotalProductsCount = async () => {
   return res.data;
 };
 
+export const getTotalSalesAmount = async () => {
+  const res = await API.get("/dashboard/tsa"); 
+  return res.data;
+};
+
 export const getExpiryAlerts = async () => {
   const res = await API.get("/inventory/expiry-alerts");
   return res.data;
