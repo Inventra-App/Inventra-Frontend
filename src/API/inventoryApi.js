@@ -6,12 +6,12 @@ export const getTotalStockUnits = async () => {
 };
 
 export const getTotalProductsCount = async () => {
-  const res = await API.get("/dashboard/gtp"); 
+  const res = await API.get("/dashboard/gtp");
   return res.data;
 };
 
 export const getAllProducts = async () => {
-  const res = await API.get("/product/getAll"); 
+  const res = await API.get("/product/getAll");
   return res.data;
 };
 
@@ -41,6 +41,11 @@ export const addInventoryItem = async (payload) => {
 };
 
 export const updateInventoryItem = async (id, data) => {
+  const res = await API.put(`inventory/product/${id}`, data);
+  return res.data;
+};
+
+export const moveInventoryStock = async (id, data) => {
   const res = await API.put(`inventory/product/${id}`, data);
   return res.data;
 };
