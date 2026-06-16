@@ -10,6 +10,11 @@ export const getTotalProductsCount = async () => {
   return res.data;
 };
 
+export const getAllProducts = async () => {
+  const res = await API.get("/product/getAll"); 
+  return res.data;
+};
+
 export const getTotalSalesAmount = async () => {
   const res = await API.get("/dashboard/tsa"); 
   return res.data;
@@ -21,7 +26,7 @@ export const getExpiryAlerts = async () => {
 };
 
 export const getInventoryItems = async () => {
-  const res = await API.get("product/getAll");
+  const res = await API.get("/i/all");
   return res.data;
 };
 
@@ -62,5 +67,10 @@ export const deleteCategory = async (categoryId) => {
 
 export const moveInventoryStock = async (inventoryId, payload) => {
   const res = await API.put(`p/move/${inventoryId}`, payload);
+  return res.data;
+};
+
+export const recordStockEntry = async (payload) => {
+  const res = await API.post("/stock/entry", payload);
   return res.data;
 };

@@ -3,7 +3,7 @@ import { X, ArrowRight, CheckCircle } from 'lucide-react'
 import '../Css/ManageStockModal.css'
 import { moveInventoryStock } from '../API/inventoryApi'
 
-const ManageStockModal = ({ product, onClose, onUpdate }) => {
+const ManageStockModal = ({ inventoryId, product, onClose, onUpdate }) => {
   if (!product) return null
 
   const [actionType, setActionType] = useState('')
@@ -13,40 +13,37 @@ const ManageStockModal = ({ product, onClose, onUpdate }) => {
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState(false)
 
-  const handleSubmit = async (e) => {
-    e.preventDefault()
-    const urlToCall = `p/move/${product.id}`;
-  console.log("Attempting API call to:", urlToCall);
-
-  console.log("SENDING ID:", product._id);
+const handleSubmit = async (e) => {
+  e.preventDefault();
   
-  
-    const idToUse = product?._id || product?.id;
-  if (!idToUse) {
-    console.error("No ID found on product:", product);
-    alert("Error: Product ID is missing.");
+  if (!inventoryId) {
+    alert("Error: Inventory record ID is missing.");
     return;
   }
-    setLoading(true)
 
-    const payload = {
-      actionType: actionType || "transfer",
-      moveFrom: moveFrom,
-      moveTo: moveTo,
-      quantity: parseInt(quantity)
-    }
+  setLoading(true);
 
-    try {
-      const response = await moveInventoryStock(idToUse, payload)
-      onUpdate(response.data)
-      setSuccess(true)
-    } catch (err) {
-      console.error("Move stock error:", err)
-      alert("Failed to move stock. Please check quantity or inventory state.")
-    } finally {
-      setLoading(false)
-    }
+ const payload = {
+  actionType: "transfer",
+  moveFrom,
+  moveTo,
+  quantity: parseInt(quantity)
+};
+
+  try {
+    console.log("inventoryId:", inventoryId);
+console.log("payload:", payload);
+    await moveInventoryStock(inventoryId, payload); 
+    onUpdate(); 
+    setSuccess(true);
+    onClose();
+  } catch (err) {
+    console.error("Move stock error:", err);
+    alert("Failed to move stock.");
+  } finally {
+    setLoading(false);
   }
+}
 
   if (success) {
     return (
