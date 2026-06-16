@@ -47,42 +47,45 @@ const getArrayPayload = (payload) => {
 };
 
 const normalizeLowStockItem = (item) => {
-  const product = item?.product ?? item?.productDetails ?? item;
-  const packageQuantity = Number(
-    product?.packageQuantity ?? item?.packageQuantity ?? 0,
-  );
-  const unitPerPackage = Number(
-    product?.unitPerPackage ?? item?.unitPerPackage ?? 1,
-  );
-  const calculatedStock = packageQuantity * unitPerPackage;
-  const availableStock = Number(
-    item?.availableStock ??
-      item?.quantity ??
-      item?.stock ??
-      product?.availableStock ??
-      product?.quantity ??
-      product?.stock ??
-      calculatedStock,
-  );
+  console.log("Low Stock Item:", item);
+
+  const product = item?.productId; 
+
+  const availableStock = Number(item?.availableStock ?? 0);
+  const totalStock = Number(item?.totalStock ?? 0);
+
+  console.log("Stock Debug:", {
+  product: item?.productId?.productName,
+  availableStock,
+  totalStock,
+  rawAvailableStock: item?.availableStock,
+});
 
   return {
-    id: item?._id ?? item?.id ?? product?._id ?? product?.id ?? Date.now(),
+    id: item?._id ?? item?.id,
+
     name:
-      item?.productName ??
       product?.productName ??
-      product?.name ??
+      item?.productName ??
       "Unnamed Product",
+
     category:
       item?.categoryName ??
       product?.categoryName ??
-      product?.category ??
       "Uncategorized",
-    batch: item?.SKU ?? item?.batch ?? product?.SKU ?? product?.batch ?? "N/A",
+
+    batch:
+      item?.SKU ??
+      item?.batch ??
+      product?.SKU ??
+      "N/A",
+
     availableStock,
-    totalStock: availableStock,
+    totalStock,
     stockReceived: 0,
-    reservedStock: 0,
-    status: availableStock > 0 ? "Low Stock" : "Out of Stock",
+    reservedStock: Number(item?.reservedStock ?? 0),
+
+    status: "Low Stock",
   };
 };
 
@@ -155,10 +158,9 @@ const Inventory = () => {
 
   const fetchLowStockAlerts = useCallback(async () => {
     try {
-      const response = await getLowStockAlerts();
-      setLowStockAlertItems(
-        getArrayPayload(response).map(normalizeLowStockItem),
-      );
+      const response = await getLowStockAlerts()
+      console.log("LOW STOCK API RESPONSE:", response);
+      setLowStockAlertItems(getArrayPayload(response).map(normalizeLowStockItem))
     } catch (err) {
       console.error("Low stock alerts fetch error:", err);
       setLowStockAlertItems([]);
