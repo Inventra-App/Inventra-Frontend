@@ -6,7 +6,12 @@ export const getTotalStockUnits = async () => {
 };
 
 export const getTotalProductsCount = async () => {
-  const res = await API.get("dashboard/gtp");
+  const res = await API.get("/dashboard/gtp"); 
+  return res.data;
+};
+
+export const getAllProducts = async () => {
+  const res = await API.get("/product/getAll"); 
   return res.data;
 };
 
@@ -26,7 +31,7 @@ export const getLowStockAlerts = async () => {
 };
 
 export const getInventoryItems = async () => {
-  const res = await API.get("product/getAll");
+  const res = await API.get("/i/all");
   return res.data;
 };
 

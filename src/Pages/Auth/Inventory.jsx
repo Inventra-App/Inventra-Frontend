@@ -6,6 +6,7 @@ import ManageStockModal from '../../Components/ManageStockModal'
 import RecordStockModal from '../../InventoryComponents/ModalComponents/RecordStockModal'
 import AddProductModal from '../../InventoryComponents/ModalComponents/AddProductModal'
 import ToastNotification from '../../InventoryComponents/ModalComponents/ToastNotification'
+import { getInventoryItems, addInventoryItem, getAllProducts, getLowStockAlerts } from '../../API/inventoryApi'
 import { getInventoryItems, getLowStockAlerts } from '../../API/inventoryApi'
 import { useNavigate } from 'react-router-dom'
 
@@ -66,45 +67,50 @@ const Inventory = () => {
   const [showToast, setShowToast] = useState(false)
 
   const fetchProducts = useCallback(async () => {
-    console.log('Initiating product fetch...')
-    setLoading(true)
+    setLoading(true);
     try {
-      const res = await getInventoryItems({ _t: Date.now() }) 
-      console.log('Raw API response:', res)
-      const data = Array.isArray(res) ? res : (res.data || [])
-      
-      const mapped = data
-        .filter(item => item.productName) 
-        .map((item) => {
-          const pkgQty = Number(item.packageQuantity) || 0;
-          const unitsPerPkg = Number(item.unitPerPackage) || 1;
-          const totalQty = pkgQty * unitsPerPkg;
-          
-          return {
-            id: item._id || Date.now(),
-            name: item.productName || 'Unnamed Product',
-            category: item.categoryName || 'Uncategorized',
-            batch: item.SKU || 'N/A', 
-            availableStock: totalQty,
-            totalStock: totalQty, 
-            stockReceived: 0, 
-            reservedStock: 0, 
-            status: totalQty > (item.reorderLevel || 10) 
-                    ? 'In Stock' 
-                    : totalQty > 0 
-                      ? 'Low Stock' 
-                      : 'Out of Stock',
-          }
-        })
-        mapped.reverse()
-      console.log('Mapped product list:', mapped)
-      setProductList(mapped)
+      const [productsRes, inventoryRes] = await Promise.all([
+        getAllProducts({ _t: Date.now() }), 
+        getInventoryItems({ _t: Date.now() }) 
+      ]);
+
+      const products = Array.isArray(productsRes) ? productsRes : (productsRes?.data || []);
+      const inventory = Array.isArray(inventoryRes) ? inventoryRes : (inventoryRes?.data || []);
+
+      const mapped = products.map((prod) => {
+        const inv = inventory.find(i => i.productId === prod._id) || {};
+        
+        const total = Number(inv.totalStock) || 0;
+        const reorderLevel = Number(prod.reorderLevel) || 10;
+
+        const status = total > reorderLevel 
+          ? 'In Stock' 
+          : total > 0 
+            ? 'Low Stock' 
+            : 'Out of Stock';
+
+       return {
+  _id: prod._id,
+  inventoryId: inv._id,
+  id: prod._id,
+  name: prod.productName || 'Unnamed Product',
+  category: prod.categoryName || 'Uncategorized',
+  batch: prod.SKU || 'N/A',
+  availableStock: Number(inv.availableStock) || 0,
+  totalStock: total,
+  reservedStock: Number(inv.reservedStock) || 0,
+  stockReceived: 0,
+  status: status
+};
+      });
+      mapped.reverse()
+      setProductList(mapped);
     } catch (err) {
-      console.error('Error fetching products:', err)
+      console.error('Error fetching data:', err);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }, [])
+  }, []);
 
   const fetchLowStockAlerts = useCallback(async () => {
     try {
@@ -121,9 +127,10 @@ const Inventory = () => {
     fetchLowStockAlerts()
   }, [fetchProducts, fetchLowStockAlerts])
 
-const handleSaveNewProduct = (newProduct) => {
-  setProductList(prev => [newProduct, ...prev]);
-}
+  const handleSaveNewProduct = (newProduct) => {
+    setProductList(prev => [newProduct, ...prev]);
+     setShowToast(true);
+  }
 
   const getTabFiltered = useCallback(() => {
     if (activeTab === 'Low Stock') return lowStockAlertItems;
@@ -146,24 +153,20 @@ const handleSaveNewProduct = (newProduct) => {
   const paginated = filtered.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
 
   const handleProductUpdate = () => {
-    console.log('Product updated, refreshing list...')
     fetchProducts()
     fetchLowStockAlerts()
   }
 
   const handleAddProduct = () => {
-    console.log('Product added via modal, refreshing list...')
     fetchProducts()
     fetchLowStockAlerts()
   }
 
   const handlePrev = () => {
-    console.log('Navigating to previous page')
     setCurrentPage((prev) => Math.max(prev - 1, 1))
   }
   
   const handleNext = () => {
-    console.log('Navigating to next page')
     setCurrentPage((prev) => Math.min(prev + 1, totalPages))
   }
   
@@ -310,7 +313,6 @@ const handleSaveNewProduct = (newProduct) => {
               </button>
             ))}
             <button onClick={handleNext} disabled={currentPage === totalPages}>›</button>
-            <span>4 per page ▾</span>
           </div>
         </div>
       </>
@@ -319,7 +321,6 @@ const handleSaveNewProduct = (newProduct) => {
 
   return (
     <div className="inventory-page">
-
       <div className="inventory-top">
         <div>
           <h2 className="inventory-title">Inventory Management</h2>
@@ -380,7 +381,6 @@ const handleSaveNewProduct = (newProduct) => {
       </div>
 
       <div className="inventory-table-wrapper">
-
         <div className="inv-tabs">
           {tabs.map((tab) => (
             <button
@@ -452,7 +452,6 @@ const handleSaveNewProduct = (newProduct) => {
               ))
             )}
           </div>
-
         ) : activeTab === 'Stock History' ? (
           <div className="stock-entry-list">
             {stockHistory.length === 0 ? (
@@ -484,73 +483,11 @@ const handleSaveNewProduct = (newProduct) => {
               ))
             )}
           </div>
-
         ) : activeTab === 'Out of Stock' ? (
-          <>
-            {loading ? (
-              <div className="inv-loading">Loading products...</div>
-            ) : filtered.length === 0 ? (
-              renderEmptyState('No out of stock products.')
-            ) : (
-              <table className="inventory-table">
-                <thead>
-                  <tr>
-                    <th>PRODUCT</th>
-                    <th>CATEGORY</th>
-                    <th>CURRENT STOCK</th>
-                    <th>STOCK RECEIVED</th>
-                    <th>TOTAL STOCK</th>
-                    <th>STATUS</th>
-                    <th>ACTIONS</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {paginated.map((product) => (
-                    <tr key={product.id}>
-                      <td>
-                        <div className="inv-product-cell">
-                          <div className="inv-product-icon"><Package size={20} /></div>
-                          <div>
-                            <p className="inv-product-name">{product.name}</p>
-                            <p className="inv-product-id">{product.batch}</p>
-                          </div>
-                        </div>
-                      </td>
-                      <td><span className="inv-category-tag">{product.category}</span></td>
-                      <td><span className="inv-quantity">{product.availableStock}</span></td>
-                      <td><span className={`inv-quantity ${product.stockReceived > 0 ? 'inv-quantity-received' : 'inv-quantity-zero'}`}>{product.stockReceived}</span></td>
-                      <td><span className="inv-quantity inv-quantity-reserved">{product.totalStock}</span></td>
-                      <td><span className={`inv-status ${getStatusClass(product.status)}`}>{product.status}</span></td>
-                      <td>
-                        <div className="inv-actions-cell">
-                          <button className="inv-view-btn" onClick={() => setSelectedProduct(product)}><Eye size={14} /> View</button>
-                          <button className="inv-manage-btn" onClick={() => setManageProduct(product)}><Pencil size={14} /> Adjust</button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            )}
-            {!loading && filtered.length > 0 && (
-              <div className="inv-footer">
-                <p>Showing {((currentPage - 1) * ITEMS_PER_PAGE) + 1} to {Math.min(currentPage * ITEMS_PER_PAGE, filtered.length)} of {filtered.length} products</p>
-                <div className="inv-pagination">
-                  <button onClick={handlePrev} disabled={currentPage === 1}>‹</button>
-                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                    <button key={page} className={currentPage === page ? 'active' : ''} onClick={() => setCurrentPage(page)}>{page}</button>
-                  ))}
-                  <button onClick={handleNext} disabled={currentPage === totalPages}>›</button>
-                  <span>4 per page ▾</span>
-                </div>
-              </div>
-            )}
-          </>
-
+          <>{renderTable()}</>
         ) : (
           renderTable()
         )}
-
       </div>
 
       <ProductDetailsModal
@@ -558,11 +495,16 @@ const handleSaveNewProduct = (newProduct) => {
         onClose={() => setSelectedProduct(null)}
         onManage={() => { setManageProduct(selectedProduct); setSelectedProduct(null) }}
       />
-      <ManageStockModal
-        product={manageProduct}
-        onClose={() => setManageProduct(null)}
-        onUpdate={handleProductUpdate}
-      />
+      
+      {manageProduct && (
+        <ManageStockModal
+          inventoryId={manageProduct.inventoryId}
+          product={manageProduct}
+          onClose={() => setManageProduct(null)}
+          onUpdate={handleProductUpdate}
+        />
+      )}
+
       <RecordStockModal
         onClose={() => setShowRecordStock(false)}
         visible={showRecordStock}
@@ -578,7 +520,6 @@ const handleSaveNewProduct = (newProduct) => {
         show={showToast}
         onClose={() => setShowToast(false)}
       />
-
     </div>
   )
 }
