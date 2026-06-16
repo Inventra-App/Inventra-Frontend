@@ -11,9 +11,10 @@ const SignUpVerify = () => {
   const completeState = useSelector((state) => state);
   console.log("👉 CURRENT REDUX STATE ACCESSED BY VERIFY PAGE:", completeState);
   const [otp, setOtp] = useState(['', '', '', '', '', ''])
-  const [timeLeft, setTimeLeft] = useState(165)
+  const [resendTimeLeft, setResendTimeLeft] = useState(0)
   const [showPopup, setShowPopup] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isResending, setIsResending] = useState(false)
   const [error, setError] = useState('')
   const inputRefs = useRef([])
   const navigate = useNavigate()
@@ -27,15 +28,15 @@ const SignUpVerify = () => {
   };
 
   useEffect(() => {
-    if (timeLeft <= 0) return
+    if (resendTimeLeft <= 0) return
     const timer = setInterval(() => {
-      setTimeLeft((prev) => prev - 1)
+      setResendTimeLeft((prev) => prev - 1)
     }, 1000)
     return () => clearInterval(timer)
-  }, [timeLeft])
+  }, [resendTimeLeft])
 
   const formatTime = (seconds) => {
-    const m = Math.floor(seconds / 60).toString().padStart(2, '0')
+    const m = Math.floor(seconds / 60)
     const s = (seconds % 60).toString().padStart(2, '0')
     return `${m}:${s}`
   }
@@ -93,7 +94,7 @@ const SignUpVerify = () => {
       }
 
       console.log("=== SENDING OTP PAYLOAD ===", payload)
-      const res = await verifySignupEmail(payload)
+      await verifySignupEmail(payload)
 
       setShowPopup(true)
       // toast.success(res?.message || "Account verified successfully!");
@@ -114,21 +115,21 @@ const SignUpVerify = () => {
   }
 
   const handleResendOtp = async () => {
-    if (isSubmitting) return
+    if (isResending || resendTimeLeft > 0) return
     if (!email) {
       toast.error("Cannot resend. Email context missing.");
       return;
     }
 
     try {
-      setIsSubmitting(true)
+      setIsResending(true)
       setError('')
 
       console.log(`Triggered resend OTP request packet for: ${email}`)
       const res = await resendOtp(email);
       console.log("=== RESEND OTP DATA SUBSET ===", res);
       
-      setTimeLeft(165)
+      setResendTimeLeft(180)
       setOtp(['', '', '', '', '', ''])
       toast.success(res?.message || "OTP has been resent to your email address!");
     } catch (err) {
@@ -139,7 +140,7 @@ const SignUpVerify = () => {
       setError(serverErrorMessage);
 
     } finally {
-      setIsSubmitting(false)
+      setIsResending(false)
     }
   }
 
@@ -192,17 +193,6 @@ const SignUpVerify = () => {
       </div>
 
       <div className="verify-right">
-        <div className="verify-right-top">
-          <span>Didn't receive code?</span>
-          <button 
-            className="verify-resend-btn" 
-            onClick={handleResendOtp} 
-            disabled={isSubmitting}
-          >
-            Resend OTP
-          </button>
-        </div>
-
         <div className="verify-form-wrapper">
           <h2>Verify Your Account</h2>
           <p>We've sent a 6-digit OTP to your email address <span className="verify-email">{getMaskedEmail()}</span></p>
@@ -228,9 +218,18 @@ const SignUpVerify = () => {
             {error && <span className="verify-error-text">{error}</span>}
           </div>
 
-          <p className="verify-timer">
-            OTP expires in <span className="verify-timer-count">{formatTime(timeLeft)}</span>
-          </p>
+          <div className="verify-resend-row">
+            <span>Didn't receive code?</span>
+            <button 
+              className="verify-resend-btn" 
+              onClick={handleResendOtp} 
+              disabled={isResending || resendTimeLeft > 0}
+            >
+              {isResending && 'Sending...'}
+              {!isResending && resendTimeLeft > 0 && `Resend OTP in ${formatTime(resendTimeLeft)}`}
+              {!isResending && resendTimeLeft === 0 && 'Resend OTP'}
+            </button>
+          </div>
 
           <button 
             className="verify-btn" 
@@ -240,11 +239,16 @@ const SignUpVerify = () => {
             {isSubmitting ? 'Verifying...' : 'Verify'}
           </button>
 
-          <div className="verify-bottom-footer">
-            <div className="verify-trust-item"><Lock size={14} color='#6B7280'/><span>Secure Login</span></div>
-            <div className="verify-trust-item"><CheckCircle size={14} color='#6B7280'/><span>Data Protected</span></div>
-            <div className="verify-trust-item"><Clock size={14} color='#6B7280'/><span>24/7 Support</span></div>
-          </div>
+          <p className="verify-security-text">
+            For your security, this code will expires in 3 minutes
+          </p>
+
+        </div>
+
+        <div className="verify-bottom-footer">
+          <div className="verify-trust-item"><Lock size={14} color='#6B7280'/><span>Secure Login</span></div>
+          <div className="verify-trust-item"><CheckCircle size={14} color='#6B7280'/><span>Data Protected</span></div>
+          <div className="verify-trust-item"><Clock size={14} color='#6B7280'/><span>24/7 Support</span></div>
         </div>
       </div>
 

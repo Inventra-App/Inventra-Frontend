@@ -343,6 +343,19 @@
   cursor: not-allowed;
 }
 
+.sales-order-proceed:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.sales-error-message {
+  margin: 0 0 14px;
+  color: #dc2626;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
 .sales-clear-btn {
   border: 1px solid #cfd6e4;
   background: #ffffff;
