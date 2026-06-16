@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react'
-import { ArrowLeft, Calendar, CheckCircle, Minus, Package, Plus, ShoppingCart, Trash2, User, X } from 'lucide-react'
+import { ArrowLeft, Calendar, CheckCircle, ChevronDown, Minus, Package, Plus, Search, ShoppingCart, Trash2, User, X } from 'lucide-react'
 import { getInventoryItems } from '../../API/inventoryApi'
 import { countSalesPos, makeSalesPos } from '../../API/salesPosApi'
 import './Css/Sales.css'
@@ -55,8 +55,8 @@ const normalizeSale = (sale) => {
 
 const Sales = () => {
   const [selectedProduct, setSelectedProduct] = useState('')
-  const [cartItem, setCartItem] = useState(null)
-  const [quantity, setQuantity] = useState(1)
+  const [cartItems, setCartItems] = useState([])
+  const [isProductDropdownOpen, setIsProductDropdownOpen] = useState(false)
   const [showEmptyCartPopup, setShowEmptyCartPopup] = useState(false)
   const [showOrderModal, setShowOrderModal] = useState(false)
   const [showSaleSuccess, setShowSaleSuccess] = useState(false)
@@ -102,14 +102,23 @@ const Sales = () => {
 
   const salesToday = historyItems.length
   const revenueToday = historyItems.reduce((sum, item) => sum + item.total, 0)
-  const subtotal = cartItem ? cartItem.price * quantity : 0
-  const itemsInCart = cartItem ? quantity : 0
+  const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0)
+  const itemsInCart = cartItems.reduce((sum, item) => sum + item.quantity, 0)
 
   const selectedProductRecord = useMemo(() => {
     const productValue = selectedProduct.trim().toLowerCase()
     return products.find((product) => (
       product.id.toLowerCase() === productValue || product.name.toLowerCase() === productValue
     ))
+  }, [products, selectedProduct])
+
+  const dropdownProducts = useMemo(() => {
+    const searchValue = selectedProduct.trim().toLowerCase()
+    if (!searchValue) return products.slice(0, 8)
+
+    return products
+      .filter((product) => product.name.toLowerCase().includes(searchValue))
+      .slice(0, 8)
   }, [products, selectedProduct])
 
   const formatNaira = (amount) => {
@@ -119,34 +128,52 @@ const Sales = () => {
     })}`
   }
 
-  const increaseQuantity = () => {
-    setQuantity((currentQuantity) => currentQuantity + 1)
+  const increaseQuantity = (productId) => {
+    setCartItems((currentItems) => (
+      currentItems.map((item) => (
+        item.id === productId ? { ...item, quantity: item.quantity + 1 } : item
+      ))
+    ))
   }
 
-  const reduceQuantity = () => {
-    setQuantity((currentQuantity) => Math.max(1, currentQuantity - 1))
+  const reduceQuantity = (productId) => {
+    setCartItems((currentItems) => (
+      currentItems.map((item) => (
+        item.id === productId ? { ...item, quantity: Math.max(1, item.quantity - 1) } : item
+      ))
+    ))
   }
 
   const addToCart = () => {
     if (!selectedProductRecord) return
 
-    setCartItem(selectedProductRecord)
-    setQuantity(1)
+    setCartItems((currentItems) => {
+      const itemAlreadyExists = currentItems.some((item) => item.id === selectedProductRecord.id)
+
+      if (itemAlreadyExists) {
+        return currentItems.map((item) => (
+          item.id === selectedProductRecord.id ? { ...item, quantity: item.quantity + 1 } : item
+        ))
+      }
+
+      return [...currentItems, { ...selectedProductRecord, quantity: 1 }]
+    })
     setSelectedProduct('')
+    setIsProductDropdownOpen(false)
     setSalesError('')
   }
 
-  const removeCartItem = () => {
-    setCartItem(null)
+  const removeCartItem = (productId) => {
+    setCartItems((currentItems) => currentItems.filter((item) => item.id !== productId))
   }
 
   const clearCart = () => {
-    setCartItem(null)
+    setCartItems([])
     setShowEmptyCartPopup(true)
   }
 
   const completeSale = () => {
-    if (!cartItem) {
+    if (cartItems.length === 0) {
       setShowEmptyCartPopup(true)
       return
     }
@@ -156,20 +183,21 @@ const Sales = () => {
   }
 
   const proceedSale = async () => {
-    if (!cartItem || isSubmitting) return
+    if (cartItems.length === 0 || isSubmitting) return
 
     setIsSubmitting(true)
     setSalesError('')
 
     try {
       await makeSalesPos({
-        id: cartItem.id,
-        quantity,
+        items: cartItems.map((item) => ({
+          id: item.id,
+          quantity: item.quantity,
+        })),
       })
 
       setShowOrderModal(false)
-      setCartItem(null)
-      setQuantity(1)
+      setCartItems([])
       setShowSaleSuccess(true)
       loadSales()
 
@@ -260,22 +288,56 @@ const Sales = () => {
               <label htmlFor="product">Select Product</label>
 
               <div className="sales-product-row">
-                <input
-                  id="product"
-                  type="text"
-                  list="sales-products"
-                  placeholder={loadingProducts ? 'Loading products...' : 'Search product name'}
-                  value={selectedProduct}
-                  onChange={(event) => setSelectedProduct(event.target.value)}
-                  aria-label="Select product"
-                />
-                <datalist id="sales-products">
-                  {products.map((product) => (
-                    <option key={product.id} value={product.name} />
-                  ))}
-                </datalist>
+                <div className="sales-product-select">
+                  <Search size={18} className="sales-product-search-icon" />
+                  <input
+                    id="product"
+                    type="text"
+                    placeholder={loadingProducts ? 'Loading products...' : 'Search product name'}
+                    value={selectedProduct}
+                    onFocus={() => setIsProductDropdownOpen(true)}
+                    onChange={(event) => {
+                      setSelectedProduct(event.target.value)
+                      setIsProductDropdownOpen(true)
+                    }}
+                    aria-label="Select product"
+                  />
+                  <button
+                    className="sales-product-arrow"
+                    type="button"
+                    onClick={() => setIsProductDropdownOpen(!isProductDropdownOpen)}
+                    aria-label="Open products"
+                  >
+                    <ChevronDown size={18} />
+                  </button>
 
-                <button type="button" disabled={!selectedProductRecord} onClick={addToCart}>
+                  {isProductDropdownOpen && (
+                    <div className="sales-product-menu">
+                      {dropdownProducts.length === 0 ? (
+                        <p className="sales-product-empty">
+                          {loadingProducts ? 'Loading products...' : 'No product found'}
+                        </p>
+                      ) : (
+                        dropdownProducts.map((product) => (
+                          <button
+                            key={product.id}
+                            type="button"
+                            className="sales-product-option"
+                            onClick={() => {
+                              setSelectedProduct(product.name)
+                              setIsProductDropdownOpen(false)
+                            }}
+                          >
+                            <span>{product.name}</span>
+                            <small>{formatNaira(product.price)} • {product.stock} in stock</small>
+                          </button>
+                        ))
+                      )}
+                    </div>
+                  )}
+                </div>
+
+                <button className="sales-add-cart-btn" type="button" disabled={!selectedProductRecord} onClick={addToCart}>
                   Add to Cart
                 </button>
               </div>
@@ -285,38 +347,40 @@ const Sales = () => {
               <h3>Cart Items</h3>
 
               <div className="sales-cart-list">
-                {!cartItem ? (
+                {cartItems.length === 0 ? (
                   <p className="sales-empty-cart">No items in cart</p>
                 ) : (
-                  <div className="sales-cart-item">
-                    <div className="sales-cart-product">
-                      <strong>{cartItem.name}</strong>
-                      <span>{formatNaira(cartItem.price)} each</span>
-                    </div>
+                  cartItems.map((item) => (
+                    <div className="sales-cart-item" key={item.id}>
+                      <div className="sales-cart-product">
+                        <strong>{item.name}</strong>
+                        <span>{formatNaira(item.price)} each</span>
+                      </div>
 
-                    <div className="sales-quantity-control" aria-label={`${cartItem.name} quantity`}>
-                      <button type="button" aria-label="Reduce quantity" onClick={reduceQuantity}>
-                        -
+                      <div className="sales-quantity-control" aria-label={`${item.name} quantity`}>
+                        <button type="button" aria-label="Reduce quantity" onClick={() => reduceQuantity(item.id)}>
+                          -
+                        </button>
+                        <span>{item.quantity}</span>
+                        <button type="button" aria-label="Increase quantity" onClick={() => increaseQuantity(item.id)}>
+                          +
+                        </button>
+                      </div>
+
+                      <strong className="sales-item-total">
+                        {formatNaira(item.price * item.quantity)}
+                      </strong>
+
+                      <button
+                        className="sales-remove-item"
+                        type="button"
+                        aria-label={`Remove ${item.name}`}
+                        onClick={() => removeCartItem(item.id)}
+                      >
+                        <img src={Container4} alt="" />
                       </button>
-                      <span>{quantity}</span>
-                      <button type="button" aria-label="Increase quantity" onClick={increaseQuantity}>
-                        +
-                      </button>
                     </div>
-
-                    <strong className="sales-item-total">
-                      {formatNaira(cartItem.price * quantity)}
-                    </strong>
-
-                    <button
-                      className="sales-remove-item"
-                      type="button"
-                      aria-label={`Remove ${cartItem.name}`}
-                      onClick={removeCartItem}
-                    >
-                      <img src={Container4} alt="" />
-                    </button>
-                  </div>
+                  ))
                 )}
               </div>
             </div>
@@ -365,7 +429,7 @@ const Sales = () => {
         </div>
       )}
 
-      {showOrderModal && cartItem && (
+      {showOrderModal && cartItems.length > 0 && (
         <div className="sales-order-backdrop">
           <div className="sales-order-modal">
             <div className="sales-order-header">
@@ -383,21 +447,23 @@ const Sales = () => {
             </div>
 
             <div className="sales-order-body">
-              <h4>ITEMS ({quantity} PRODUCT{quantity === 1 ? '' : 'S'})</h4>
+              <h4>ITEMS ({itemsInCart} ITEM{itemsInCart === 1 ? '' : 'S'})</h4>
 
-              <div className="sales-order-item">
-                <div>
-                  <strong>{cartItem.name}</strong>
-                  <span>{formatNaira(cartItem.price)} each</span>
+              {cartItems.map((item) => (
+                <div className="sales-order-item" key={item.id}>
+                  <div>
+                    <strong>{item.name}</strong>
+                    <span>{formatNaira(item.price)} each</span>
+                  </div>
+                  <div className="sales-order-qty">
+                    <button type="button" onClick={() => reduceQuantity(item.id)}><Minus size={15} /></button>
+                    <b>{item.quantity}</b>
+                    <button type="button" onClick={() => increaseQuantity(item.id)}><Plus size={15} /></button>
+                  </div>
+                  <strong>{formatNaira(item.price * item.quantity)}</strong>
+                  <button type="button" className="sales-order-delete" onClick={() => removeCartItem(item.id)}><Trash2 size={15} /></button>
                 </div>
-                <div className="sales-order-qty">
-                  <button type="button" onClick={reduceQuantity}><Minus size={15} /></button>
-                  <b>{quantity}</b>
-                  <button type="button" onClick={increaseQuantity}><Plus size={15} /></button>
-                </div>
-                <strong>{formatNaira(subtotal)}</strong>
-                <button type="button" className="sales-order-delete" onClick={removeCartItem}><Trash2 size={15} /></button>
-              </div>
+              ))}
 
               <div className="sales-order-total-box">
                 <div>
@@ -406,7 +472,7 @@ const Sales = () => {
                 </div>
                 <div>
                   <span>Total Qty</span>
-                  <strong>{quantity} item{quantity === 1 ? '' : 's'}</strong>
+                  <strong>{itemsInCart} item{itemsInCart === 1 ? '' : 's'}</strong>
                 </div>
                 <div>
                   <span>Discount</span>
