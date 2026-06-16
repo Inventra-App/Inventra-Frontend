@@ -1,34 +1,96 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { AlertTriangle, Package, Calendar, Eye, Box, Truck, Trash2, X } from 'lucide-react'
 import './Css/ExpiryMgm.css'
+import { getExpiryAlerts } from '../../API/inventoryApi'
 
-const statCards = [
-  { label: 'Total Alerts', value: 5, color: 'white', bg: 'white-bg' },
-  { label: 'Critical', value: 2, color: 'red', bg: 'red-bg' },
-  { label: 'Warning', value: 2, color: 'orange', bg: 'orange-bg' },
-  { label: 'Info', value: 1, color: 'yellow', bg: 'yellow-bg' },
-]
+const getArrayPayload = (payload) => {
+  if (Array.isArray(payload)) return payload
+  if (Array.isArray(payload?.data)) return payload.data
+  if (Array.isArray(payload?.alerts)) return payload.alerts
+  if (Array.isArray(payload?.items)) return payload.items
+  if (Array.isArray(payload?.products)) return payload.products
+  return []
+}
 
-const criticalItems = [
-  { name: 'Yogurt', productId: 'prod-004', category: 'Dairy', price: 180, batch: 'BTH-2026-004', quantity: 30, expires: 'May 18, 2026', status: 'EXPIRED', daysLeft: '0d left', expiredAgo: 'Expired 15 days ago' },
-  { name: 'White Bread', productId: 'prod-002', category: 'Bakery', price: 150, batch: 'BTH-2026-002', quantity: 20, expires: 'May 20, 2026', status: 'EXPIRED', daysLeft: '0d left', expiredAgo: 'Expired 13 days ago' },
-  { name: 'Fresh Milk', productId: 'prod-001', category: 'Dairy', price: 250, batch: 'BTH-2026-001', quantity: 45, expires: 'May 25, 2026', status: 'EXPIRED', daysLeft: '0d left', expiredAgo: 'Expired 8 days ago' },
-]
+const getDaysRemaining = (dateValue) => {
+  if (!dateValue) return 0
+  const today = new Date()
+  const expiryDate = new Date(dateValue)
+  today.setHours(0, 0, 0, 0)
+  expiryDate.setHours(0, 0, 0, 0)
+  return Math.ceil((expiryDate - today) / (1000 * 60 * 60 * 24))
+}
 
-const warningItems = [
-  { name: 'SARDINES', productId: 'prod-009', category: 'Canned', price: 600, batch: 'BTH-202605-9SW5', quantity: 97, expires: 'May 23, 2026', daysLeft: '5 days left' },
-  { name: 'Fresh Milk', productId: 'prod-012', category: 'Dairy', price: 250, batch: 'BATCH-2405012', quantity: 45, expires: 'May 15, 2026', daysLeft: '5 days left' },
-]
+const formatDate = (dateValue) => {
+  if (!dateValue) return 'No expiry date'
+  return new Date(dateValue).toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  })
+}
 
-const infoItems = [
-  { name: 'Orange Juice', productId: 'prod-005', category: 'Drinks', price: 350, batch: 'BTH-2026-005', quantity: 15, expires: 'Jun 10, 2026', daysLeft: '8 days left' },
-]
+const normalizeExpiryItem = (item) => {
+  const product = item?.product ?? item?.productDetails ?? item
+  const expiryValue = item?.expiryDate ?? item?.expiresAt ?? item?.expires ?? item?.expirationDate ?? product?.expiryDate
+  const days = Number(item?.daysRemaining ?? item?.daysLeftNumber ?? getDaysRemaining(expiryValue))
+  const expiredDays = Math.abs(days)
+
+  return {
+    id: item?._id ?? item?.id ?? product?._id ?? product?.id ?? `${product?.productName}-${expiryValue}`,
+    name: item?.productName ?? product?.productName ?? product?.name ?? 'Unnamed Product',
+    productId: item?.productId ?? product?.productId ?? product?._id ?? 'N/A',
+    category: item?.categoryName ?? product?.categoryName ?? product?.category ?? 'Uncategorized',
+    price: Number(item?.unitPrice ?? item?.price ?? product?.unitPrice ?? product?.price ?? 0),
+    batch: item?.batch ?? item?.batchNumber ?? item?.SKU ?? product?.SKU ?? 'N/A',
+    quantity: Number(item?.quantity ?? item?.availableStock ?? product?.quantity ?? product?.availableStock ?? 0),
+    expires: formatDate(expiryValue),
+    daysNumber: days,
+    status: days <= 0 ? 'EXPIRED' : 'EXPIRING SOON',
+    daysLeft: days <= 0 ? '0d left' : `${days} day${days === 1 ? '' : 's'} left`,
+    expiredAgo: days <= 0 ? `Expired ${expiredDays} day${expiredDays === 1 ? '' : 's'} ago` : `${days} day${days === 1 ? '' : 's'} remaining`,
+  }
+}
 
 const ExpiryMgm = () => {
+  const [expiryItems, setExpiryItems] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
   const [selectedProduct, setSelectedProduct] = useState(null)
   const [removingProduct, setRemovingProduct] = useState(null)
   const [showRemovePopup, setShowRemovePopup] = useState(false)
   const [showRemovalSuccess, setShowRemovalSuccess] = useState(false)
+
+  useEffect(() => {
+    const loadExpiryAlerts = async () => {
+      setLoading(true)
+      setError('')
+
+      try {
+        const response = await getExpiryAlerts()
+        setExpiryItems(getArrayPayload(response).map(normalizeExpiryItem))
+      } catch (err) {
+        console.error('Expiry alerts fetch error:', err)
+        setError('Failed to load expiry alerts.')
+        setExpiryItems([])
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    loadExpiryAlerts()
+  }, [])
+
+  const criticalItems = expiryItems.filter((item) => item.daysNumber <= 0)
+  const warningItems = expiryItems.filter((item) => item.daysNumber >= 1 && item.daysNumber <= 7)
+  const infoItems = expiryItems.filter((item) => item.daysNumber >= 8 && item.daysNumber <= 14)
+
+  const statCards = [
+    { label: 'Total Alerts', value: expiryItems.length, color: 'white', bg: 'white-bg' },
+    { label: 'Critical', value: criticalItems.length, color: 'red', bg: 'red-bg' },
+    { label: 'Warning', value: warningItems.length, color: 'orange', bg: 'orange-bg' },
+    { label: 'Info', value: infoItems.length, color: 'yellow', bg: 'yellow-bg' },
+  ]
 
   const formatNaira = (amount) => `₦${amount.toFixed(2)}`
   const batchValue = selectedProduct ? selectedProduct.quantity * selectedProduct.price : 0
@@ -76,14 +138,19 @@ const ExpiryMgm = () => {
 
       <button className="expiry-manage-btn">+ Manage Expiry</button>
 
+      {loading && <p className="expiry-api-message">Loading expiry alerts...</p>}
+      {error && <p className="expiry-api-message expiry-api-error">{error}</p>}
+
       <div className="expiry-section">
         <div className="expiry-section-header">
           <h3>Critical (Expired)</h3>
           <span className="expiry-count expiry-count-red">{criticalItems.length} items</span>
         </div>
         <div className="expiry-list">
-          {criticalItems.map((item, index) => (
-            <div key={index} className="expiry-item expiry-item-red">
+          {criticalItems.length === 0 && !loading ? (
+            <p className="expiry-api-message">No expired products.</p>
+          ) : criticalItems.map((item) => (
+            <div key={item.id} className="expiry-item expiry-item-red">
               <div className="expiry-item-left">
                 <div className="expiry-item-icon expiry-item-icon-red">
                   <Package size={18} />
@@ -121,8 +188,10 @@ const ExpiryMgm = () => {
           <span className="expiry-count expiry-count-orange">{warningItems.length} items</span>
         </div>
         <div className="expiry-list">
-          {warningItems.map((item, index) => (
-            <div key={index} className="expiry-item expiry-item-orange">
+          {warningItems.length === 0 && !loading ? (
+            <p className="expiry-api-message">No warning expiry alerts.</p>
+          ) : warningItems.map((item) => (
+            <div key={item.id} className="expiry-item expiry-item-orange">
               <div className="expiry-item-left">
                 <div className="expiry-item-icon expiry-item-icon-orange">
                   <Package size={18} />
@@ -160,8 +229,10 @@ const ExpiryMgm = () => {
           <span className="expiry-count expiry-count-yellow">{infoItems.length} items</span>
         </div>
         <div className="expiry-list">
-          {infoItems.map((item, index) => (
-            <div key={index} className="expiry-item expiry-item-yellow">
+          {infoItems.length === 0 && !loading ? (
+            <p className="expiry-api-message">No info expiry alerts.</p>
+          ) : infoItems.map((item) => (
+            <div key={item.id} className="expiry-item expiry-item-yellow">
               <div className="expiry-item-left">
                 <div className="expiry-item-icon expiry-item-icon-yellow">
                   <Package size={18} />
