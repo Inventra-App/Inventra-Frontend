@@ -25,7 +25,7 @@ const handleSubmit = async (e) => {
 
  const payload = {
   actionType: "transfer",
-  moveFrom: "allStock",
+  moveFrom: "all stock",
   moveTo: "available stock",
   quantity: parseInt(quantity)
 };
@@ -109,7 +109,7 @@ const handleSubmit = async (e) => {
               <div className="manage-select-wrapper">
                 <select required value={moveFrom} onChange={(e) => setMoveFrom(e.target.value)}>
                   <option value=""></option>
-                  <option value="total stock">Total Stock</option>
+                  <option value="all stock">All Stock</option>
                   <option value="reserved stock">Reserved Stock</option>
                   <option value="available stock">Available Stock</option>
                 </select>
