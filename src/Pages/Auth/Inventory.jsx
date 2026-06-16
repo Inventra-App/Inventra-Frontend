@@ -6,7 +6,7 @@ import ManageStockModal from '../../Components/ManageStockModal'
 import RecordStockModal from '../../InventoryComponents/ModalComponents/RecordStockModal'
 import AddProductModal from '../../InventoryComponents/ModalComponents/AddProductModal'
 import ToastNotification from '../../InventoryComponents/ModalComponents/ToastNotification'
-import { getInventoryItems, addInventoryItem, getAllProducts } from '../../API/inventoryApi'
+import { getInventoryItems, addInventoryItem, getAllProducts, getLowStockAlerts } from '../../API/inventoryApi'
 import { useNavigate } from 'react-router-dom'
 
 const ITEMS_PER_PAGE = 6
