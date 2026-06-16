@@ -25,6 +25,7 @@ import Demo from "./Pages/Auth/Demo";
 import PlanSetup from "./Pages/Auth/PlanSetup";
 import PaymentSuccess from "./Pages/Auth/PaymentSuccess";
 import CategoriesList from "./Pages/Auth/CategoriesList";
+import NotFound from "./Pages/Auth/NotFound";
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -74,10 +75,7 @@ function App() {
         <Route path="/demo" element={<Demo />} />
         <Route path="/plan-setup/:plan" element={<PlanSetup />} />
         <Route path="/payment-success" element={<PaymentSuccess />} />
-        <Route path="*" element={null} />
-      </AnimatedRoutes>
 
-      <Routes>
         <Route element={<DashboardLayout />}>
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/inventory" element={<Inventory />} />
@@ -88,8 +86,9 @@ function App() {
           <Route path="/users" element={<UserMgm />} />
           <Route path="/settings" element={<Settings />} />
         </Route>
-        <Route path="*" element={null} />
-      </Routes>
+
+        <Route path="*" element={<NotFound />} />
+      </AnimatedRoutes>
     </BrowserRouter>
   );
 }

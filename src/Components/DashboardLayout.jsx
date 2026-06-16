@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Outlet, useNavigate } from 'react-router-dom'
 import { LogOut, Package } from 'lucide-react'
 import toast from 'react-hot-toast'
@@ -6,12 +6,27 @@ import '../Pages/Auth/Css/Dashboard.css'
 import SideBar from './SideBar'
 import DashboardHeader from './DashboardHeader'
 import { logoutUser } from '../API/logoutUser'
+import NoInternet from '../Pages/Auth/NoInternet'
 
 const DashboardLayout = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false)
   const [isLoggingOut, setIsLoggingOut] = useState(false)
+  const [isOffline, setIsOffline] = useState(!navigator.onLine)
   const navigate = useNavigate()
+
+  useEffect(() => {
+    const showOfflinePage = () => setIsOffline(true)
+    const hideOfflinePage = () => setIsOffline(false)
+
+    window.addEventListener('offline', showOfflinePage)
+    window.addEventListener('online', hideOfflinePage)
+
+    return () => {
+      window.removeEventListener('offline', showOfflinePage)
+      window.removeEventListener('online', hideOfflinePage)
+    }
+  }, [])
 
   const closeMobileMenu = () => setIsMobileMenuOpen(false)
   const openLogoutModal = () => {
@@ -78,7 +93,7 @@ const DashboardLayout = () => {
         <div className="desktop-header-wrapper">
           <DashboardHeader />
         </div>
-        <Outlet />
+        {isOffline ? <NoInternet /> : <Outlet />}
       </div>
 
       {isLogoutModalOpen && (
