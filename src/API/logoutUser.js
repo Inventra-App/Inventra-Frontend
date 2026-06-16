@@ -37,7 +37,7 @@ const removeAllTokens = () => {
 // UX than trapping the user on a dashboard with a broken session.
 export const logoutUser = async () => {
   try {
-    const res = await API.post("/logout");
+    const res = await API.post("logout");
     return res.data;
   } catch (error) {
     // Re-throw so the caller can decide what to do, but the finally-style

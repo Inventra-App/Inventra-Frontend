@@ -1,32 +1,32 @@
 import API from "./axios";
 
 export const getTotalStockUnits = async () => {
-  const res = await API.get("/dashboard/tsu");
+  const res = await API.get("dashboard/tsu");
   return res.data;
 };
 
 export const getTotalProductsCount = async () => {
-  const res = await API.get("/dashboard/gtp"); 
+  const res = await API.get("/dashboard/gtp");
   return res.data;
 };
 
 export const getAllProducts = async () => {
-  const res = await API.get("/product/getAll"); 
+  const res = await API.get("/product/getAll");
   return res.data;
 };
 
 export const getTotalSalesAmount = async () => {
-  const res = await API.get("/dashboard/tsa"); 
+  const res = await API.get("dashboard/tsa");
   return res.data;
 };
 
 export const getExpiryAlerts = async () => {
-  const res = await API.get("/expiry/check");
+  const res = await API.get("expiry/check");
   return res.data;
 };
 
 export const getLowStockAlerts = async () => {
-  const res = await API.get("/low-stock/check");
+  const res = await API.get("low-stock/check");
   return res.data;
 };
 
@@ -41,12 +41,17 @@ export const addInventoryItem = async (payload) => {
 };
 
 export const updateInventoryItem = async (id, data) => {
-  const res = await API.put(`/inventory/product/${id}`, data);
+  const res = await API.put(`inventory/product/${id}`, data);
+  return res.data;
+};
+
+export const moveInventoryStock = async (id, data) => {
+  const res = await API.put(`inventory/product/${id}`, data);
   return res.data;
 };
 
 export const deleteInventoryItem = async (id) => {
-  const res = await API.delete(`/inventory/product/${id}`);
+  const res = await API.delete(`inventory/product/${id}`);
   return res.data;
 };
 
@@ -67,15 +72,5 @@ export const addCategory = async (payload) => {
 
 export const deleteCategory = async (categoryId) => {
   const res = await API.delete(`d/category/${categoryId}`);
-  return res.data;
-};
-
-export const moveInventoryStock = async (inventoryId, payload) => {
-  const res = await API.put(`p/move/${inventoryId}`, payload);
-  return res.data;
-};
-
-export const recordStockEntry = async (payload) => {
-  const res = await API.post("/stock/entry", payload);
   return res.data;
 };
