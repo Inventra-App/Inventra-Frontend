@@ -59,3 +59,8 @@ export const deleteCategory = async (categoryId) => {
   const res = await API.delete(`d/category/${categoryId}`);
   return res.data;
 };
+
+export const moveInventoryStock = async (inventoryId, payload) => {
+  const res = await API.put(`p/move/${inventoryId}`, payload);
+  return res.data;
+};

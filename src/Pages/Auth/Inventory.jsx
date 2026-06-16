@@ -36,28 +36,29 @@ const Inventory = () => {
       const data = Array.isArray(res) ? res : (res.data || [])
       
       const mapped = data
-        .filter(item => item.productName) 
-        .map((item) => {
-          const pkgQty = Number(item.packageQuantity) || 0;
-          const unitsPerPkg = Number(item.unitPerPackage) || 1;
-          const totalQty = pkgQty * unitsPerPkg;
-          
-          return {
-            id: item._id || Date.now(),
-            name: item.productName || 'Unnamed Product',
-            category: item.categoryName || 'Uncategorized',
-            batch: item.SKU || 'N/A', 
-            availableStock: totalQty,
-            totalStock: totalQty, 
-            stockReceived: 0, 
-            reservedStock: 0, 
-            status: totalQty > (item.reorderLevel || 10) 
-                    ? 'In Stock' 
-                    : totalQty > 0 
-                      ? 'Low Stock' 
-                      : 'Out of Stock',
-          }
-        })
+  .filter(item => item.productName) 
+  .map((item) => {
+    const pkgQty = Number(item.packageQuantity) || 0;
+    const unitsPerPkg = Number(item.unitPerPackage) || 1;
+    const totalQty = pkgQty * unitsPerPkg;
+    
+    return {
+      _id: item._id,
+      id: item._id || Date.now(),
+      name: item.productName || 'Unnamed Product',
+      category: item.categoryName || 'Uncategorized',
+      batch: item.SKU || 'N/A', 
+      availableStock: item.availableStock || 0,  
+      totalStock: totalQty,   
+      stockReceived: 0,         
+      reservedStock: item.reservedStock || 0,         
+      status: totalQty > (item.reorderLevel || 10) 
+                  ? 'In Stock' 
+                  : totalQty > 0 
+                    ? 'Low Stock' 
+                    : 'Out of Stock',
+    }
+  })
         mapped.reverse()
       console.log('Mapped product list:', mapped)
       setProductList(mapped)
