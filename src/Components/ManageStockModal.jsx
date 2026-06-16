@@ -25,14 +25,14 @@ const handleSubmit = async (e) => {
 
  const payload = {
   actionType: "transfer",
-  moveFrom,
-  moveTo,
+  moveFrom: "allStock",
+  moveTo: "available stock",
   quantity: parseInt(quantity)
 };
 
   try {
     console.log("inventoryId:", inventoryId);
-console.log("payload:", payload);
+    console.log("payload:", payload);
     await moveInventoryStock(inventoryId, payload); 
     onUpdate(); 
     setSuccess(true);
