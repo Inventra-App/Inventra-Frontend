@@ -7,14 +7,53 @@ import RecordStockModal from '../../InventoryComponents/ModalComponents/RecordSt
 import AddProductModal from '../../InventoryComponents/ModalComponents/AddProductModal'
 import ToastNotification from '../../InventoryComponents/ModalComponents/ToastNotification'
 import { getInventoryItems, addInventoryItem, getAllProducts } from '../../API/inventoryApi'
+import { getInventoryItems, getLowStockAlerts } from '../../API/inventoryApi'
 import { useNavigate } from 'react-router-dom'
 
 const ITEMS_PER_PAGE = 6
 const tabs = ['All Products', 'Stock Entry', 'Low Stock', 'Stock History', 'Out of Stock']
 
+const getArrayPayload = (payload) => {
+  if (Array.isArray(payload)) return payload
+  if (Array.isArray(payload?.data)) return payload.data
+  if (Array.isArray(payload?.alerts)) return payload.alerts
+  if (Array.isArray(payload?.items)) return payload.items
+  if (Array.isArray(payload?.products)) return payload.products
+  return []
+}
+
+const normalizeLowStockItem = (item) => {
+  const product = item?.product ?? item?.productDetails ?? item
+  const packageQuantity = Number(product?.packageQuantity ?? item?.packageQuantity ?? 0)
+  const unitPerPackage = Number(product?.unitPerPackage ?? item?.unitPerPackage ?? 1)
+  const calculatedStock = packageQuantity * unitPerPackage
+  const availableStock = Number(
+    item?.availableStock ??
+    item?.quantity ??
+    item?.stock ??
+    product?.availableStock ??
+    product?.quantity ??
+    product?.stock ??
+    calculatedStock
+  )
+
+  return {
+    id: item?._id ?? item?.id ?? product?._id ?? product?.id ?? Date.now(),
+    name: item?.productName ?? product?.productName ?? product?.name ?? 'Unnamed Product',
+    category: item?.categoryName ?? product?.categoryName ?? product?.category ?? 'Uncategorized',
+    batch: item?.SKU ?? item?.batch ?? product?.SKU ?? product?.batch ?? 'N/A',
+    availableStock,
+    totalStock: availableStock,
+    stockReceived: 0,
+    reservedStock: 0,
+    status: availableStock > 0 ? 'Low Stock' : 'Out of Stock',
+  }
+}
+
 const Inventory = () => {
   const navigate = useNavigate()
   const [productList, setProductList] = useState([])
+  const [lowStockAlertItems, setLowStockAlertItems] = useState([])
   const [loading, setLoading] = useState(true)
   const [stockEntries, setStockEntries] = useState([])
   const [stockHistory, setStockHistory] = useState([])
@@ -73,9 +112,20 @@ const Inventory = () => {
     }
   }, []);
 
+  const fetchLowStockAlerts = useCallback(async () => {
+    try {
+      const response = await getLowStockAlerts()
+      setLowStockAlertItems(getArrayPayload(response).map(normalizeLowStockItem))
+    } catch (err) {
+      console.error('Low stock alerts fetch error:', err)
+      setLowStockAlertItems([])
+    }
+  }, [])
+
   useEffect(() => {
     fetchProducts()
-  }, [fetchProducts])
+    fetchLowStockAlerts()
+  }, [fetchProducts, fetchLowStockAlerts])
 
   const handleSaveNewProduct = (newProduct) => {
     setProductList(prev => [newProduct, ...prev]);
@@ -83,10 +133,10 @@ const Inventory = () => {
   }
 
   const getTabFiltered = useCallback(() => {
-    if (activeTab === 'Low Stock') return productList.filter((p) => p.status === 'Low Stock');
+    if (activeTab === 'Low Stock') return lowStockAlertItems;
     if (activeTab === 'Out of Stock') return productList.filter((p) => p.status === 'Out of Stock');
     return productList;
-  }, [activeTab, productList]);
+  }, [activeTab, productList, lowStockAlertItems]);
 
   const tabFiltered = getTabFiltered();
   
@@ -96,7 +146,7 @@ const Inventory = () => {
   );
 
   const totalProducts = productList.length;
-  const lowStockItems = productList.filter((p) => p.status === 'Low Stock').length;
+  const lowStockItems = lowStockAlertItems.length;
   const stockEntry = stockEntries.length;
   const outOfStock = productList.filter((p) => p.status === 'Out of Stock').length;
   const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
@@ -104,10 +154,12 @@ const Inventory = () => {
 
   const handleProductUpdate = () => {
     fetchProducts()
+    fetchLowStockAlerts()
   }
 
   const handleAddProduct = () => {
     fetchProducts()
+    fetchLowStockAlerts()
   }
 
   const handlePrev = () => {

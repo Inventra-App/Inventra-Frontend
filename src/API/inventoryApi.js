@@ -21,7 +21,12 @@ export const getTotalSalesAmount = async () => {
 };
 
 export const getExpiryAlerts = async () => {
-  const res = await API.get("/inventory/expiry-alerts");
+  const res = await API.get("/expiry/check");
+  return res.data;
+};
+
+export const getLowStockAlerts = async () => {
+  const res = await API.get("/low-stock/check");
   return res.data;
 };
 
