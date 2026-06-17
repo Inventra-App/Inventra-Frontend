@@ -106,55 +106,55 @@ const Inventory = () => {
   const [showToast, setShowToast] = useState(false);
 
   const fetchProducts = useCallback(async () => {
-    setLoading(true);
-    try {
-      const [productsRes, inventoryRes] = await Promise.all([
-        getAllProducts({ _t: Date.now() }),
-        getInventoryItems({ _t: Date.now() }),
-      ]);
+  setLoading(true);
+  try {
+    const [productsRes, inventoryRes] = await Promise.all([
+      getAllProducts({ _t: Date.now() }),
+      getInventoryItems({ _t: Date.now() }),
+    ]);
 
-      const products = Array.isArray(productsRes)
-        ? productsRes
-        : productsRes?.data || [];
-      const inventory = Array.isArray(inventoryRes)
-        ? inventoryRes
-        : inventoryRes?.data || [];
+    const products = Array.isArray(productsRes)
+      ? productsRes
+      : productsRes?.data || [];
+    const inventory = Array.isArray(inventoryRes)
+      ? inventoryRes
+      : inventoryRes?.data || [];
 
-      const mapped = products.map((prod) => {
-        const inv = inventory.find((i) => i.productId === prod._id) || {};
+    const stored = JSON.parse(localStorage.getItem('stockReceived') || '{}')
 
-        const total = Number(inv.totalStock) || 0;
-        const reorderLevel = Number(prod.reorderLevel) || 10;
+    const mapped = products.map((prod) => {
+      const inv = inventory.find((i) => i.productId === prod._id) || {};
+      const total = Number(inv.totalStock) || 0;
+      const reorderLevel = Number(prod.reorderLevel) || 10;
+      const status =
+        total > reorderLevel
+          ? "In Stock"
+          : total > 0
+            ? "Low Stock"
+            : "Out of Stock";
 
-        const status =
-          total > reorderLevel
-            ? "In Stock"
-            : total > 0
-              ? "Low Stock"
-              : "Out of Stock";
-
-        return {
-          _id: prod._id,
-          inventoryId: inv._id,
-          id: prod._id,
-          name: prod.productName || "Unnamed Product",
-          category: prod.categoryName || "Uncategorized",
-          batch: prod.SKU || "N/A",
-          availableStock: Number(inv.availableStock) || 0,
-          totalStock: total,
-          reservedStock: Number(inv.reservedStock) || 0,
-          stockReceived: 0,
-          status: status,
-        };
-      });
-      mapped.reverse();
-      setProductList(mapped);
-    } catch (err) {
-      console.error("Error fetching data:", err);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+      return {
+        _id: prod._id,
+        inventoryId: inv._id,
+        id: prod._id,
+        name: prod.productName || "Unnamed Product",
+        category: prod.categoryName || "Uncategorized",
+        batch: prod.SKU || "N/A",
+        availableStock: Number(inv.availableStock) || 0,
+        totalStock: total,
+        reservedStock: Number(inv.reservedStock) || 0,
+        stockReceived: stored[prod._id] || 0, 
+        status: status,
+      };
+    });
+    mapped.reverse();
+    setProductList(mapped);
+  } catch (err) {
+    console.error("Error fetching data:", err);
+  } finally {
+    setLoading(false);
+  }
+}, []);
 
   const fetchLowStockAlerts = useCallback(async () => {
     try {
@@ -209,10 +209,39 @@ const Inventory = () => {
     fetchLowStockAlerts();
   };
 
-  const handleAddProduct = () => {
-    fetchProducts();
-    fetchLowStockAlerts();
-  };
+  const handleAddProduct = (newBatch) => {
+  if (!newBatch) return
+
+  const storedEntries = JSON.parse(localStorage.getItem('stockEntries') || '[]')
+  const productName = productList.find((p) => p._id === newBatch.productId)?.name || 'Unknown'
+  
+  const newEntry = {
+    id: newBatch._id,
+    productName,
+    batch: newBatch.batchCode,
+    quantity: newBatch.quantity,
+    supplier: newBatch.supplier,
+    expiryDate: new Date(newBatch.expiryDate).toLocaleDateString('en-GB'),
+    user: 'You',
+    timestamp: new Date(newBatch.createdAt || Date.now()).toISOString(),
+  }
+
+  const updatedEntries = [newEntry, ...storedEntries]
+  localStorage.setItem('stockEntries', JSON.stringify(updatedEntries))
+  setStockEntries(updatedEntries.map(e => ({ ...e, timestamp: new Date(e.timestamp) })))
+
+  const stored = JSON.parse(localStorage.getItem('stockReceived') || '{}')
+  stored[newBatch.productId] = newBatch.quantity
+  localStorage.setItem('stockReceived', JSON.stringify(stored))
+
+  fetchProducts()
+  fetchLowStockAlerts()
+}
+
+useEffect(() => {
+  const storedEntries = JSON.parse(localStorage.getItem('stockEntries') || '[]')
+  setStockEntries(storedEntries.map(e => ({ ...e, timestamp: new Date(e.timestamp) })))
+}, [])
 
   const handlePrev = () => {
     setCurrentPage((prev) => Math.max(prev - 1, 1));

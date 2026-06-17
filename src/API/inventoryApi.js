@@ -46,7 +46,7 @@ export const updateInventoryItem = async (id, data) => {
 };
 
 export const moveInventoryStock = async (id, data) => {
-  const res = await API.put(`inventory/product/${id}`, data);
+  const res = await API.put(`p/move/${id}`, data);
   return res.data;
 };
 
@@ -72,5 +72,10 @@ export const addCategory = async (payload) => {
 
 export const deleteCategory = async (categoryId) => {
   const res = await API.delete(`d/category/${categoryId}`);
+  return res.data;
+};
+
+export const recordStockEntry = async (payload) => {
+  const res = await API.post("stock/entry", payload);
   return res.data;
 };
