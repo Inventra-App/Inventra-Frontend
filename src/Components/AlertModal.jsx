@@ -1,234 +1,155 @@
 import React from "react";
-import { AlertTriangle, Clock, X } from "lucide-react";
+import { AlertTriangle, Box, Calendar, Clock, MapPin, Package, X } from "lucide-react";
 import "./AlertModal.css";
+
+const configs = {
+  expired: {
+    tone: "expired",
+    title: "Expired Products Alert",
+    subtitle: (count) => `${count} product${count === 1 ? "" : "s"} ${count === 1 ? "has" : "have"} expired`,
+    headerIcon: <AlertTriangle size={20} />,
+    actionText:
+      "The following products have passed their expiry date. Please remove them from shelves immediately to prevent sale and potential health risks.",
+    statusText: "EXPIRED",
+    secondaryButton: "Go to Expiry Management",
+    secondaryTarget: "Expiry Management",
+    footerText: 'Click "Go to Expiry Management" to view and manage all expired products',
+  },
+  expiring: {
+    tone: "expiring",
+    title: "Products Expiring Soon",
+    subtitle: (count) => `${count} product${count === 1 ? " is" : "s are"} expiring in the next 7 days`,
+    headerIcon: <Clock size={20} />,
+    actionText: "",
+    statusText: "",
+    secondaryButton: "Go to Expiry Management",
+    secondaryTarget: "Expiry Management",
+    footerText: 'Click "View All" to see complete expiry management page with all details',
+  },
+  lowstock: {
+    tone: "lowstock",
+    title: "Low Stock Alert",
+    subtitle: () => "The following products are below minimum stock level",
+    headerIcon: <Clock size={20} />,
+    actionText: "",
+    statusText: "Batch no",
+    secondaryButton: "Go to Inventory Management",
+    secondaryTarget: "Inventory Management",
+    footerText: 'Click "Go to inventory management" page to see all details',
+  },
+};
 
 const AlertModal = ({
   isOpen,
-  type, // "expired", "expiring", "lowstock"
-  items,
+  type,
+  items = [],
   onDismiss,
   onViewDetails,
   onRestock,
 }) => {
   if (!isOpen) return null;
 
-  const getConfig = () => {
-    switch (type) {
-      case "expired":
-        return {
-          title: `A Expired Products Alert`,
-          subtitle: `${items.length} product${items.length !== 1 ? "s" : ""} ${
-            items.length !== 1 ? "have" : "has"
-          } expired`,
-          headerBgColor: "#ef4444",
-          headerIcon: <AlertTriangle size={20} color="white" />,
-          headerBadgeBg: "#fee2e2",
-          headerBadgeColor: "#ef4444",
-          actionText:
-            "Action Required: The following products have passed their expiry date. Please remove them from shelves immediately to prevent sale and potential health risks.",
-          actionBgColor: "#fee2e2",
-          actionBorderColor: "#fecaca",
-          actionTextColor: "#991b1b",
-          itemBgColor: "#fef2f2",
-          itemBorderColor: "#fecaca",
-          statusBadgeBg: "#fee2e2",
-          statusBadgeColor: "#dc2626",
-          buttonBg: "#ef4444",
-          buttonHover: "#dc2626",
-          secondaryButton: "Go to Expiry Management",
-          secondaryBgColor: "#ef4444",
-          daysField: "daysLeft",
-        };
-      case "expiring":
-        return {
-          title: `Products Expiring Soon`,
-          subtitle: `${items.length} product${items.length !== 1 ? "s" : ""} ${
-            items.length !== 1 ? "are" : "is"
-          } expiring in the next 7 days`,
-          headerBgColor: "#f97316",
-          headerIcon: <Clock size={20} color="white" />,
-          headerBadgeBg: "#fff7ed",
-          headerBadgeColor: "#f97316",
-          actionText: "",
-          itemBgColor: "#fff7ed",
-          itemBorderColor: "#fed7aa",
-          statusBadgeBg: "#fef3c7",
-          statusBadgeColor: "#f59e0b",
-          buttonBg: "#f97316",
-          buttonHover: "#ea580c",
-          secondaryButton: "Go to Expiry Management",
-          secondaryBgColor: "#f97316",
-          daysField: "daysLeft",
-        };
-      case "lowstock":
-        return {
-          title: `Low Stock Alert`,
-          subtitle: `The following products are below minimum stock level`,
-          headerBgColor: "#ea580c",
-          headerIcon: <AlertTriangle size={20} color="white" />,
-          headerBadgeBg: "#fff7ed",
-          headerBadgeColor: "#ea580c",
-          actionText: "",
-          itemBgColor: "#fff7ed",
-          itemBorderColor: "#fed7aa",
-          statusBadgeBg: "#ddd6fe",
-          statusBadgeColor: "#6366f1",
-          buttonBg: "#6366f1",
-          buttonHover: "#4f46e5",
-          secondaryButton: "Go to Inventory Management",
-          secondaryBgColor: "#ea580c",
-          daysField: "units",
-        };
-      default:
-        return {};
-    }
-  };
-
-  const config = getConfig();
+  const config = configs[type] ?? configs.expired;
+  const isLowStock = type === "lowstock";
+  const isExpired = type === "expired";
+  const isExpiring = type === "expiring";
 
   const handleRestock = (item) => {
-    if (onRestock) {
-      onRestock(item);
-    }
+    if (onRestock) onRestock(item);
   };
 
   return (
     <div className="alert-modal-overlay" onClick={onDismiss}>
-      <div
-        className="alert-modal-container"
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* Header */}
-        <div
-          className="alert-modal-header"
-          style={{ backgroundColor: config.headerBgColor }}
-        >
+      <div className="alert-modal-container" onClick={(event) => event.stopPropagation()}>
+        <div className={`alert-modal-header alert-modal-header-${config.tone}`}>
           <div className="alert-modal-header-content">
             <div className="alert-modal-icon">{config.headerIcon}</div>
             <div className="alert-modal-titles">
               <h2 className="alert-modal-title">{config.title}</h2>
-              <p className="alert-modal-subtitle">{config.subtitle}</p>
+              <p className="alert-modal-subtitle">{config.subtitle(items.length)}</p>
             </div>
           </div>
-          <button
-            className="alert-modal-close"
-            onClick={onDismiss}
-            style={{ color: "white" }}
-          >
-            <X size={24} />
+
+          <button className="alert-modal-close" type="button" onClick={onDismiss} aria-label="Close alert">
+            <X size={22} />
           </button>
         </div>
 
-        {/* Action Required Box */}
         {config.actionText && (
-          <div
-            className="alert-modal-action-box"
-            style={{
-              backgroundColor: config.actionBgColor,
-              borderColor: config.actionBorderColor,
-              color: config.actionTextColor,
-            }}
-          >
+          <div className={`alert-modal-action-box alert-modal-action-${config.tone}`}>
             <strong>Action Required:</strong> {config.actionText}
           </div>
         )}
 
-        {/* Items List */}
         <div className="alert-modal-items">
           {items.map((item, index) => (
-            <div
-              key={index}
-              className="alert-modal-item"
-              style={{
-                backgroundColor: config.itemBgColor,
-                borderColor: config.itemBorderColor,
-              }}
-            >
-              <div className="alert-modal-item-icon">
-                <AlertTriangle size={16} color={config.statusBadgeColor} />
+            <div key={item.id ?? `${item.name}-${index}`} className={`alert-modal-item alert-modal-item-${config.tone}`}>
+              <div className={`alert-modal-item-icon alert-modal-item-icon-${config.tone}`}>
+                <Package size={16} />
               </div>
 
               <div className="alert-modal-item-content">
                 <p className="alert-modal-item-name">{item.name}</p>
                 <p className="alert-modal-item-meta">
-                  {item.category && `${item.category} • `}
-                  {type === "lowstock"
-                    ? `${item.units} units`
-                    : `${item.quantity} units`}
-                  {item.expiryDate && ` • ${item.expiryDate}`}
+                  {item.category && <span>{item.category}</span>}
+                  <span><Box size={12} /> {isLowStock ? item.units : item.quantity} units</span>
+                  {isExpired && item.batch && <span><MapPin size={12} /> {item.batch}</span>}
                 </p>
+
+                {isExpired && (
+                  <div className="alert-modal-item-actions">
+                    <button type="button" className="alert-modal-note-btn" onClick={onDismiss}>
+                      Noted
+                    </button>
+                    <button type="button" className="alert-modal-detail-btn" onClick={onViewDetails}>
+                      View Details
+                    </button>
+                  </div>
+                )}
               </div>
 
               <div className="alert-modal-item-right">
-                {type === "lowstock" ? (
-                  <button
-                    className="alert-modal-restock-btn"
-                    style={{
-                      backgroundColor: config.buttonBg,
-                      color: "white",
-                    }}
-                    onClick={() => handleRestock(item)}
-                    onMouseEnter={(e) =>
-                      (e.target.style.backgroundColor = config.buttonHover)
-                    }
-                    onMouseLeave={(e) =>
-                      (e.target.style.backgroundColor = config.buttonBg)
-                    }
-                  >
-                    Restock
-                  </button>
+                {isLowStock ? (
+                  <>
+                    <span className="alert-modal-date"><Calendar size={12} /> {item.expiryDate}</span>
+                    <span className="alert-modal-days-badge">{item.batch || config.statusText}</span>
+                    <button className="alert-modal-restock-btn" type="button" onClick={() => handleRestock(item)}>
+                      Restock
+                    </button>
+                  </>
+                ) : isExpiring ? (
+                  <>
+                    <span className={`alert-modal-date alert-modal-date-${config.tone}`}>
+                      <Calendar size={12} /> {item.expiryDate}
+                    </span>
+                    <span className={`alert-modal-age alert-modal-age-${config.tone}`}>{item.daysLeft}</span>
+                  </>
                 ) : (
-                  <span
-                    className="alert-modal-days-badge"
-                    style={{
-                      backgroundColor: config.statusBadgeBg,
-                      color: config.statusBadgeColor,
-                    }}
-                  >
-                    {item[config.daysField]}
-                  </span>
+                  <>
+                    <span className={`alert-modal-status-badge alert-modal-status-${config.tone}`}>
+                      {config.statusText}
+                    </span>
+                    <span className={`alert-modal-date alert-modal-date-${config.tone}`}>
+                      <Calendar size={12} /> {item.expiryDate}
+                    </span>
+                    <span className={`alert-modal-age alert-modal-age-${config.tone}`}>{item.daysLeft}</span>
+                  </>
                 )}
               </div>
             </div>
           ))}
         </div>
 
-        {/* Footer Buttons */}
         <div className="alert-modal-footer">
-          <button
-            className="alert-modal-btn alert-modal-btn-secondary"
-            onClick={onDismiss}
-          >
-            {type === "lowstock" ? "Remind Me Later" : "Dismiss"}
+          <button className="alert-modal-btn alert-modal-btn-secondary" type="button" onClick={onDismiss}>
+            {isLowStock ? "Remind Me Later" : "Dismiss"}
           </button>
-          <button
-            className="alert-modal-btn alert-modal-btn-primary"
-            style={{
-              backgroundColor: config.secondaryBgColor,
-            }}
-            onClick={onViewDetails}
-            onMouseEnter={(e) =>
-              (e.target.style.backgroundColor = config.buttonHover)
-            }
-            onMouseLeave={(e) =>
-              (e.target.style.backgroundColor = config.secondaryBgColor)
-            }
-          >
-            {config.secondaryButton} →
+          <button className={`alert-modal-btn alert-modal-btn-primary alert-modal-btn-${config.tone}`} type="button" onClick={onViewDetails}>
+            {config.secondaryButton}
           </button>
         </div>
 
-        {type === "lowstock" && (
-          <p className="alert-modal-footer-text">
-            Click "Go to Inventory Management" page to see all details
-          </p>
-        )}
-        {type !== "lowstock" && (
-          <p className="alert-modal-footer-text">
-            Click "Go to Expiry Management" to view and manage all expired
-            products
-          </p>
-        )}
+        <p className="alert-modal-footer-text">{config.footerText}</p>
       </div>
     </div>
   );

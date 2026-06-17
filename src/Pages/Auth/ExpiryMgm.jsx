@@ -94,8 +94,52 @@ const ExpiryMgm = () => {
 
   const formatNaira = (amount) => `₦${amount.toFixed(2)}`
   const batchValue = selectedProduct ? selectedProduct.quantity * selectedProduct.price : 0
+  const getProductTone = (product) => {
+    if (!product) return 'warning'
+    if (product.daysNumber <= 0) return 'expired'
+    if (product.daysNumber <= 7) return 'warning'
+    return 'info'
+  }
+  const selectedProductTone = getProductTone(selectedProduct)
+  const removingProductTone = getProductTone(removingProduct)
+  const selectedProductAlertTitle = selectedProductTone === 'expired'
+    ? 'Product Expired'
+    : selectedProductTone === 'warning'
+      ? 'Product Warning'
+      : 'Product Info'
+  const selectedProductStatusText = selectedProductTone === 'expired'
+    ? 'Expired'
+    : selectedProductTone === 'warning'
+      ? 'Warning'
+      : 'Info'
+  const selectedProductStatusBadge = selectedProductStatusText.toUpperCase()
+  const selectedProductActions = {
+    expired: [
+      'Remove expired stock immediately to prevent sale',
+      'Document disposal for inventory records',
+    ],
+    warning: [
+      'Move warning stock forward for quick sale review',
+      'Monitor this batch closely before expiry date',
+    ],
+    info: [
+      'Plan stock rotation before the expiry window becomes urgent',
+      'Monitor this batch during routine inventory checks',
+    ],
+  }[selectedProductTone]
+  const selectedProductRemoveLabel = selectedProductTone === 'expired'
+    ? 'Remove Expired Stock'
+    : selectedProductTone === 'warning'
+      ? 'Review Warning Stock'
+      : 'Review Info Stock'
+  const removingProductLabel = removingProductTone === 'expired'
+    ? 'Expired'
+    : removingProductTone === 'warning'
+      ? 'Warning'
+      : 'Info'
 
   const confirmRemoval = () => {
+    setExpiryItems((items) => items.filter((item) => item.id !== removingProduct?.id))
     setShowRemovePopup(false)
     setRemovingProduct(null)
     setShowRemovalSuccess(true)
@@ -274,10 +318,10 @@ const ExpiryMgm = () => {
               </button>
             </div>
 
-            <div className="expiry-expired-alert">
+            <div className={`expiry-detail-alert expiry-detail-alert-${selectedProductTone}`}>
               <AlertTriangle size={20} />
               <div>
-                <strong>Product Expired</strong>
+                <strong>{selectedProductAlertTitle}</strong>
                 <span>{selectedProduct.expiredAgo || 'Product is nearing expiry'}</span>
               </div>
             </div>
@@ -313,7 +357,9 @@ const ExpiryMgm = () => {
                 </div>
                 <div>
                   <span>Days Remaining</span>
-                  <strong className="expiry-red-text">{selectedProduct.status || selectedProduct.daysLeft}</strong>
+                  <strong className={`expiry-status-text expiry-status-text-${selectedProductTone}`}>
+                    {selectedProductStatusText}
+                  </strong>
                 </div>
               </div>
             </section>
@@ -346,18 +392,21 @@ const ExpiryMgm = () => {
                   <strong>{selectedProduct.batch} <span>(Current)</span></strong>
                   <small>Qty: {selectedProduct.quantity} • Expires: {selectedProduct.expires}</small>
                 </div>
-                <b>EXPIRED</b>
+                <b className={`expiry-batch-status expiry-batch-status-${selectedProductTone}`}>
+                  {selectedProductStatusBadge}
+                </b>
               </div>
             </section>
 
             <section className="expiry-actions-box">
               <h4>Recommended Actions</h4>
-              <p>• Remove expired stock immediately to prevent sale</p>
-              <p>• Document disposal for inventory records</p>
+              {selectedProductActions.map((action) => (
+                <p key={action}>• {action}</p>
+              ))}
             </section>
 
             <button className="expiry-remove-stock-btn" type="button" onClick={openRemovePopup}>
-              <Trash2 size={16} /> Remove Expired Stock
+              <Trash2 size={16} /> {selectedProductRemoveLabel}
             </button>
           </aside>
         </div>
@@ -372,7 +421,7 @@ const ExpiryMgm = () => {
             <div className="expiry-remove-icon">
               <Trash2 size={27} />
             </div>
-            <h3>Remove Expired Stock</h3>
+            <h3>Remove {removingProductLabel} Stock</h3>
             <p>Remove <strong>{removingProduct.quantity} units</strong> of <strong>{removingProduct.name}</strong> from inventory?</p>
             <div className="expiry-remove-note">
               <strong>Note:</strong> This action will log the disposal in activity records and adjust inventory accordingly.
@@ -390,7 +439,7 @@ const ExpiryMgm = () => {
 
       {showRemovalSuccess && (
         <div className="expiry-removal-success">
-          Expired Stock removed successfully
+          Stock removed successfully
         </div>
       )}
 

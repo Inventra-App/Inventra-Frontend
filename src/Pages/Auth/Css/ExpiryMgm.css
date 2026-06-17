@@ -310,29 +310,49 @@
   padding: 0;
 }
 
-.expiry-expired-alert {
+.expiry-expired-alert,
+.expiry-detail-alert {
   display: flex;
   align-items: center;
   gap: 8px;
-  border: 1px solid #fca5a5;
-  background: #fef2f2;
   border-radius: 6px;
   padding: 10px 12px;
-  color: #ef4444;
   margin-bottom: 12px;
 }
 
+.expiry-detail-alert-expired {
+  border: 1px solid #fca5a5;
+  background: #fef2f2;
+  color: #ef4444;
+}
+
+.expiry-detail-alert-warning {
+  border: 1px solid #FFD6A8;
+  background: #fff7ed;
+  color: #f97316;
+}
+
+.expiry-detail-alert-info {
+  border: 1px solid #FFF085;
+  background: #fefce8;
+  color: #ca8a04;
+}
+
 .expiry-expired-alert strong,
-.expiry-expired-alert span {
+.expiry-expired-alert span,
+.expiry-detail-alert strong,
+.expiry-detail-alert span {
   display: block;
 }
 
-.expiry-expired-alert strong {
+.expiry-expired-alert strong,
+.expiry-detail-alert strong {
   font-size: 9px;
   margin-bottom: 3px;
 }
 
-.expiry-expired-alert span {
+.expiry-expired-alert span,
+.expiry-detail-alert span {
   font-size: 8px;
   font-weight: 600;
 }
@@ -422,8 +442,17 @@
   font-size: 9px;
 }
 
-.expiry-red-text {
+.expiry-red-text,
+.expiry-status-text-expired {
   color: #ef4444;
+}
+
+.expiry-status-text-warning {
+  color: #f97316;
+}
+
+.expiry-status-text-info {
+  color: #ca8a04;
 }
 
 .expiry-detail-stats-row {
@@ -528,6 +557,18 @@
   border-radius: 4px;
   padding: 4px 6px;
   font-size: 7px;
+}
+
+.expiry-batch-row .expiry-batch-status-expired {
+  background: #ef4444;
+}
+
+.expiry-batch-row .expiry-batch-status-warning {
+  background: #f97316;
+}
+
+.expiry-batch-row .expiry-batch-status-info {
+  background: #ca8a04;
 }
 
 .expiry-actions-box {

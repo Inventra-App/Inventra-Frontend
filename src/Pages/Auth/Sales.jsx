@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { ArrowLeft, Calendar, CheckCircle, ChevronDown, Minus, Package, Plus, Search, ShoppingCart, Trash2, User, X } from 'lucide-react'
-import { getInventoryItems } from '../../API/inventoryApi'
+import { getAllProducts } from '../../API/inventoryApi'
 import { countSalesPos, makeSalesPos } from '../../API/salesPosApi'
 import './Css/Sales.css'
 import calendar from '../../assets/calendar.png'
@@ -23,13 +23,14 @@ const getArrayPayload = (payload) => {
 const getProductId = (product) => product?._id ?? product?.id ?? product?.productId ?? product?.productDetails?.productId ?? ''
 const getProductName = (product) => product?.productName ?? product?.name ?? product?.title ?? 'Unnamed Product'
 const getProductPrice = (product) => Number(product?.unitPrice ?? product?.price ?? product?.sellingPrice ?? product?.amount ?? 0)
-const getProductStock = (product) => Number(product?.availableStock ?? product?.quantity ?? product?.stock ?? 0)
+const getProductStock = (product) => Number(product?.availableStock ?? product?.quantity ?? product?.stock ?? product?.inventory?.availableStock ?? 0)
 
 const normalizeProduct = (product) => ({
   id: getProductId(product),
   name: getProductName(product),
   price: getProductPrice(product),
   stock: getProductStock(product),
+  category: product?.categoryName ?? product?.category?.name ?? product?.category ?? 'Uncategorized',
 })
 
 const normalizeSale = (sale) => {
@@ -82,7 +83,7 @@ const Sales = () => {
     const loadProducts = async () => {
       setLoadingProducts(true)
       try {
-        const response = await getInventoryItems()
+        const response = await getAllProducts()
         setProducts(getArrayPayload(response).map(normalizeProduct).filter((product) => product.id))
       } catch (error) {
         console.error('POS products fetch error:', error)
