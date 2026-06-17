@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { X, CheckCircle } from 'lucide-react'
 import './ModalStyles/RecordStockModal.css'
 import Logo from '../../Components/Logo'
-import { recordStockEntry, getAllProducts } from '../../api/inventoryApi'
+import { recordStockEntry, getAllProducts } from '../../API/inventoryApi'
 
 const RecordStockModal = ({ onClose, visible, onAddProduct }) => {
   const [products, setProducts] = useState([])
