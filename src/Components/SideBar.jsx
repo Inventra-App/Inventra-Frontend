@@ -1,5 +1,5 @@
 import React from 'react'
-import { NavLink } from 'react-router-dom'
+import { NavLink, useParams } from 'react-router-dom'
 import { LayoutDashboard, Package, ShoppingCart, AlertTriangle, ClipboardList, Users, Settings, LogOut } from 'lucide-react'
 import Logo from './Logo'
 import '../Css/SideBar.css'
@@ -15,6 +15,9 @@ const navItems = [
 ]
 
 const SideBar = ({ onItemClick, onLogout }) => {
+  const { accountId } = useParams()
+  const basePath = accountId ? `/${accountId}` : ''
+
   return (
     <div className="sidebar">
 
@@ -26,7 +29,7 @@ const SideBar = ({ onItemClick, onLogout }) => {
         {navItems.map((item) => (
           <NavLink
             key={item.path}
-            to={item.path}
+            to={`${basePath}${item.path}`}
             onClick={onItemClick}
             className={({ isActive }) => `sidebar-item ${isActive ? 'sidebar-item-active' : ''}`}
           >

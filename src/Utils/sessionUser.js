@@ -2,6 +2,11 @@ const SESSION_USER_KEY = "inventra_user";
 const NEW_USER_KEY = "inventra_is_new_user";
 
 const pick = (...values) => values.find((value) => value !== undefined && value !== null && String(value).trim() !== "");
+const toSlug = (value) => String(value || "account")
+  .trim()
+  .toLowerCase()
+  .replace(/[^a-z0-9]+/g, "-")
+  .replace(/^-+|-+$/g, "") || "account";
 
 const readJson = (key) => {
   try {
@@ -17,6 +22,7 @@ export const buildSessionUser = (source = {}, fallback = {}) => {
   const lastName = pick(user.lastName, user.lastname, source.lastName, fallback.lastName, "");
   const fullName = pick(user.fullName, user.name, `${firstName} ${lastName}`.trim(), fallback.fullName, "Admin User");
   const business = user.business ?? user.businessDetails ?? user.supermarket ?? source.business ?? source.businessDetails ?? {};
+  const email = pick(user.email, source.email, fallback.email, "");
   const businessName = pick(
     user.businessName,
     user.storeName,
@@ -26,14 +32,29 @@ export const buildSessionUser = (source = {}, fallback = {}) => {
     fallback.businessName,
     "Inventra"
   );
+  const accountId = pick(
+    user.accountId,
+    user.businessId,
+    user.supermarketId,
+    business._id,
+    business.id,
+    source.accountId,
+    source.businessId,
+    fallback.accountId,
+    fallback.businessId,
+    businessName,
+    email
+  );
 
   return {
+    accountId: toSlug(accountId),
+    id: pick(user._id, user.id, source._id, source.id, fallback.id, ""),
     firstName,
     lastName,
     fullName,
     businessName,
     role: pick(user.role, source.role, fallback.role, "Admin"),
-    email: pick(user.email, source.email, fallback.email, ""),
+    email,
   };
 };
 
@@ -52,4 +73,9 @@ export const isNewSessionUser = () => localStorage.getItem(NEW_USER_KEY) === "tr
 
 export const markReturningSessionUser = () => {
   localStorage.setItem(NEW_USER_KEY, "false");
+};
+
+export const getAccountPath = (path = "/dashboard", user = getSessionUser()) => {
+  const cleanPath = path.startsWith("/") ? path : `/${path}`;
+  return `/${user.accountId}${cleanPath}`;
 };

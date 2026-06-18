@@ -18,7 +18,8 @@ export const loginAdmin = async (data) => {
 };
 
 export const loginStaffs = async (data) => {
-  const res = await API.post("staff/login");
+  const res = await API.post("staff/login", data);
+  return res.data;
 };
 
 export const resendOtp = async (email) => {

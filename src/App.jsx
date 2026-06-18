@@ -14,6 +14,7 @@ import SettingUp from "./Pages/Auth/SettingUp";
 import Created from "./Pages/Auth/Created";
 import ForgetPassUi from "./Components/ForgetPassUi";
 import DashboardLayout from "./Components/DashboardLayout";
+import ProtectedRoute from "./Components/ProtectedRoute";
 import Dashboard from "./Pages/Auth/Dashboard";
 import Inventory from "./Pages/Auth/Inventory";
 import Sales from "./Pages/Auth/Sales";
@@ -76,15 +77,30 @@ function App() {
         <Route path="/plan-setup/:plan" element={<PlanSetup />} />
         <Route path="/payment-success" element={<PaymentSuccess />} />
 
-        <Route element={<DashboardLayout />}>
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/inventory" element={<Inventory />} />
-          <Route path="/inventory/categories" element={<CategoriesList />} />
-          <Route path="/sales" element={<Sales />} />
-          <Route path="/expiry" element={<ExpiryMgm />} />
-          <Route path="/activity" element={<ActivityLog />} />
-          <Route path="/users" element={<UserMgm />} />
-          <Route path="/settings" element={<Settings />} />
+        <Route element={<ProtectedRoute />}>
+          <Route element={<DashboardLayout />}>
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/inventory" element={<Inventory />} />
+            <Route path="/inventory/categories" element={<CategoriesList />} />
+            <Route path="/sales" element={<Sales />} />
+            <Route path="/expiry" element={<ExpiryMgm />} />
+            <Route path="/activity" element={<ActivityLog />} />
+            <Route path="/users" element={<UserMgm />} />
+            <Route path="/settings" element={<Settings />} />
+          </Route>
+        </Route>
+
+        <Route path="/:accountId" element={<ProtectedRoute />}>
+          <Route element={<DashboardLayout />}>
+            <Route path="dashboard" element={<Dashboard />} />
+            <Route path="inventory" element={<Inventory />} />
+            <Route path="inventory/categories" element={<CategoriesList />} />
+            <Route path="sales" element={<Sales />} />
+            <Route path="expiry" element={<ExpiryMgm />} />
+            <Route path="activity" element={<ActivityLog />} />
+            <Route path="users" element={<UserMgm />} />
+            <Route path="settings" element={<Settings />} />
+          </Route>
         </Route>
 
         <Route path="*" element={<NotFound />} />

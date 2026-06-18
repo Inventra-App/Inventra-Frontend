@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   AlertCircle,
   Calendar,
@@ -25,18 +25,46 @@ import manage from '../../assets/manage-roles-icon.png'
 import green from '../../assets/Icon green.png'
 import gray from '../../assets/Icon gray.png'
 import { getSessionUser } from '../../Utils/sessionUser'
+import { getStaffs, onBoardStaff } from '../../API/userManagementAPI'
+
+const getArrayPayload = (payload) => {
+  if (Array.isArray(payload)) return payload
+  if (Array.isArray(payload?.data)) return payload.data
+  if (Array.isArray(payload?.staffs)) return payload.staffs
+  if (Array.isArray(payload?.staff)) return payload.staff
+  if (Array.isArray(payload?.users)) return payload.users
+  if (Array.isArray(payload?.items)) return payload.items
+  return []
+}
+
+const splitName = (name = '') => {
+  const parts = name.trim().split(/\s+/).filter(Boolean)
+  return {
+    firstName: parts[0] || '',
+    lastName: parts.slice(1).join(' '),
+  }
+}
+
+const normalizeStaff = (staff) => {
+  const fullName = staff?.fullName ?? staff?.name ?? `${staff?.firstName ?? ''} ${staff?.lastName ?? ''}`.trim()
+  return {
+    id: staff?._id ?? staff?.id ?? staff?.staffId ?? `${staff?.email}-${fullName}`,
+    name: fullName || 'Staff Member',
+    username: staff?.email ?? staff?.username ?? staff?.gmail ?? 'No email',
+    role: staff?.role ?? 'Staff',
+    status: staff?.isLoggedIn || staff?.loggedIn || staff?.online || staff?.status === 'Active' ? 'Active' : (staff?.status ?? 'Inactive'),
+    joined: staff?.createdAt ? new Date(staff.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'Not available',
+    lastLogin: staff?.lastLogin ? new Date(staff.lastLogin).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' }) : 'Not available',
+  }
+}
 
 const UserMgm = () => {
   const currentUser = getSessionUser()
   const currentUsername = `${currentUser.firstName} ${currentUser.lastName}`.trim() || currentUser.fullName
-  const [users, setUsers] = useState([
-    { id: 'user-001', name: currentUser.businessName, username: currentUsername, role: 'Admin', status: 'Active', isCurrent: true, joined: 'May 1st 2026', lastLogin: 'May 1st 2026' },
-    { id: 'user-002', name: 'Admin User', username: 'admin', role: 'Admin', status: 'Active', joined: 'May 1st 2026', lastLogin: 'May 1st 2026' },
-    { id: 'user-003', name: 'Store Manager', username: 'manager', role: 'Manager', status: 'Active', joined: 'May 1st 2026', lastLogin: 'May 1st 2026' },
-    { id: 'user-004', name: 'Jane Cashier', username: 'cashier1', role: 'Cashier', status: 'Active', joined: 'May 1st 2026', lastLogin: 'May 1st 2026' },
-    { id: 'user-005', name: 'John Staff', username: 'staff1', role: 'Staff', status: 'Active', joined: 'May 1st 2026', lastLogin: 'May 1st 2026' },
-    { id: 'user-1779480351703-nnrusnyoc', name: 'anthony onyema', username: 'onyema3004', role: 'Staff', status: 'Active', joined: 'May 1st 2026', lastLogin: 'May 1st 2026' },
-  ])
+  const currentAdminUser = { id: 'current-admin', name: currentUser.businessName, username: currentUsername, role: 'Admin', status: 'Active', isCurrent: true, joined: 'Current account', lastLogin: 'Now' }
+  const [users, setUsers] = useState([currentAdminUser])
+  const [loadingUsers, setLoadingUsers] = useState(false)
+  const [isCreatingStaff, setIsCreatingStaff] = useState(false)
 
   const [page, setPage] = useState('users')
   const [modal, setModal] = useState('')
@@ -45,7 +73,6 @@ const UserMgm = () => {
 
   const [fullName, setFullName] = useState('')
   const [username, setUsername] = useState('')
-  const [password, setPassword] = useState('')
   const [role, setRole] = useState('')
   const [newRole, setNewRole] = useState('')
   const [copied, setCopied] = useState(false)
@@ -64,6 +91,25 @@ const UserMgm = () => {
   ]
 
   const roles = ['Admin', 'Manager', 'Cashier', 'Staff']
+
+  useEffect(() => {
+    const loadStaffs = async () => {
+      setLoadingUsers(true)
+
+      try {
+        const response = await getStaffs()
+        const staffs = getArrayPayload(response).map(normalizeStaff)
+        setUsers([currentAdminUser, ...staffs])
+      } catch (error) {
+        console.error('Staff fetch error:', error)
+        setUsers([currentAdminUser])
+      } finally {
+        setLoadingUsers(false)
+      }
+    }
+
+    loadStaffs()
+  }, [])
 
   // Default permission state per role (used when no custom config exists yet)
   const defaultRolePermissions = {
@@ -170,40 +216,26 @@ const UserMgm = () => {
     setModal('details')
   }
 
-  const createUser = (event) => {
+  const createUser = async (event) => {
     event.preventDefault()
+    if (isCreatingStaff) return
 
     const cleanName = fullName.trim()
-    const cleanUsername = username.trim()
-    const cleanPassword = password.trim()
+    const cleanEmail = username.trim()
 
     if (cleanName === '') {
       alert('Full name is required')
       return
     }
 
-    if (cleanUsername === '') {
-      alert('Username is required')
+    if (cleanEmail === '') {
+      alert('Email is required')
       return
-    } else if (cleanUsername.includes('@')) {
-      alert('Username should not be an email address')
+    } else if (!/\S+@\S+\.\S+/.test(cleanEmail)) {
+      alert('Enter a valid email address')
       return
-    } else if (!/^[a-zA-Z0-9_]+$/.test(cleanUsername)) {
-      alert('Use only letters, numbers, and underscore')
-      return
-    } else {
-      const usernameExists = users.find((user) => user.username.toLowerCase() === cleanUsername.toLowerCase())
-      if (usernameExists) {
-        alert('Username already exists')
-        return
-      }
-    }
-
-    if (cleanPassword === '') {
-      alert('Password is required')
-      return
-    } else if (cleanPassword.length < 6) {
-      alert('Password must be at least 6 characters')
+    } else if (users.find((user) => user.username.toLowerCase() === cleanEmail.toLowerCase())) {
+      alert('Email already exists')
       return
     }
 
@@ -212,23 +244,31 @@ const UserMgm = () => {
       return
     }
 
-    const newUser = {
-      id: `user-${Date.now()}`,
-      name: cleanName,
-      username: cleanUsername,
+    const { firstName, lastName } = splitName(cleanName)
+    const payload = {
+      fullName: cleanName,
+      firstName,
+      lastName,
+      email: cleanEmail,
       role,
-      status: 'Active',
-      joined: 'May 1st 2026',
-      lastLogin: 'May 1st 2026',
     }
 
-    setUsers([...users, newUser])
-    setFullName('')
-    setUsername('')
-    setPassword('')
-    setRole('')
-    closeModal()
-    showToast('New User has been created')
+    try {
+      setIsCreatingStaff(true)
+      const response = await onBoardStaff(payload)
+      const newStaff = normalizeStaff(response?.staff ?? response?.data ?? response?.user ?? { ...payload, status: 'Inactive' })
+      setUsers((currentUsers) => [...currentUsers, newStaff])
+      setFullName('')
+      setUsername('')
+      setRole('')
+      closeModal()
+      showToast('New staff member has been created')
+    } catch (error) {
+      console.error('Create staff error:', error)
+      alert(error?.response?.data?.message || 'Failed to create staff. Please try again.')
+    } finally {
+      setIsCreatingStaff(false)
+    }
   }
 
   const suspendUser = () => {
@@ -542,13 +582,8 @@ const UserMgm = () => {
             </label>
 
             <label>
-              <span>Username</span>
-              <input type="text" placeholder="johndoe" value={username} onChange={(event) => setUsername(event.target.value)} />
-            </label>
-
-            <label>
-              <span>Password</span>
-              <input type="password" placeholder="Minimum 6 characters" value={password} onChange={(event) => setPassword(event.target.value)} />
+              <span>Email</span>
+              <input type="email" placeholder="johndoe@example.com" value={username} onChange={(event) => setUsername(event.target.value)} />
             </label>
 
             <label>
@@ -566,7 +601,9 @@ const UserMgm = () => {
 
             <div className="modal-actions">
               <button className="neutral-btn" type="button" onClick={closeModal}>Cancel</button>
-              <button className="primary-btn" type="submit">Create User</button>
+              <button className="primary-btn" type="submit" disabled={isCreatingStaff}>
+                {isCreatingStaff ? 'Creating...' : 'Create User'}
+              </button>
             </div>
           </form>
         </div>
