@@ -17,7 +17,68 @@ import {
   getLowStockAlerts,
 } from "../../API/inventoryApi";
 import AlertModal from "../../Components/AlertModal";
+import { getSessionUser, isNewSessionUser, markReturningSessionUser } from "../../Utils/sessionUser";
 import "./Css/Dashboard.css";
+
+const getArrayPayload = (payload) => {
+  if (Array.isArray(payload)) return payload;
+  if (Array.isArray(payload?.data)) return payload.data;
+  if (Array.isArray(payload?.alerts)) return payload.alerts;
+  if (Array.isArray(payload?.items)) return payload.items;
+  if (Array.isArray(payload?.products)) return payload.products;
+  return [];
+};
+
+const formatAlertDate = (dateValue) => {
+  if (!dateValue) return "No date";
+  return new Date(dateValue).toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+};
+
+const getDaysRemaining = (dateValue) => {
+  if (!dateValue) return 0;
+  const today = new Date();
+  const expiryDate = new Date(dateValue);
+  today.setHours(0, 0, 0, 0);
+  expiryDate.setHours(0, 0, 0, 0);
+  return Math.ceil((expiryDate - today) / (1000 * 60 * 60 * 24));
+};
+
+const normalizeLowStockItem = (item) => {
+  const product = item?.product ?? item?.productDetails ?? item;
+  return {
+    id: item?._id ?? item?.id ?? product?._id ?? product?.id ?? product?.productId,
+    name: item?.productName ?? product?.productName ?? product?.name ?? "Unknown",
+    category: item?.categoryName ?? product?.categoryName ?? product?.category ?? "-",
+    units: Number(item?.availableStock ?? item?.quantity ?? item?.stock ?? product?.availableStock ?? product?.quantity ?? product?.stock ?? 0),
+    batch: item?.batch ?? item?.batchNumber ?? item?.SKU ?? product?.SKU ?? "Batch no",
+    expiryDate: formatAlertDate(item?.expiryDate ?? item?.expiresAt ?? item?.expires ?? product?.expiryDate),
+  };
+};
+
+const normalizeExpiryAlert = (item) => {
+  const product = item?.product ?? item?.productDetails ?? item;
+  const expiryValue = item?.expiryDate ?? item?.expiresAt ?? item?.expires ?? item?.expirationDate ?? product?.expiryDate;
+  const daysRemaining = Number(item?.daysRemaining ?? item?.daysLeftNumber ?? getDaysRemaining(expiryValue));
+  const expiredDays = Math.abs(daysRemaining);
+
+  return {
+    id: item?._id ?? item?.id ?? product?._id ?? product?.id ?? `${product?.productName}-${expiryValue}`,
+    name: item?.productName ?? product?.productName ?? product?.name ?? "Unnamed Product",
+    batch: item?.batch ?? item?.batchNumber ?? item?.SKU ?? product?.SKU ?? "N/A",
+    quantity: Number(item?.quantity ?? item?.availableStock ?? product?.quantity ?? product?.availableStock ?? 0),
+    category: item?.categoryName ?? product?.categoryName ?? product?.category ?? "General",
+    expiryDate: formatAlertDate(expiryValue),
+    daysRemaining,
+    daysLeft: daysRemaining <= 0
+      ? `${expiredDays} day${expiredDays === 1 ? "" : "s"} ago`
+      : `${daysRemaining} day${daysRemaining === 1 ? "" : "s"} left`,
+    status: daysRemaining <= 0 ? "EXPIRED" : "EXPIRING SOON",
+  };
+};
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -34,6 +95,8 @@ const Dashboard = () => {
   const [modalType, setModalType] = useState(null); // "expired", "expiring", "lowstock"
   const [modalItems, setModalItems] = useState([]);
   const [modalQueue, setModalQueue] = useState([]); // Queue of modals to show
+  const [sessionUser] = useState(() => getSessionUser());
+  const [isFirstLogin] = useState(() => isNewSessionUser());
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -90,89 +153,29 @@ const Dashboard = () => {
       // Low Stock — use API data or derive from inventory items
       let lowStock = [];
       if (lowStockRes.status === "fulfilled" && lowStockRes.value) {
-        const apiLowStock = Array.isArray(lowStockRes.value)
-          ? lowStockRes.value
-          : Array.isArray(lowStockRes.value?.data)
-            ? lowStockRes.value.data
-            : Array.isArray(lowStockRes.value?.items)
-              ? lowStockRes.value.items
-              : [];
+        const apiLowStock = getArrayPayload(lowStockRes.value);
 
         if (apiLowStock.length > 0) {
-          lowStock = apiLowStock.map((p) => ({
-            name: p.name ?? p.productName ?? "Unknown",
-            category: p.category ?? p.categoryName ?? "-",
-            units: p.availableStock ?? p.quantity ?? p.stock ?? 0,
-          }));
+          lowStock = apiLowStock.map(normalizeLowStockItem);
         }
       }
 
       // Fallback: derive from inventory items if API doesn't return data
       if (lowStock.length === 0) {
-        const items =
-          invRes.status === "fulfilled" && Array.isArray(invRes.value)
-            ? invRes.value
-            : invRes.status === "fulfilled" &&
-                invRes.value?.data &&
-                Array.isArray(invRes.value.data)
-              ? invRes.value.data
-              : [];
+        const items = invRes.status === "fulfilled" ? getArrayPayload(invRes.value) : [];
 
         lowStock = items
           .filter((p) => {
             const qty = p.availableStock ?? p.quantity ?? p.stock ?? 0;
             return qty > 0 && qty <= 10;
           })
-          .map((p) => ({
-            name: p.name ?? p.productName ?? "Unknown",
-            category: p.category ?? "-",
-            units: p.availableStock ?? p.quantity ?? p.stock ?? 0,
-          }));
+          .map(normalizeLowStockItem);
       }
       setLowStockItems(lowStock);
 
       // Expiry Alerts
-      const expiry =
-        expiryRes.status === "fulfilled" && expiryRes.value
-          ? Array.isArray(expiryRes.value)
-            ? expiryRes.value
-            : Array.isArray(expiryRes.value?.data)
-              ? expiryRes.value.data
-              : Array.isArray(expiryRes.value?.alerts)
-                ? expiryRes.value.alerts
-                : Array.isArray(expiryRes.value?.items)
-                  ? expiryRes.value.items
-                  : []
-          : [];
-
-      const formatDate = (dateValue) => {
-        if (!dateValue) return "No date";
-        return new Date(dateValue).toLocaleDateString("en-US", {
-          month: "short",
-          day: "numeric",
-          year: "numeric",
-        });
-      };
-
-      const normalizedExpiry = expiry.map((item) => {
-        const daysRemaining = item.daysRemaining ?? 0;
-        const daysLeft =
-          daysRemaining <= 0
-            ? `${Math.abs(daysRemaining)}d left`
-            : `${daysRemaining}d left`;
-
-        return {
-          id: item._id ?? item.id ?? `${item.productName}-${item.expiryDate}`,
-          name: item.productName ?? item.name ?? "Unnamed Product",
-          batch: item.batch ?? item.batchNumber ?? item.SKU ?? "N/A",
-          quantity: item.quantity ?? item.availableStock ?? 0,
-          category: item.category ?? item.categoryName ?? "General",
-          expiryDate: formatDate(item.expiryDate ?? item.expires),
-          daysRemaining,
-          daysLeft,
-          status: daysRemaining <= 0 ? "EXPIRED" : "EXPIRING SOON",
-        };
-      });
+      const expiry = expiryRes.status === "fulfilled" ? getArrayPayload(expiryRes.value) : [];
+      const normalizedExpiry = expiry.map(normalizeExpiryAlert);
       setExpiryItems(normalizedExpiry);
 
       // Separate expired and expiring items for modals
@@ -180,7 +183,7 @@ const Dashboard = () => {
         (item) => item.status === "EXPIRED",
       );
       const expiringItems = normalizedExpiry.filter(
-        (item) => item.status === "EXPIRING SOON",
+        (item) => item.daysRemaining >= 1 && item.daysRemaining <= 7,
       );
 
       // Create modal queue
@@ -222,8 +225,14 @@ const Dashboard = () => {
   }, []);
 
   useEffect(() => {
-    fetchData();
+    const timerId = window.setTimeout(fetchData, 0);
+    return () => window.clearTimeout(timerId);
   }, [fetchData]);
+
+  useEffect(() => {
+    if (!isFirstLogin) return;
+    markReturningSessionUser();
+  }, [isFirstLogin]);
 
   // Modal handlers
   const handleDismissModal = () => {
@@ -322,8 +331,10 @@ const Dashboard = () => {
   return (
     <div className="dashboard-content">
       <div className="dashboard-welcome">
-        <h2>Welcome back!</h2>
-        <p>Here's what's happening in your supermarket today.</p>
+        <h2>{isFirstLogin ? `Welcome to inventra ${sessionUser.businessName}` : `Welcome back, ${sessionUser.businessName}!`}</h2>
+        <p>
+          Here's what's happening in your supermarket today. <span className="expiry-admin">({sessionUser.role})</span>
+        </p>
       </div>
 
       <div className="dashboard-stats">

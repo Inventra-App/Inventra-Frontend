@@ -1,46 +1,147 @@
-import React, { useEffect, useMemo, useState } from 'react'
-import { ArrowLeft, Calendar, CheckCircle, ChevronDown, Minus, Package, Plus, Search, ShoppingCart, Trash2, User, X } from 'lucide-react'
-import { getInventoryItems } from '../../API/inventoryApi'
-import { countSalesPos, makeSalesPos } from '../../API/salesPosApi'
-import './Css/Sales.css'
-import calendar from '../../assets/calendar.png'
-import Container1 from '../../assets/Container (6).png'
-import Container2 from '../../assets/Container (7).png'
-import Container3 from '../../assets/Container (8).png'
-import Container4 from '../../assets/Button.png'
+import React, { useEffect, useMemo, useState } from "react";
+import {
+  ArrowLeft,
+  Calendar,
+  CheckCircle,
+  ChevronDown,
+  Minus,
+  Package,
+  Plus,
+  Search,
+  ShoppingCart,
+  Trash2,
+  User,
+  X,
+} from "lucide-react";
+import { getAllProducts } from "../../API/inventoryApi";
+import { countSalesPos, makeSalesPos } from "../../API/salesPosApi";
+import "./Css/Sales.css";
+import calendar from "../../assets/calendar.png";
+import Container1 from "../../assets/Container (6).png";
+import Container2 from "../../assets/Container (7).png";
+import Container3 from "../../assets/Container (8).png";
+import Container4 from "../../assets/Button.png";
 
 const getArrayPayload = (payload) => {
-  if (Array.isArray(payload)) return payload
-  if (Array.isArray(payload?.data)) return payload.data
-  if (Array.isArray(payload?.sales)) return payload.sales
-  if (Array.isArray(payload?.salesData)) return payload.salesData
-  if (Array.isArray(payload?.history)) return payload.history
-  if (Array.isArray(payload?.products)) return payload.products
-  if (Array.isArray(payload?.items)) return payload.items
-  return []
-}
+  if (Array.isArray(payload)) return payload;
+  if (Array.isArray(payload?.data)) return payload.data;
+  if (Array.isArray(payload?.sales)) return payload.sales;
+  if (Array.isArray(payload?.salesData)) return payload.salesData;
+  if (Array.isArray(payload?.history)) return payload.history;
+  if (Array.isArray(payload?.products)) return payload.products;
+  if (Array.isArray(payload?.items)) return payload.items;
+  return [];
+};
 
-const getProductId = (product) => product?._id ?? product?.id ?? product?.productId ?? product?.productDetails?.productId ?? ''
-const getProductName = (product) => product?.productName ?? product?.name ?? product?.title ?? 'Unnamed Product'
-const getProductPrice = (product) => Number(product?.unitPrice ?? product?.price ?? product?.sellingPrice ?? product?.amount ?? 0)
-const getProductStock = (product) => Number(product?.availableStock ?? product?.quantity ?? product?.stock ?? 0)
+const getProductRecord = (product) =>
+  product?.product ?? product?.productDetails ?? product;
+const getProductId = (product) => {
+  const record = getProductRecord(product);
+  return (
+    product?._id ??
+    product?.id ??
+    product?.productId ??
+    record?._id ??
+    record?.id ??
+    record?.productId ??
+    ""
+  );
+};
+const getProductName = (product) => {
+  const record = getProductRecord(product);
+  return (
+    product?.productName ??
+    product?.name ??
+    product?.title ??
+    record?.productName ??
+    record?.name ??
+    "Unnamed Product"
+  );
+};
+const getProductPrice = (product) => {
+  const record = getProductRecord(product);
+  return Number(
+    product?.unitPrice ??
+      product?.price ??
+      product?.sellingPrice ??
+      product?.amount ??
+      record?.unitPrice ??
+      record?.price ??
+      0,
+  );
+};
+const getProductStock = (product) => {
+  const record = getProductRecord(product);
+  const batches =
+    product?.batches ?? product?.stockEntries ?? product?.inventoryItems ?? [];
+  const batchStock = Array.isArray(batches)
+    ? batches.reduce(
+        (sum, batch) =>
+          sum +
+          Number(batch?.availableStock ?? batch?.quantity ?? batch?.stock ?? 0),
+        0,
+      )
+    : 0;
+  return Number(
+    product?.availableStock ??
+      product?.quantity ??
+      product?.stock ??
+      product?.inventory?.availableStock ??
+      record?.availableStock ??
+      record?.quantity ??
+      batchStock ??
+      0,
+  );
+};
+const getProductCategory = (product) => {
+  const record = getProductRecord(product);
+  return (
+    product?.categoryName ??
+    product?.category?.name ??
+    product?.category ??
+    record?.categoryName ??
+    record?.category?.name ??
+    record?.category ??
+    "Uncategorized"
+  );
+};
 
 const normalizeProduct = (product) => ({
   id: getProductId(product),
   name: getProductName(product),
   price: getProductPrice(product),
   stock: getProductStock(product),
-})
+  category: getProductCategory(product),
+});
 
 const normalizeSale = (sale) => {
-  const product = sale?.product ?? sale?.productDetails ?? sale?.item ?? {}
-  const name = sale?.productName ?? sale?.name ?? product?.productName ?? product?.name ?? 'Product'
-  const qty = Number(sale?.quantity ?? sale?.qty ?? sale?.totalQuantity ?? 0)
-  const price = Number(sale?.unitPrice ?? sale?.price ?? product?.unitPrice ?? product?.price ?? 0)
-  const total = Number(sale?.total ?? sale?.totalAmount ?? sale?.amount ?? price * qty)
-  const user = sale?.user?.name ?? sale?.cashier?.name ?? sale?.createdBy?.name ?? sale?.processedBy ?? 'Admin User'
-  const dateValue = sale?.createdAt ?? sale?.date ?? sale?.updatedAt ?? ''
-  const date = dateValue ? new Date(dateValue).toLocaleString('en-NG', { dateStyle: 'medium', timeStyle: 'short' }) : '-'
+  const product = sale?.product ?? sale?.productDetails ?? sale?.item ?? {};
+  const name =
+    sale?.productName ??
+    sale?.name ??
+    product?.productName ??
+    product?.name ??
+    "Product";
+  const qty = Number(sale?.quantity ?? sale?.qty ?? sale?.totalQuantity ?? 0);
+  const price = Number(
+    sale?.unitPrice ?? sale?.price ?? product?.unitPrice ?? product?.price ?? 0,
+  );
+  const total = Number(
+    sale?.total ?? sale?.totalAmount ?? sale?.amount ?? price * qty,
+  );
+  const user =
+    sale?.user?.name ??
+    sale?.cashier?.name ??
+    sale?.createdBy?.name ??
+    sale?.processedBy ??
+    "Admin User";
+  const dateValue = sale?.createdAt ?? sale?.date ?? sale?.updatedAt ?? "";
+  const date = dateValue
+    ? new Date(dateValue).toLocaleString("en-NG", {
+        dateStyle: "medium",
+        timeStyle: "short",
+      })
+    : "-";
 
   return {
     id: sale?._id ?? sale?.id ?? `${name}-${date}`,
@@ -50,143 +151,169 @@ const normalizeSale = (sale) => {
     total,
     user,
     date,
-  }
-}
+  };
+};
 
 const Sales = () => {
-  const [selectedProduct, setSelectedProduct] = useState('')
-  const [cartItems, setCartItems] = useState([])
-  const [isProductDropdownOpen, setIsProductDropdownOpen] = useState(false)
-  const [showEmptyCartPopup, setShowEmptyCartPopup] = useState(false)
-  const [showOrderModal, setShowOrderModal] = useState(false)
-  const [showSaleSuccess, setShowSaleSuccess] = useState(false)
-  const [showOrderHistory, setShowOrderHistory] = useState(false)
-  const [selectedHistory, setSelectedHistory] = useState(null)
-  const [products, setProducts] = useState([])
-  const [historyItems, setHistoryItems] = useState([])
-  const [loadingProducts, setLoadingProducts] = useState(false)
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [salesError, setSalesError] = useState('')
+  const [selectedProduct, setSelectedProduct] = useState("");
+  const [selectedProductId, setSelectedProductId] = useState("");
+  const [cartItems, setCartItems] = useState([]);
+  const [isProductDropdownOpen, setIsProductDropdownOpen] = useState(false);
+  const [showEmptyCartPopup, setShowEmptyCartPopup] = useState(false);
+  const [showOrderModal, setShowOrderModal] = useState(false);
+  const [showSaleSuccess, setShowSaleSuccess] = useState(false);
+  const [showOrderHistory, setShowOrderHistory] = useState(false);
+  const [selectedHistory, setSelectedHistory] = useState(null);
+  const [products, setProducts] = useState([]);
+  const [historyItems, setHistoryItems] = useState([]);
+  const [loadingProducts, setLoadingProducts] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [salesError, setSalesError] = useState("");
 
   const loadSales = async () => {
     try {
-      const response = await countSalesPos()
-      setHistoryItems(getArrayPayload(response).map(normalizeSale))
+      const response = await countSalesPos();
+      setHistoryItems(getArrayPayload(response).map(normalizeSale));
     } catch (error) {
-      console.error('Sales history fetch error:', error)
-      setHistoryItems([])
+      console.error("Sales history fetch error:", error);
+      setHistoryItems([]);
     }
-  }
+  };
 
   useEffect(() => {
     const loadProducts = async () => {
-      setLoadingProducts(true)
+      setLoadingProducts(true);
       try {
-        const response = await getInventoryItems()
-        setProducts(getArrayPayload(response).map(normalizeProduct).filter((product) => product.id))
+        const response = await getAllProducts();
+        setProducts(
+          getArrayPayload(response)
+            .map(normalizeProduct)
+            .filter((product) => product.id),
+        );
       } catch (error) {
-        console.error('POS products fetch error:', error)
-        setProducts([])
+        console.error("POS products fetch error:", error);
+        setProducts([]);
       } finally {
-        setLoadingProducts(false)
+        setLoadingProducts(false);
       }
-    }
+    };
 
     const timerId = window.setTimeout(() => {
-      loadProducts()
-      loadSales()
-    }, 0)
+      loadProducts();
+      loadSales();
+    }, 0);
 
-    return () => window.clearTimeout(timerId)
-  }, [])
+    return () => window.clearTimeout(timerId);
+  }, []);
 
-  const salesToday = historyItems.length
-  const revenueToday = historyItems.reduce((sum, item) => sum + item.total, 0)
-  const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0)
-  const itemsInCart = cartItems.reduce((sum, item) => sum + item.quantity, 0)
+  const salesToday = historyItems.length;
+  const revenueToday = historyItems.reduce((sum, item) => sum + item.total, 0);
+  const subtotal = cartItems.reduce(
+    (sum, item) => sum + item.price * item.quantity,
+    0,
+  );
+  const itemsInCart = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
   const selectedProductRecord = useMemo(() => {
-    const productValue = selectedProduct.trim().toLowerCase()
-    return products.find((product) => (
-      product.id.toLowerCase() === productValue || product.name.toLowerCase() === productValue
-    ))
-  }, [products, selectedProduct])
+    if (selectedProductId)
+      return products.find((product) => product.id === selectedProductId);
+
+    const productValue = selectedProduct.trim().toLowerCase();
+    return products.find(
+      (product) =>
+        product.id.toLowerCase() === productValue ||
+        product.name.toLowerCase() === productValue,
+    );
+  }, [products, selectedProduct, selectedProductId]);
 
   const dropdownProducts = useMemo(() => {
-    const searchValue = selectedProduct.trim().toLowerCase()
-    if (!searchValue) return products.slice(0, 8)
+    const searchValue = selectedProduct.trim().toLowerCase();
+    if (!searchValue) return products.slice(0, 8);
 
     return products
-      .filter((product) => product.name.toLowerCase().includes(searchValue))
-      .slice(0, 8)
-  }, [products, selectedProduct])
+      .filter(
+        (product) =>
+          product.name.toLowerCase().includes(searchValue) ||
+          product.category.toLowerCase().includes(searchValue),
+      )
+      .slice(0, 8);
+  }, [products, selectedProduct]);
 
   const formatNaira = (amount) => {
-    return `\u20a6${Number(amount || 0).toLocaleString('en-NG', {
+    return `\u20a6${Number(amount || 0).toLocaleString("en-NG", {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
-    })}`
-  }
+    })}`;
+  };
 
   const increaseQuantity = (productId) => {
-    setCartItems((currentItems) => (
-      currentItems.map((item) => (
-        item.id === productId ? { ...item, quantity: item.quantity + 1 } : item
-      ))
-    ))
-  }
+    setCartItems((currentItems) =>
+      currentItems.map((item) =>
+        item.id === productId ? { ...item, quantity: item.quantity + 1 } : item,
+      ),
+    );
+  };
 
   const reduceQuantity = (productId) => {
-    setCartItems((currentItems) => (
-      currentItems.map((item) => (
-        item.id === productId ? { ...item, quantity: Math.max(1, item.quantity - 1) } : item
-      ))
-    ))
-  }
+    setCartItems((currentItems) =>
+      currentItems.map((item) =>
+        item.id === productId
+          ? { ...item, quantity: Math.max(1, item.quantity - 1) }
+          : item,
+      ),
+    );
+  };
 
   const addToCart = () => {
-    if (!selectedProductRecord) return
+    if (!selectedProductRecord) return;
 
     setCartItems((currentItems) => {
-      const itemAlreadyExists = currentItems.some((item) => item.id === selectedProductRecord.id)
+      const itemAlreadyExists = currentItems.some(
+        (item) => item.id === selectedProductRecord.id,
+      );
 
       if (itemAlreadyExists) {
-        return currentItems.map((item) => (
-          item.id === selectedProductRecord.id ? { ...item, quantity: item.quantity + 1 } : item
-        ))
+        return currentItems.map((item) =>
+          item.id === selectedProductRecord.id
+            ? { ...item, quantity: item.quantity + 1 }
+            : item,
+        );
       }
 
-      return [...currentItems, { ...selectedProductRecord, quantity: 1 }]
-    })
-    setSelectedProduct('')
-    setIsProductDropdownOpen(false)
-    setSalesError('')
-  }
+      return [...currentItems, { ...selectedProductRecord, quantity: 1 }];
+    });
+    setSelectedProduct("");
+    setSelectedProductId("");
+    setIsProductDropdownOpen(false);
+    setSalesError("");
+  };
 
   const removeCartItem = (productId) => {
-    setCartItems((currentItems) => currentItems.filter((item) => item.id !== productId))
-  }
+    setCartItems((currentItems) =>
+      currentItems.filter((item) => item.id !== productId),
+    );
+  };
 
   const clearCart = () => {
-    setCartItems([])
-    setShowEmptyCartPopup(true)
-  }
+    setCartItems([]);
+    setShowEmptyCartPopup(true);
+  };
 
   const completeSale = () => {
     if (cartItems.length === 0) {
-      setShowEmptyCartPopup(true)
-      return
+      setShowEmptyCartPopup(true);
+      return;
     }
 
-    setSalesError('')
-    setShowOrderModal(true)
-  }
+    setSalesError("");
+    setShowOrderModal(true);
+  };
 
   const proceedSale = async () => {
-    if (cartItems.length === 0 || isSubmitting) return
+    if (cartItems.length === 0 || isSubmitting) return;
 
-    setIsSubmitting(true)
-    setSalesError('')
+    setIsSubmitting(true);
+    setSalesError("");
 
     try {
       await makeSalesPos({
@@ -194,23 +321,26 @@ const Sales = () => {
           id: item.id,
           quantity: item.quantity,
         })),
-      })
+      });
 
-      setShowOrderModal(false)
-      setCartItems([])
-      setShowSaleSuccess(true)
-      loadSales()
+      setShowOrderModal(false);
+      setCartItems([]);
+      setShowSaleSuccess(true);
+      loadSales();
 
       setTimeout(() => {
-        setShowSaleSuccess(false)
-      }, 2500)
+        setShowSaleSuccess(false);
+      }, 2500);
     } catch (error) {
-      console.error('Complete sale error:', error)
-      setSalesError(error?.response?.data?.message || 'Failed to complete sale. Please try again.')
+      console.error("Complete sale error:", error);
+      setSalesError(
+        error?.response?.data?.message ||
+          "Failed to complete sale. Please try again.",
+      );
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
-  }
+  };
 
   return (
     <div className="sales-page">
@@ -220,9 +350,15 @@ const Sales = () => {
           <p>Process customer purchases</p>
         </div>
 
-        <button className="sales-history-btn" type="button" onClick={() => setShowOrderHistory(!showOrderHistory)}>
+        <button
+          className="sales-history-btn"
+          type="button"
+          onClick={() => setShowOrderHistory(!showOrderHistory)}
+        >
           <img src={calendar} alt="" />
-          <span>{showOrderHistory ? 'Hide Order History' : 'Show Order History'}</span>
+          <span>
+            {showOrderHistory ? "Hide Order History" : "Show Order History"}
+          </span>
         </button>
       </div>
 
@@ -267,9 +403,17 @@ const Sales = () => {
               <p className="sales-empty-cart">No sales history to display</p>
             ) : (
               historyItems.map((item) => (
-                <button className="sales-history-item" type="button" key={item.id} onClick={() => setSelectedHistory(item)}>
+                <button
+                  className="sales-history-item"
+                  type="button"
+                  key={item.id}
+                  onClick={() => setSelectedHistory(item)}
+                >
                   <strong>{item.name}</strong>
-                  <span>Qty: {item.qty} x {formatNaira(item.price)} = {formatNaira(item.total)}</span>
+                  <span>
+                    Qty: {item.qty} x {formatNaira(item.price)} ={" "}
+                    {formatNaira(item.total)}
+                  </span>
                   <small>
                     <User size={13} />
                     {item.user}
@@ -293,19 +437,26 @@ const Sales = () => {
                   <input
                     id="product"
                     type="text"
-                    placeholder={loadingProducts ? 'Loading products...' : 'Search product name'}
+                    placeholder={
+                      loadingProducts
+                        ? "Loading products..."
+                        : "Search product name"
+                    }
                     value={selectedProduct}
                     onFocus={() => setIsProductDropdownOpen(true)}
                     onChange={(event) => {
-                      setSelectedProduct(event.target.value)
-                      setIsProductDropdownOpen(true)
+                      setSelectedProduct(event.target.value);
+                      setSelectedProductId("");
+                      setIsProductDropdownOpen(true);
                     }}
                     aria-label="Select product"
                   />
                   <button
                     className="sales-product-arrow"
                     type="button"
-                    onClick={() => setIsProductDropdownOpen(!isProductDropdownOpen)}
+                    onClick={() =>
+                      setIsProductDropdownOpen(!isProductDropdownOpen)
+                    }
                     aria-label="Open products"
                   >
                     <ChevronDown size={18} />
@@ -315,7 +466,9 @@ const Sales = () => {
                     <div className="sales-product-menu">
                       {dropdownProducts.length === 0 ? (
                         <p className="sales-product-empty">
-                          {loadingProducts ? 'Loading products...' : 'No product found'}
+                          {loadingProducts
+                            ? "Loading products..."
+                            : "No product found"}
                         </p>
                       ) : (
                         dropdownProducts.map((product) => (
@@ -324,12 +477,16 @@ const Sales = () => {
                             type="button"
                             className="sales-product-option"
                             onClick={() => {
-                              setSelectedProduct(product.name)
-                              setIsProductDropdownOpen(false)
+                              setSelectedProduct(product.name);
+                              setSelectedProductId(product.id);
+                              setIsProductDropdownOpen(false);
                             }}
                           >
                             <span>{product.name}</span>
-                            <small>{formatNaira(product.price)} • {product.stock} in stock</small>
+                            <small>
+                              {product.category} • {formatNaira(product.price)}{" "}
+                              • {product.stock} in stock
+                            </small>
                           </button>
                         ))
                       )}
@@ -337,7 +494,12 @@ const Sales = () => {
                   )}
                 </div>
 
-                <button className="sales-add-cart-btn" type="button" disabled={!selectedProductRecord} onClick={addToCart}>
+                <button
+                  className="sales-add-cart-btn"
+                  type="button"
+                  disabled={!selectedProductRecord}
+                  onClick={addToCart}
+                >
                   Add to Cart
                 </button>
               </div>
@@ -357,12 +519,23 @@ const Sales = () => {
                         <span>{formatNaira(item.price)} each</span>
                       </div>
 
-                      <div className="sales-quantity-control" aria-label={`${item.name} quantity`}>
-                        <button type="button" aria-label="Reduce quantity" onClick={() => reduceQuantity(item.id)}>
+                      <div
+                        className="sales-quantity-control"
+                        aria-label={`${item.name} quantity`}
+                      >
+                        <button
+                          type="button"
+                          aria-label="Reduce quantity"
+                          onClick={() => reduceQuantity(item.id)}
+                        >
                           -
                         </button>
                         <span>{item.quantity}</span>
-                        <button type="button" aria-label="Increase quantity" onClick={() => increaseQuantity(item.id)}>
+                        <button
+                          type="button"
+                          aria-label="Increase quantity"
+                          onClick={() => increaseQuantity(item.id)}
+                        >
                           +
                         </button>
                       </div>
@@ -408,11 +581,20 @@ const Sales = () => {
 
             {salesError && <p className="sales-error-message">{salesError}</p>}
 
-            <button className="sales-complete-btn" type="button" onClick={completeSale} disabled={isSubmitting}>
-              {isSubmitting ? 'Completing...' : 'Complete Sale'}
+            <button
+              className="sales-complete-btn"
+              type="button"
+              onClick={completeSale}
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? "Completing..." : "Complete Sale"}
             </button>
 
-            <button className="sales-clear-btn" type="button" onClick={clearCart}>
+            <button
+              className="sales-clear-btn"
+              type="button"
+              onClick={clearCart}
+            >
               Clear Cart
             </button>
           </aside>
@@ -420,8 +602,14 @@ const Sales = () => {
       )}
 
       {showEmptyCartPopup && (
-        <div className="sales-empty-popup-backdrop" onClick={() => setShowEmptyCartPopup(false)}>
-          <div className="sales-empty-popup" onClick={(event) => event.stopPropagation()}>
+        <div
+          className="sales-empty-popup-backdrop"
+          onClick={() => setShowEmptyCartPopup(false)}
+        >
+          <div
+            className="sales-empty-popup"
+            onClick={(event) => event.stopPropagation()}
+          >
             <ShoppingCart size={36} />
             <h3>Your cart is empty!</h3>
             <p>Looks like you haven't added anything to your cart yet</p>
@@ -434,20 +622,26 @@ const Sales = () => {
           <div className="sales-order-modal">
             <div className="sales-order-header">
               <div className="sales-order-title-row">
-                <div className="sales-order-icon">{'\u20a6'}</div>
+                <div className="sales-order-icon">{"\u20a6"}</div>
                 <div>
                   <h3>Order Confirmation</h3>
                   <p>Review before proceeding</p>
                 </div>
               </div>
 
-              <button type="button" className="sales-order-close" onClick={() => setShowOrderModal(false)}>
+              <button
+                type="button"
+                className="sales-order-close"
+                onClick={() => setShowOrderModal(false)}
+              >
                 <X size={20} />
               </button>
             </div>
 
             <div className="sales-order-body">
-              <h4>ITEMS ({itemsInCart} ITEM{itemsInCart === 1 ? '' : 'S'})</h4>
+              <h4>
+                ITEMS ({itemsInCart} ITEM{itemsInCart === 1 ? "" : "S"})
+              </h4>
 
               {cartItems.map((item) => (
                 <div className="sales-order-item" key={item.id}>
@@ -456,12 +650,28 @@ const Sales = () => {
                     <span>{formatNaira(item.price)} each</span>
                   </div>
                   <div className="sales-order-qty">
-                    <button type="button" onClick={() => reduceQuantity(item.id)}><Minus size={15} /></button>
+                    <button
+                      type="button"
+                      onClick={() => reduceQuantity(item.id)}
+                    >
+                      <Minus size={15} />
+                    </button>
                     <b>{item.quantity}</b>
-                    <button type="button" onClick={() => increaseQuantity(item.id)}><Plus size={15} /></button>
+                    <button
+                      type="button"
+                      onClick={() => increaseQuantity(item.id)}
+                    >
+                      <Plus size={15} />
+                    </button>
                   </div>
                   <strong>{formatNaira(item.price * item.quantity)}</strong>
-                  <button type="button" className="sales-order-delete" onClick={() => removeCartItem(item.id)}><Trash2 size={15} /></button>
+                  <button
+                    type="button"
+                    className="sales-order-delete"
+                    onClick={() => removeCartItem(item.id)}
+                  >
+                    <Trash2 size={15} />
+                  </button>
                 </div>
               ))}
 
@@ -472,11 +682,15 @@ const Sales = () => {
                 </div>
                 <div>
                   <span>Total Qty</span>
-                  <strong>{itemsInCart} item{itemsInCart === 1 ? '' : 's'}</strong>
+                  <strong>
+                    {itemsInCart} item{itemsInCart === 1 ? "" : "s"}
+                  </strong>
                 </div>
                 <div>
                   <span>Discount</span>
-                  <strong className="sales-order-discount">{formatNaira(0)}</strong>
+                  <strong className="sales-order-discount">
+                    {formatNaira(0)}
+                  </strong>
                 </div>
                 <div className="sales-order-total-line">
                   <span>Total Amount</span>
@@ -484,17 +698,28 @@ const Sales = () => {
                 </div>
               </div>
 
-              {salesError && <p className="sales-error-message">{salesError}</p>}
+              {salesError && (
+                <p className="sales-error-message">{salesError}</p>
+              )}
             </div>
 
             <div className="sales-order-actions">
-              <button type="button" className="sales-order-cancel" onClick={() => setShowOrderModal(false)}>
+              <button
+                type="button"
+                className="sales-order-cancel"
+                onClick={() => setShowOrderModal(false)}
+              >
                 <ArrowLeft size={17} />
                 <span>Cancel</span>
               </button>
-              <button type="button" className="sales-order-proceed" onClick={proceedSale} disabled={isSubmitting}>
+              <button
+                type="button"
+                className="sales-order-proceed"
+                onClick={proceedSale}
+                disabled={isSubmitting}
+              >
                 <CheckCircle size={17} />
-                <span>{isSubmitting ? 'Processing...' : 'Proceed'}</span>
+                <span>{isSubmitting ? "Processing..." : "Proceed"}</span>
               </button>
             </div>
           </div>
@@ -502,9 +727,7 @@ const Sales = () => {
       )}
 
       {showSaleSuccess && (
-        <div className="sales-success-toast">
-          Sales Completed Successfully
-        </div>
+        <div className="sales-success-toast">Sales Completed Successfully</div>
       )}
 
       {selectedHistory && (
@@ -556,11 +779,15 @@ const Sales = () => {
 
             <div className="sales-detail-info-row">
               <div className="sales-detail-info">
-                <span><User size={14} /> Processed By</span>
+                <span>
+                  <User size={14} /> Processed By
+                </span>
                 <strong>{selectedHistory.user}</strong>
               </div>
               <div className="sales-detail-info">
-                <span><Calendar size={14} /> Date & Time</span>
+                <span>
+                  <Calendar size={14} /> Date & Time
+                </span>
                 <strong>{selectedHistory.date}</strong>
               </div>
             </div>
@@ -568,7 +795,9 @@ const Sales = () => {
             <div className="sales-detail-breakdown">
               <h4>PRICE BREAKDOWN</h4>
               <div>
-                <span>{selectedHistory.name} x {selectedHistory.qty}</span>
+                <span>
+                  {selectedHistory.name} x {selectedHistory.qty}
+                </span>
                 <strong>{formatNaira(selectedHistory.total)}</strong>
               </div>
               <div>
@@ -577,14 +806,16 @@ const Sales = () => {
               </div>
               <div>
                 <span>Total Paid</span>
-                <strong className="sales-detail-blue">{formatNaira(selectedHistory.total)}</strong>
+                <strong className="sales-detail-blue">
+                  {formatNaira(selectedHistory.total)}
+                </strong>
               </div>
             </div>
           </div>
         </div>
       )}
     </div>
-  )
-}
+  );
+};
 
-export default Sales
+export default Sales;
