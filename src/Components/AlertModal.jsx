@@ -24,7 +24,7 @@ const configs = {
     statusText: "",
     secondaryButton: "Go to Expiry Management",
     secondaryTarget: "Expiry Management",
-    footerText: 'Click "View All" to see complete expiry management page with all details',
+    footerText: 'Click "Go to Expiry Management" to see all details',
   },
   lowstock: {
     tone: "lowstock",
