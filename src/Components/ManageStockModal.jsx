@@ -24,9 +24,9 @@ const handleSubmit = async (e) => {
   setLoading(true);
 
  const payload = {
-  actionType: "transfer",
-  moveFrom: "all stock",
-  moveTo: "available stock",
+  actionType,
+  moveFrom,
+  moveTo,
   quantity: parseInt(quantity)
 };
 
