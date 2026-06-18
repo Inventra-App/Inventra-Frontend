@@ -15,6 +15,7 @@ import "./Css/Login.css";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import { loginAdmin } from "../../API/authApi"; 
+import { saveSessionUser } from "../../Utils/sessionUser";
 
 const Login = () => {
   const nav = useNavigate();
@@ -94,6 +95,7 @@ const Login = () => {
       if (res.token) {
         localStorage.setItem("inventra_token", res.token);
       }
+      saveSessionUser(res, { email: payload.email, role: "Admin" });
 
       toast.success(res.message || "Login Successful");
 

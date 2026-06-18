@@ -13,6 +13,8 @@ const TOKEN_KEYS = [
   "token",
   "refreshToken",
   "inventra_refresh_token",
+  "inventra_user",
+  "inventra_is_new_user",
 ];
 
 const removeAllTokens = () => {

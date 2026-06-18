@@ -17,6 +17,7 @@ import {
   getLowStockAlerts,
 } from "../../API/inventoryApi";
 import AlertModal from "../../Components/AlertModal";
+import { getSessionUser, isNewSessionUser, markReturningSessionUser } from "../../Utils/sessionUser";
 import "./Css/Dashboard.css";
 
 const getArrayPayload = (payload) => {
@@ -94,6 +95,8 @@ const Dashboard = () => {
   const [modalType, setModalType] = useState(null); // "expired", "expiring", "lowstock"
   const [modalItems, setModalItems] = useState([]);
   const [modalQueue, setModalQueue] = useState([]); // Queue of modals to show
+  const [sessionUser] = useState(() => getSessionUser());
+  const [isFirstLogin] = useState(() => isNewSessionUser());
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -226,6 +229,11 @@ const Dashboard = () => {
     return () => window.clearTimeout(timerId);
   }, [fetchData]);
 
+  useEffect(() => {
+    if (!isFirstLogin) return;
+    markReturningSessionUser();
+  }, [isFirstLogin]);
+
   // Modal handlers
   const handleDismissModal = () => {
     setShowModal(false);
@@ -323,8 +331,10 @@ const Dashboard = () => {
   return (
     <div className="dashboard-content">
       <div className="dashboard-welcome">
-        <h2>Welcome back!</h2>
-        <p>Here's what's happening in your supermarket today.</p>
+        <h2>{isFirstLogin ? `Welcome to inventra ${sessionUser.businessName}` : `Welcome back, ${sessionUser.businessName}!`}</h2>
+        <p>
+          Here's what's happening in your supermarket today. <span className="expiry-admin">({sessionUser.role})</span>
+        </p>
       </div>
 
       <div className="dashboard-stats">
