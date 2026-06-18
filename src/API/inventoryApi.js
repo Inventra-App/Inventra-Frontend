@@ -80,3 +80,13 @@ export const recordStockEntry = async (payload) => {
   const res = await API.post("stock/entry", payload);
   return res.data;
 };
+
+export const getBatchById = async (id) => {
+  const res = await API.get(`batch/getOne/${id}`);
+  return res.data;
+};
+
+export const getAllBatches = async () => {
+  const res = await API.get('batch/getAll');
+  return res.data;
+};

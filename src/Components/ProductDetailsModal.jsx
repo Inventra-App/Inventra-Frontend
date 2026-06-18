@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { Package, Pencil, X } from 'lucide-react'
 import '../Css/ProductDetailsModal.css'
 
@@ -46,17 +46,32 @@ const ProductDetailsModal = ({ product, onClose, onManage }) => {
             </div>
             <div>
               <p className="inv-modal-label">Unit Price</p>
-              <p className="inv-modal-value">₦250.00</p>
+              <p className="inv-modal-value">
+                 ₦{Number(product.price || 0).toLocaleString("en-NG", {
+                 minimumFractionDigits: 2,
+                 })}
+              </p>
             </div>
             <div>
               <p className="inv-modal-label">Total Value</p>
               <p className="inv-modal-value inv-modal-green">
-                ₦{(product.totalStock * 250).toLocaleString('en-NG', { minimumFractionDigits: 2 })}
+                ₦{( Number(product.totalStock || 0) *Number(product.price || 0))
+                    .toLocaleString("en-NG", {
+                    minimumFractionDigits: 2,
+                  })}
               </p>
             </div>
             <div>
               <p className="inv-modal-label">Date Added</p>
-              <p className="inv-modal-values">May 01, 2026</p>
+              <p className="inv-modal-values">
+                {product.createdAt
+                  ? new Date(product.createdAt).toLocaleDateString("en-GB", {
+                 day: "2-digit",
+                month: "short",
+                year: "numeric",
+                 })
+                 : "-"}
+                </p>
             </div>
           </div>
         </div>
@@ -64,9 +79,17 @@ const ProductDetailsModal = ({ product, onClose, onManage }) => {
         <div className="inv-modal-section">
           <h5>Batch Information</h5>
           <div className="inv-modal-batch-info">
-            <p className="inv-modal-batch-id">{product.batch}</p>
+            <p className="inv-modal-batch-id">
+              {product.batchCode || "N/A"}
+              </p>
             <p className="inv-modal-batch-meta">
-              Quantity: {product.availableStock} • Expires: May 25, 2026
+              Quantity: {product.availableStock} • Expires: {product.expiryDate 
+              ? new Date(product.expiryDate).toLocaleDateString("en-GB", {
+               day: "2-digit",
+               month: "short",
+               year: "numeric"
+              }) 
+              : "N/A"}
             </p>
           </div>
         </div>

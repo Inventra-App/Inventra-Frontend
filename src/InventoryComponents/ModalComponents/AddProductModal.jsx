@@ -68,6 +68,7 @@ const AddProductModal = ({ isOpen, onClose, onAddProduct }) => {
       }
 
       const response = await addInventoryItem(payload)
+      console.log("FULL RESPONSE FROM ADD PRODUCT API:", response);
 
       const generatedBatch =
         response?.data?.batch?.batchCode ||
@@ -79,17 +80,19 @@ const AddProductModal = ({ isOpen, onClose, onAddProduct }) => {
       const selectedCategory = categories.find((cat) => cat._id === formData.categoryId)
   const totalQty = Number(formData.packageQuantity) * Number(formData.unitPerPackage)
 
-onAddProduct({
+ onAddProduct({
   id: response?.data?.productDetails?.productId || response?.productDetails?.productId || Date.now(),
   name: formData.productName,
   batch: response?.data?.productDetails?.SKU,
+  batchCode: response?.data?.batch?.batchCode,
+  expiryDate: response?.data?.batch?.expiryDate,
   category: selectedCategory?.categoryName || formData.categoryId,
   availableStock: 0,
   stockReceived: 0,
   reservedStock: 0,
   totalStock: totalQty,
   status: totalQty > 10 ? 'In Stock' : totalQty > 0 ? 'Low Stock' : 'Out of Stock',
-})
+ })
 
       onClose()
     } catch (err) {
