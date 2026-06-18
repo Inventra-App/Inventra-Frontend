@@ -24,10 +24,13 @@ import Icon5 from '../../assets/Icon (7).png'
 import manage from '../../assets/manage-roles-icon.png'
 import green from '../../assets/Icon green.png'
 import gray from '../../assets/Icon gray.png'
+import { getSessionUser } from '../../Utils/sessionUser'
 
 const UserMgm = () => {
+  const currentUser = getSessionUser()
+  const currentUsername = `${currentUser.firstName} ${currentUser.lastName}`.trim() || currentUser.fullName
   const [users, setUsers] = useState([
-    { id: 'user-001', name: 'Admin User', username: 'admin001', role: 'Admin', status: 'Active', isCurrent: true, joined: 'May 1st 2026', lastLogin: 'May 1st 2026' },
+    { id: 'user-001', name: currentUser.businessName, username: currentUsername, role: 'Admin', status: 'Active', isCurrent: true, joined: 'May 1st 2026', lastLogin: 'May 1st 2026' },
     { id: 'user-002', name: 'Admin User', username: 'admin', role: 'Admin', status: 'Active', joined: 'May 1st 2026', lastLogin: 'May 1st 2026' },
     { id: 'user-003', name: 'Store Manager', username: 'manager', role: 'Manager', status: 'Active', joined: 'May 1st 2026', lastLogin: 'May 1st 2026' },
     { id: 'user-004', name: 'Jane Cashier', username: 'cashier1', role: 'Cashier', status: 'Active', joined: 'May 1st 2026', lastLogin: 'May 1st 2026' },
@@ -384,8 +387,8 @@ const UserMgm = () => {
 
         <div>
           <p>Currently Logged In</p>
-          <h3>Admin User</h3>
-          <span>Role: Admin &bull; Username: Admin001</span>
+          <h3>{currentUser.businessName}</h3>
+          <span>Role: Admin &bull; Username: {currentUsername}</span>
         </div>
       </section>
 

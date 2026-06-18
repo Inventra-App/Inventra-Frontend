@@ -6,7 +6,7 @@ export const makeSalesPos = async (payload) => {
     : {
         items: [
           {
-            id: payload?.id,
+            productId: payload?.id,
             quantity: payload?.quantity,
           },
         ],

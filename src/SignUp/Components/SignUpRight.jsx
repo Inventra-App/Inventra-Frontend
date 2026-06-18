@@ -7,6 +7,7 @@ import { useDispatch } from 'react-redux'
 import { signupSchema } from '../../Schemas/auth'
 import { signupAdmin } from '../../API/authApi'
 import { setRegistrationEmail } from '../../redux/apiSlice'
+import { saveSessionUser } from '../../Utils/sessionUser'
 import '../Style/SignUpRight.css'
 
 const SignUpRight = ({ nav }) => {
@@ -44,8 +45,10 @@ const SignUpRight = ({ nav }) => {
     }
 
     try {
-      const { agree, ...backendPayload } = data;
+      const backendPayload = { ...data };
+      delete backendPayload.agree;
       const response = await signupAdmin(backendPayload);
+      saveSessionUser(response, backendPayload, { isNewUser: true });
       dispatch(setRegistrationEmail(data.email));
       toast.success(response?.message || "Welcome to Inventra! Check your email for OTP.");
       nav("/signupverify");
