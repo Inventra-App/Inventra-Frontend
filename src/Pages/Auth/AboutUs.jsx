@@ -19,7 +19,6 @@ import john from "../../assets/john.png";
 import nnaemeka from "../../assets/nana.png";
 import anthony from "../../assets/Anthony.png";
 import destiny from "../../assets/destiny.png";
-import { motion } from "framer-motion";
 
 
 const AboutUs = () => {
@@ -74,7 +73,6 @@ const AboutUs = () => {
       slider.removeEventListener('scroll', updateScrollButtons);
       window.removeEventListener('resize', updateScrollButtons);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Block native horizontal scroll gestures (mouse wheel, trackpad, touch)
@@ -349,7 +347,7 @@ const AboutUs = () => {
         <article className='team-container'>
           <header className='team-header'>
             <div className='team-text'>
-            <h3 className='teamh3'> <p className='teamh3-content'>OUR Team</p></h3>
+            <h3 className='teamh3'> <p className='teamh3-content'>OUR TEAM</p></h3>
             <p className='teamp'>Meet the brains behind the products</p>
             </div>
           </header>

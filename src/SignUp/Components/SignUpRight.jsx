@@ -6,14 +6,16 @@ import { toast } from 'react-hot-toast'
 import { useDispatch } from 'react-redux'
 import { signupSchema } from '../../Schemas/auth'
 import { signupAdmin } from '../../API/authApi'
+import { contWithGoogle } from '../../API/googleAuthApi'
 import { setRegistrationEmail } from '../../redux/apiSlice'
-import { saveSessionUser } from '../../Utils/sessionUser'
+import { getAccountPath, saveSessionUser } from '../../Utils/sessionUser'
 import '../Style/SignUpRight.css'
 
 const SignUpRight = ({ nav }) => {
   const dispatch = useDispatch()
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false)
 
   const {
     register,
@@ -57,6 +59,38 @@ const SignUpRight = ({ nav }) => {
       toast.error(errorMessage);
     }
   };
+
+  const handleGoogleSignup = async () => {
+    if (isGoogleLoading) return
+
+    try {
+      setIsGoogleLoading(true)
+      const response = await contWithGoogle({
+        authType: "signup",
+        redirectUri: `${window.location.origin}/signup`,
+      })
+
+      const redirectUrl = response?.url || response?.authUrl || response?.redirectUrl || response?.data?.url
+      if (redirectUrl) {
+        window.location.href = redirectUrl
+        return
+      }
+
+      const token = response?.token || response?.accessToken || response?.data?.token
+      if (token) {
+        localStorage.setItem("inventra_token", token)
+      }
+
+      const sessionUser = saveSessionUser(response, {}, { isNewUser: true })
+      toast.success(response?.message || "Google signup successful")
+      nav(getAccountPath("/dashboard", sessionUser))
+    } catch (error) {
+      const errorMessage = error.response?.data?.message || "Google signup failed. Please try again."
+      toast.error(errorMessage)
+    } finally {
+      setIsGoogleLoading(false)
+    }
+  }
 
   return (
     <div className="signup-right">
@@ -186,9 +220,14 @@ const SignUpRight = ({ nav }) => {
           </button>
 
           <div className="signup-divider"><span>or continue with</span></div>
-          <button type="button" className="signup-google-btn" onClick={() => nav("/supermarket-info")}>
+          <button
+            type="button"
+            className="signup-google-btn"
+            onClick={handleGoogleSignup}
+            disabled={isSubmitting || isGoogleLoading}
+          >
             <img src="https://www.google.com/favicon.ico" alt="Google" width={18} />
-            Google
+            {isGoogleLoading ? "Connecting..." : "Google"}
           </button>
         </form>
       </div>
