@@ -15,7 +15,8 @@ import "./Css/Login.css";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import { loginAdmin } from "../../API/authApi"; 
-import { saveSessionUser } from "../../Utils/sessionUser";
+import { loginStaff } from "../../API/userManagementAPI";
+import { getAccountPath, saveSessionUser } from "../../Utils/sessionUser";
 
 const Login = () => {
   const nav = useNavigate();
@@ -89,19 +90,27 @@ const Login = () => {
       };
 
       console.log("=== LOGIN REQUEST ===", { email: payload.email });
-      const res = await loginAdmin(payload);
+      let res;
+      let loginRole = "Admin";
+
+      try {
+        res = await loginAdmin(payload);
+      } catch {
+        res = await loginStaff(payload);
+        loginRole = "Staff";
+      }
       console.log("=== LOGIN SUCCESS ===", res);
 
       if (res.token) {
         localStorage.setItem("inventra_token", res.token);
       }
-      saveSessionUser(res, { email: payload.email, role: "Admin" });
+      const sessionUser = saveSessionUser(res, { email: payload.email, role: loginRole });
 
       toast.success(res.message || "Login Successful");
 
       setIsLoggingIn(true);
       setTimeout(() => {
-        nav("/dashboard");
+        nav(getAccountPath("/dashboard", sessionUser));
       }, 1000);
 
     } catch (error) {
