@@ -16,6 +16,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import { loginAdmin } from "../../API/authApi"; 
 import { loginStaff } from "../../API/userManagementAPI";
+import { contWithGoogle } from "../../API/googleAuthApi";
 import { getAccountPath, saveSessionUser } from "../../Utils/sessionUser";
 
 const Login = () => {
@@ -97,7 +98,7 @@ const Login = () => {
         res = await loginAdmin(payload);
       } catch {
         res = await loginStaff(payload);
-        loginRole = "Staff";
+        loginRole = res?.staff?.role || res?.user?.role || res?.data?.role || res?.role || "Staff";
       }
       console.log("=== LOGIN SUCCESS ===", res);
 
@@ -138,16 +139,39 @@ const Login = () => {
     }
   };
 
-  const handleGoogleLogin = () => {
-    setIsGoogleLoading(true);
+  const handleGoogleLogin = async () => {
+    if (isGoogleLoading) return;
 
-    setTimeout(() => {
+    try {
+      setIsGoogleLoading(true);
+      const res = await contWithGoogle({
+        authType: "login",
+        redirectUri: `${window.location.origin}/login`,
+      });
+
+      const redirectUrl = res?.url || res?.authUrl || res?.redirectUrl || res?.data?.url;
+      if (redirectUrl) {
+        window.location.href = redirectUrl;
+        return;
+      }
+
+      const token = res?.token || res?.accessToken || res?.data?.token;
+      if (token) {
+        localStorage.setItem("inventra_token", token);
+      }
+
+      const sessionUser = saveSessionUser(res, { role: "Admin" });
+      toast.success(res?.message || "Google login successful");
       setIsLoggingIn(true);
-    }, 1200);
-
-    setTimeout(() => {
-      nav("/dashboard");
-    }, 3000);
+      setTimeout(() => {
+        nav(getAccountPath("/dashboard", sessionUser));
+      }, 1000);
+    } catch (error) {
+      console.error("Google login error:", error);
+      toast.error(error?.response?.data?.message || "Google login failed. Please try again.");
+    } finally {
+      setIsGoogleLoading(false);
+    }
   };
 
   if (isLoggingIn) {

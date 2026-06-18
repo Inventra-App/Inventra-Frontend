@@ -415,6 +415,47 @@ line-height: 20px;
   margin-top: 4px;
 }
 
+.failed-modal {
+  width: min(100%, 560px);
+  min-height: 500px;
+  padding: 120px 40px 56px;
+  border: 1.5px solid #ef4444;
+  border-radius: 12px;
+  background: #ffffff;
+  color: #000000;
+  text-align: center;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.12), 0 10px 10px -5px rgba(0, 0, 0, 0.05);
+  animation: modalScaleUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.failed-badge-icon {
+  width: 72px;
+  height: 72px;
+  margin: 0 auto 66px;
+  border-radius: 50%;
+  background: #ef4444;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.failed-modal h3 {
+  margin: 0 0 22px;
+  color: #000000;
+  font-size: 25px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.failed-modal p {
+  margin: 0;
+  color: #000000;
+  font-size: 17px;
+  font-weight: 400;
+  line-height: 1.45;
+}
+
 .verify-bottom-footer {
   display: flex;
   gap: 24px;

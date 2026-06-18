@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import {
+  AlertCircle,
   ArrowLeft,
   Calendar,
   CheckCircle,
@@ -33,139 +34,19 @@ const getArrayPayload = (payload) => {
   return [];
 };
 
-const getProductRecord = (product) =>
-  product?.product ?? product?.productDetails ?? product;
-const getProductId = (product) => {
-  const record = getProductRecord(product);
-  return (
-    product?._id ??
-    product?.id ??
-    product?.productId ??
-    record?._id ??
-    record?.id ??
-    record?.productId ??
-    ""
-  );
-};
-const getProductName = (product) => {
-  const record = getProductRecord(product);
-  return (
-    product?.productName ??
-    product?.name ??
-    product?.title ??
-    record?.productName ??
-    record?.name ??
-    "Unnamed Product"
-  );
-};
-const getProductPrice = (product) => {
-  const record = getProductRecord(product);
-  return Number(
-    product?.unitPrice ??
-      product?.price ??
-      product?.sellingPrice ??
-      product?.amount ??
-      record?.unitPrice ??
-      record?.price ??
-      0,
-  );
-};
-const getProductStock = (product) => {
-  const record = getProductRecord(product);
-  const batches =
-    product?.batches ?? product?.stockEntries ?? product?.inventoryItems ?? [];
-  const batchStock = Array.isArray(batches)
-    ? batches.reduce(
-        (sum, batch) =>
-          sum +
-          Number(batch?.availableStock ?? batch?.quantity ?? batch?.stock ?? 0),
-        0,
-      )
-    : 0;
-  return Number(
-    product?.availableStock ??
-      product?.quantity ??
-      product?.stock ??
-      product?.inventory?.availableStock ??
-      record?.availableStock ??
-      record?.quantity ??
-      batchStock ??
-      0,
-  );
-};
-const getProductCategory = (product) => {
-  const record = getProductRecord(product);
-  return (
-    product?.categoryName ??
-    product?.category?.name ??
-    product?.category ??
-    record?.categoryName ??
-    record?.category?.name ??
-    record?.category ??
-    "Uncategorized"
-  );
-};
-
-const normalizeProduct = (product) => ({
-  id: getProductId(product),
-  name: getProductName(product),
-  price: getProductPrice(product),
-  stock: getProductStock(product),
-  category: getProductCategory(product),
-});
-
-const normalizeSale = (sale) => {
-  const product = sale?.product ?? sale?.productDetails ?? sale?.item ?? {};
-  const name =
-    sale?.productName ??
-    sale?.name ??
-    product?.productName ??
-    product?.name ??
-    "Product";
-  const qty = Number(sale?.quantity ?? sale?.qty ?? sale?.totalQuantity ?? 0);
-  const price = Number(
-    sale?.unitPrice ?? sale?.price ?? product?.unitPrice ?? product?.price ?? 0,
-  );
-  const total = Number(
-    sale?.total ?? sale?.totalAmount ?? sale?.amount ?? price * qty,
-  );
-  const user =
-    sale?.user?.name ??
-    sale?.cashier?.name ??
-    sale?.createdBy?.name ??
-    sale?.processedBy ??
-    "Admin User";
-  const dateValue = sale?.createdAt ?? sale?.date ?? sale?.updatedAt ?? "";
-  const date = dateValue
-    ? new Date(dateValue).toLocaleString("en-NG", {
-        dateStyle: "medium",
-        timeStyle: "short",
-      })
-    : "-";
-
-  return {
-    id: sale?._id ?? sale?.id ?? `${name}-${date}`,
-    name,
-    qty,
-    price,
-    total,
-    user,
-    date,
-  };
-};
-
 const Sales = () => {
   const [selectedProduct, setSelectedProduct] = useState("");
   const [selectedProductId, setSelectedProductId] = useState("");
   const [cartItems, setCartItems] = useState([]);
   const [isProductDropdownOpen, setIsProductDropdownOpen] = useState(false);
   const [showEmptyCartPopup, setShowEmptyCartPopup] = useState(false);
+  const [showClearCartModal, setShowClearCartModal] = useState(false);
   const [showOrderModal, setShowOrderModal] = useState(false);
   const [showSaleSuccess, setShowSaleSuccess] = useState(false);
   const [showOrderHistory, setShowOrderHistory] = useState(false);
   const [selectedHistory, setSelectedHistory] = useState(null);
   const [products, setProducts] = useState([]);
-  const [historyItems, setHistoryItems] = useState([]);
+  const [historyItems] = useState([]);
   const [loadingProducts, setLoadingProducts] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [salesError, setSalesError] = useState("");
@@ -337,8 +218,17 @@ const Sales = () => {
   };
 
   const clearCart = () => {
+    if (cartItems.length === 0) {
+      setShowEmptyCartPopup(true);
+      return;
+    }
+
+    setShowClearCartModal(true);
+  };
+
+  const confirmClearCart = () => {
     setCartItems([]);
-    setShowEmptyCartPopup(true);
+    setShowClearCartModal(false);
   };
 
   const completeSale = () => {
@@ -673,6 +563,42 @@ const Sales = () => {
             <ShoppingCart size={36} />
             <h3>Your cart is empty!</h3>
             <p>Looks like you haven't added anything to your cart yet</p>
+          </div>
+        </div>
+      )}
+
+      {showClearCartModal && (
+        <div
+          className="sales-clear-modal-backdrop"
+          onClick={() => setShowClearCartModal(false)}
+        >
+          <div
+            className="sales-clear-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="sales-clear-title"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="sales-clear-alert-icon">
+              <AlertCircle size={22} />
+            </div>
+            <h3 id="sales-clear-title">Do you want to clear cart?</h3>
+            <div className="sales-clear-actions">
+              <button
+                type="button"
+                className="sales-clear-no"
+                onClick={() => setShowClearCartModal(false)}
+              >
+                No
+              </button>
+              <button
+                type="button"
+                className="sales-clear-yes"
+                onClick={confirmClearCart}
+              >
+                Yes
+              </button>
+            </div>
           </div>
         </div>
       )}

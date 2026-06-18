@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react'
-import { Shield, BarChart2, Users, Lock, CheckCircle, Clock, Check } from 'lucide-react'
+import { Shield, BarChart2, Users, Lock, CheckCircle, Clock, Check, X } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { useSelector } from 'react-redux' 
 import { resendOtp, verifySignupEmail } from '../../API/authApi'
@@ -11,8 +11,9 @@ const SignUpVerify = () => {
   const completeState = useSelector((state) => state);
   console.log("👉 CURRENT REDUX STATE ACCESSED BY VERIFY PAGE:", completeState);
   const [otp, setOtp] = useState(['', '', '', '', '', ''])
-  const [resendTimeLeft, setResendTimeLeft] = useState(0)
+  const [resendTimeLeft, setResendTimeLeft] = useState(180)
   const [showPopup, setShowPopup] = useState(false)
+  const [showFailedPopup, setShowFailedPopup] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isResending, setIsResending] = useState(false)
   const [error, setError] = useState('')
@@ -52,6 +53,10 @@ const SignUpVerify = () => {
     if (value && index < 5) {
       inputRefs.current[index + 1].focus()
     }
+  }
+
+  const closeFailedPopup = () => {
+    setShowFailedPopup(false)
   }
 
   const handleKeyDown = (index, e) => {
@@ -108,6 +113,7 @@ const SignUpVerify = () => {
       console.error("OTP VERIFICATION ERROR:", err)
       const serverErrorMessage = err.response?.data?.message || "Invalid or expired OTP";
       setError(serverErrorMessage)
+      setShowFailedPopup(true)
       toast.error(serverErrorMessage)
     } finally {
       setIsSubmitting(false)
@@ -261,6 +267,25 @@ const SignUpVerify = () => {
             <h3>Verification Successful</h3>
             <p>Your account has been verified successfully.</p>
             <p className="redirect-text">Redirecting you to login....</p>
+          </div>
+        </div>
+      )}
+
+      {showFailedPopup && (
+        <div className="modal-overlay" onClick={closeFailedPopup}>
+          <div
+            className="failed-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="verification-failed-title"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="failed-badge-icon">
+              <X size={52} strokeWidth={3.5} />
+            </div>
+            <h3 id="verification-failed-title">Verification Failed</h3>
+            <p>The OTP you entered is incorrect or has expired.</p>
+            <p>Please try again.</p>
           </div>
         </div>
       )}

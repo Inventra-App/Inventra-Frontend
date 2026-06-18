@@ -319,7 +319,7 @@ const Dashboard = () => {
   return (
     <div className="dashboard-content">
       <div className="dashboard-welcome">
-        <h2>{isFirstLogin ? `Welcome to inventra ${sessionUser.businessName}` : `Welcome back, ${sessionUser.businessName}!`}</h2>
+        <h2>{isFirstLogin ? `Welcome to INVENTRA ${sessionUser.businessName}` : `Welcome back, ${sessionUser.businessName}!!`}</h2>
         <p>
           Here's what's happening in your supermarket today. <span className="expiry-admin">({sessionUser.role})</span>
         </p>

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import {
   AlertCircle,
   Calendar,
@@ -8,7 +8,6 @@ import {
   Lock,
   Power,
   Settings,
-  Shield,
   User,
   UserCog,
   Users,
@@ -23,7 +22,6 @@ import Icon4 from '../../assets/Icon (6).png'
 import Icon5 from '../../assets/Icon (7).png'
 import manage from '../../assets/manage-roles-icon.png'
 import green from '../../assets/Icon green.png'
-import gray from '../../assets/Icon gray.png'
 import { getSessionUser } from '../../Utils/sessionUser'
 import { getStaffs, onBoardStaff } from '../../API/userManagementAPI'
 
@@ -37,21 +35,15 @@ const getArrayPayload = (payload) => {
   return []
 }
 
-const splitName = (name = '') => {
-  const parts = name.trim().split(/\s+/).filter(Boolean)
-  return {
-    firstName: parts[0] || '',
-    lastName: parts.slice(1).join(' '),
-  }
-}
-
 const normalizeStaff = (staff) => {
   const fullName = staff?.fullName ?? staff?.name ?? `${staff?.firstName ?? ''} ${staff?.lastName ?? ''}`.trim()
+  const rawRole = staff?.role ?? 'Cashier'
+  const role = String(rawRole).charAt(0).toUpperCase() + String(rawRole).slice(1).toLowerCase()
   return {
     id: staff?._id ?? staff?.id ?? staff?.staffId ?? `${staff?.email}-${fullName}`,
-    name: fullName || 'Staff Member',
+    name: fullName || 'User',
     username: staff?.email ?? staff?.username ?? staff?.gmail ?? 'No email',
-    role: staff?.role ?? 'Staff',
+    role,
     status: staff?.isLoggedIn || staff?.loggedIn || staff?.online || staff?.status === 'Active' ? 'Active' : (staff?.status ?? 'Inactive'),
     joined: staff?.createdAt ? new Date(staff.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'Not available',
     lastLogin: staff?.lastLogin ? new Date(staff.lastLogin).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' }) : 'Not available',
@@ -61,7 +53,16 @@ const normalizeStaff = (staff) => {
 const UserMgm = () => {
   const currentUser = getSessionUser()
   const currentUsername = `${currentUser.firstName} ${currentUser.lastName}`.trim() || currentUser.fullName
-  const currentAdminUser = { id: 'current-admin', name: currentUser.businessName, username: currentUsername, role: 'Admin', status: 'Active', isCurrent: true, joined: 'Current account', lastLogin: 'Now' }
+  const currentAdminUser = useMemo(() => ({
+    id: 'current-admin',
+    name: currentUser.businessName,
+    username: currentUsername,
+    role: 'Admin',
+    status: 'Active',
+    isCurrent: true,
+    joined: 'Current account',
+    lastLogin: 'Now',
+  }), [currentUser.businessName, currentUsername])
   const [users, setUsers] = useState([currentAdminUser])
   const [loadingUsers, setLoadingUsers] = useState(false)
   const [isCreatingStaff, setIsCreatingStaff] = useState(false)
@@ -71,8 +72,9 @@ const UserMgm = () => {
   const [selectedUser, setSelectedUser] = useState(null)
   const [toast, setToast] = useState('')
 
-  const [fullName, setFullName] = useState('')
-  const [username, setUsername] = useState('')
+  const [firstName, setFirstName] = useState('')
+  const [lastName, setLastName] = useState('')
+  const [email, setEmail] = useState('')
   const [role, setRole] = useState('')
   const [newRole, setNewRole] = useState('')
   const [copied, setCopied] = useState(false)
@@ -90,7 +92,7 @@ const UserMgm = () => {
     'Activity Logs',
   ]
 
-  const roles = ['Admin', 'Manager', 'Cashier', 'Staff']
+  const roles = ['manager', 'cashier']
 
   useEffect(() => {
     const loadStaffs = async () => {
@@ -109,33 +111,21 @@ const UserMgm = () => {
     }
 
     loadStaffs()
-  }, [])
+  }, [currentAdminUser])
 
   // Default permission state per role (used when no custom config exists yet)
   const defaultRolePermissions = {
-    Admin: {
+    Manager: {
       'Dashboard': true,
       'Inventory': true,
       'Incoming Stock': true,
       'Low Stock Management': true,
       'Sales (POS)': true,
-      'Expiry Management': false,
+      'Expiry Management': true,
       'Reports': true,
       'User Management': false,
       'Settings': true,
       'Activity Logs': true,
-    },
-    Staff: {
-      'Dashboard': true,
-      'Inventory': true,
-      'Incoming Stock': true,
-      'Low Stock Management': true,
-      'Sales (POS)': false,
-      'Expiry Management': true,
-      'Reports': false,
-      'User Management': false,
-      'Settings': false,
-      'Activity Logs': false,
     },
     Cashier: {
       'Dashboard': true,
@@ -152,13 +142,12 @@ const UserMgm = () => {
   }
 
   const roleDisplayName = {
-    Admin: 'Admin',
-    Staff: 'Inventory Staff',
+    Manager: 'Manager',
     Cashier: 'Cashier',
   }
 
   // Active role being managed in the Role & Permissions page
-  const [activePermissionRole, setActivePermissionRole] = useState('Admin')
+  const [activePermissionRole, setActivePermissionRole] = useState('Manager')
 
   // Persist custom permission toggles per role
   const [rolePermissions, setRolePermissions] = useState(defaultRolePermissions)
@@ -180,16 +169,14 @@ const UserMgm = () => {
   }
 
   const roleText = {
-    Admin: 'Full system access. Can manage users, view all reports, and configure system settings.',
     Manager: 'Can manage inventory, view reports, receive goods, and monitor expiry alerts.',
     Cashier: 'Can process sales, view inventory, and access sales history.',
-    Staff: 'Can add products, receive goods, and update inventory levels.',
   }
 
   const totalUsers = users.length
   const adminCount = users.filter((user) => user.role === 'Admin').length
   const managerCount = users.filter((user) => user.role === 'Manager').length
-  const staffCount = users.filter((user) => user.role === 'Staff').length
+  const cashierCount = users.filter((user) => user.role === 'Cashier').length
 
   const showToast = (message) => {
     setToast(message)
@@ -220,11 +207,12 @@ const UserMgm = () => {
     event.preventDefault()
     if (isCreatingStaff) return
 
-    const cleanName = fullName.trim()
-    const cleanEmail = username.trim()
+    const cleanFirstName = firstName.trim()
+    const cleanLastName = lastName.trim()
+    const cleanEmail = email.trim()
 
-    if (cleanName === '') {
-      alert('Full name is required')
+    if (cleanFirstName === '' || cleanLastName === '') {
+      alert('First and last name is required')
       return
     }
 
@@ -244,11 +232,9 @@ const UserMgm = () => {
       return
     }
 
-    const { firstName, lastName } = splitName(cleanName)
     const payload = {
-      fullName: cleanName,
-      firstName,
-      lastName,
+      firstName: cleanFirstName,
+      lastName: cleanLastName,
       email: cleanEmail,
       role,
     }
@@ -258,8 +244,9 @@ const UserMgm = () => {
       const response = await onBoardStaff(payload)
       const newStaff = normalizeStaff(response?.staff ?? response?.data ?? response?.user ?? { ...payload, status: 'Inactive' })
       setUsers((currentUsers) => [...currentUsers, newStaff])
-      setFullName('')
-      setUsername('')
+      setFirstName('')
+      setLastName('')
+      setEmail('')
       setRole('')
       closeModal()
       showToast('New staff member has been created')
@@ -340,21 +327,12 @@ const UserMgm = () => {
 
         <div className="role-select-grid">
           <button
-            className={`role-select-card${activePermissionRole === 'Admin' ? ' active' : ''}`}
+            className={`role-select-card${activePermissionRole === 'Manager' ? ' active' : ''}`}
             type="button"
-            onClick={() => setActivePermissionRole('Admin')}
-          >
-            <span className="role-select-icon admin"><Shield size={22} /></span>
-            <strong>Admin</strong>
-            <small>Full system access</small>
-          </button>
-          <button
-            className={`role-select-card${activePermissionRole === 'Staff' ? ' active' : ''}`}
-            type="button"
-            onClick={() => setActivePermissionRole('Staff')}
+            onClick={() => setActivePermissionRole('Manager')}
           >
             <span className="role-select-icon manager"><Users size={22} /></span>
-            <strong>Inventory Staff</strong>
+            <strong>Manager</strong>
             <small>Inventory management</small>
           </button>
           <button
@@ -468,14 +446,14 @@ const UserMgm = () => {
             <img src={Icon5} alt="" />
           </div>
           <div>
-            <p>Staff</p>
-            <h3>{staffCount}</h3>
+            <p>Cashiers</p>
+            <h3>{cashierCount}</h3>
           </div>
         </div>
       </section>
 
       <section className="staff-card">
-        <h3>Staff Directory</h3>
+        <h3>User Directory</h3>
 
         <div className="staff-table">
           <div className="table-head">
@@ -486,7 +464,17 @@ const UserMgm = () => {
             <span>Actions</span>
           </div>
 
-          {users.map((user) => (
+          {loadingUsers ? (
+            <div className="table-row">
+              <div className="staff-user">
+                <div className="staff-avatar">...</div>
+                <div>
+                  <strong>Loading users...</strong>
+                  <p>Please wait</p>
+                </div>
+              </div>
+            </div>
+          ) : users.map((user) => (
             <div className="table-row" key={user.id}>
               <div className="staff-user">
                 <div className="staff-avatar">{user.name.charAt(0)}</div>
@@ -533,36 +521,20 @@ const UserMgm = () => {
         <h3>Role Permissions</h3>
 
         <div className="permission-grid">
-          <div className="permission-box admin">
-            <div className="permission-title">
-              <img src={Vector} alt="" />
-              <h4>Admin</h4>
-            </div>
-            <p>{roleText.Admin}</p>
-          </div>
-
           <div className="permission-box manager">
             <div className="permission-title">
               <img src={Icon3} alt="" />
-              <h4>Manager</h4>
+              <h4>manager</h4>
             </div>
-            <p>{roleText.Manager}</p>
+            <p>{roleText.manager}</p>
           </div>
 
           <div className="permission-box cashier">
             <div className="permission-title">
               <img src={green} alt="" className="icon4" />
-              <h4>Cashier</h4>
+              <h4>cashier</h4>
             </div>
-            <p>{roleText.Cashier}</p>
-          </div>
-
-          <div className="permission-box staff">
-            <div className="permission-title">
-              <img src={gray} alt="" />
-              <h4>Staff</h4>
-            </div>
-            <p>{roleText.Staff}</p>
+            <p>{roleText.cashier}</p>
           </div>
         </div>
       </section>
@@ -574,16 +546,21 @@ const UserMgm = () => {
               <X size={18} />
             </button>
 
-            <h3>Onboard New Staff Member</h3>
+            <h3>Create New User</h3>
 
             <label>
-              <span>Full Name</span>
-              <input type="text" placeholder="John Doe" value={fullName} onChange={(event) => setFullName(event.target.value)} />
+              <span>First Name</span>
+              <input type="text" placeholder="John" value={firstName} onChange={(event) => setFirstName(event.target.value)} />
+            </label>
+
+            <label>
+              <span>Last Name</span>
+              <input type="text" placeholder="Doe" value={lastName} onChange={(event) => setLastName(event.target.value)} />
             </label>
 
             <label>
               <span>Email</span>
-              <input type="email" placeholder="johndoe@example.com" value={username} onChange={(event) => setUsername(event.target.value)} />
+              <input type="email" placeholder="johndoe@example.com" value={email} onChange={(event) => setEmail(event.target.value)} />
             </label>
 
             <label>
@@ -756,10 +733,10 @@ const UserMgm = () => {
           <form className="user-modal change-role-modal" onSubmit={saveRoleChange}>
             <h3>Change Role</h3>
             <div className="role-change-info">
-              <strong>Staff Member</strong>
+              <strong>User</strong>
               <p>{selectedUser.name}</p>
               <strong>Current Role</strong>
-              <p>{selectedUser.role === 'Staff' ? 'Inventory Staff' : selectedUser.role}</p>
+              <p>{selectedUser.role}</p>
             </div>
             <label>
               <span>New Role *</span>
