@@ -13,7 +13,7 @@ import {
   User,
   X,
 } from "lucide-react";
-import { getAllProducts } from "../../API/inventoryApi";
+import { getAllProducts, getInventoryItems, getTotalSalesAmount,  } from "../../API/inventoryApi";
 import { countSalesPos, makeSalesPos } from "../../API/salesPosApi";
 import "./Css/Sales.css";
 import calendar from "../../assets/calendar.png";
@@ -169,35 +169,79 @@ const Sales = () => {
   const [loadingProducts, setLoadingProducts] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [salesError, setSalesError] = useState("");
+  const [salesToday, setSalesToday] = useState(0);
+  const [revenueToday, setRevenueToday] = useState(0);
 
   const loadSales = async () => {
-    try {
-      const response = await countSalesPos();
-      setHistoryItems(getArrayPayload(response).map(normalizeSale));
-    } catch (error) {
-      console.error("Sales history fetch error:", error);
-      setHistoryItems([]);
+  try {
+    const [salesResponse, revenueResponse] = await Promise.all([
+      countSalesPos(),
+      getTotalSalesAmount(),
+    ]);
+
+    console.log("SALES COUNT:", salesResponse);
+    console.log("SALES AMOUNT:", revenueResponse);
+    console.log("SALES AMOUNT DATA:", revenueResponse?.data);
+
+    setSalesToday(Number(salesResponse?.data || 0));
+    setRevenueToday(Number(revenueResponse?.data || 0));
+   } catch (error) {
+    console.error("Sales stats fetch error:", error);
+    setSalesToday(0);
+    setRevenueToday(0);
     }
   };
-
-  useEffect(() => {
+  
     const loadProducts = async () => {
-      setLoadingProducts(true);
-      try {
-        const response = await getAllProducts();
-        setProducts(
-          getArrayPayload(response)
-            .map(normalizeProduct)
-            .filter((product) => product.id),
-        );
-      } catch (error) {
-        console.error("POS products fetch error:", error);
-        setProducts([]);
-      } finally {
-        setLoadingProducts(false);
-      }
-    };
+    setLoadingProducts(true);
 
+   try {
+    const [productsRes, inventoryRes] = await Promise.all([
+      getAllProducts({ _t: Date.now() }),
+      getInventoryItems({ _t: Date.now() }),
+    ]);
+
+    const productsData = getArrayPayload(productsRes);
+    const inventoryData = getArrayPayload(inventoryRes);
+
+    const mappedProducts = productsData
+      .map((product) => {
+        const inventory =
+           inventoryData.find((item) => {
+           const productId =
+           typeof item.productId === "object"
+           ? item.productId?._id
+           : item.productId;
+
+          return productId === product._id;
+          }) || {};
+
+        return {
+          id: product._id,
+          name: product.productName || "Unnamed Product",
+          price: Number(
+            product.price ||
+            product.sellingPrice ||
+            product.unitPrice ||
+            0
+          ),
+          stock: Number(inventory.availableStock || 0),
+          category: product.categoryName || "Uncategorized",
+        };
+      })
+      .reverse();
+
+    console.log("POS PRODUCTS:", mappedProducts);
+
+    setProducts(mappedProducts);
+     } catch (error) {
+    console.error("POS products fetch error:", error);
+    setProducts([]);
+     } finally {
+    setLoadingProducts(false);
+    }
+   };
+   useEffect(() => {
     const timerId = window.setTimeout(() => {
       loadProducts();
       loadSales();
@@ -206,8 +250,6 @@ const Sales = () => {
     return () => window.clearTimeout(timerId);
   }, []);
 
-  const salesToday = historyItems.length;
-  const revenueToday = historyItems.reduce((sum, item) => sum + item.total, 0);
   const subtotal = cartItems.reduce(
     (sum, item) => sum + item.price * item.quantity,
     0,
@@ -310,37 +352,55 @@ const Sales = () => {
   };
 
   const proceedSale = async () => {
-    if (cartItems.length === 0 || isSubmitting) return;
+  if (cartItems.length === 0 || isSubmitting) return;
 
-    setIsSubmitting(true);
-    setSalesError("");
+  setIsSubmitting(true);
+  setSalesError("");
 
-    try {
-      await makeSalesPos({
-        items: cartItems.map((item) => ({
-          id: item.id,
-          quantity: item.quantity,
-        })),
-      });
-
-      setShowOrderModal(false);
-      setCartItems([]);
-      setShowSaleSuccess(true);
-      loadSales();
-
-      setTimeout(() => {
-        setShowSaleSuccess(false);
-      }, 2500);
-    } catch (error) {
-      console.error("Complete sale error:", error);
-      setSalesError(
-        error?.response?.data?.message ||
-          "Failed to complete sale. Please try again.",
-      );
-    } finally {
-      setIsSubmitting(false);
-    }
+  const payload = {
+    paymentMethod: "cash",
+    items: cartItems.map((item) => ({
+      productId: item.id,
+      quantity: Number(item.quantity),
+    })),
   };
+
+  console.log(
+    "SALE PAYLOAD:",
+    JSON.stringify(payload, null, 2)
+  );
+
+  try {
+    const response = await makeSalesPos(payload);
+
+    console.log("SALE RESPONSE:", response);
+
+    setShowOrderModal(false);
+    setCartItems([]);
+    setShowSaleSuccess(true);
+
+    await loadSales();
+    await loadProducts();
+
+    setTimeout(() => {
+      setShowSaleSuccess(false);
+    }, 2500);
+  } catch (error) {
+    console.error("Complete sale error:", error);
+
+    console.log(
+      "FAILED PAYLOAD:",
+      JSON.stringify(payload, null, 2)
+    );
+
+    setSalesError(
+      error?.response?.data?.message ||
+      "Failed to complete sale. Please try again."
+    );
+  } finally {
+    setIsSubmitting(false);
+  }
+};
 
   return (
     <div className="sales-page">

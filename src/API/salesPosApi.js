@@ -1,18 +1,15 @@
 import API from "./axios";
 
 export const makeSalesPos = async (payload) => {
-  const salePayload = Array.isArray(payload?.items)
-    ? payload
-    : {
-        items: [
-          {
-            productId: payload?.id,
-            quantity: payload?.quantity,
-          },
-        ],
-      };
+  console.log(
+    "SALE PAYLOAD:",
+    JSON.stringify(payload, null, 2)
+  );
 
-  const res = await API.post("pos/sale", salePayload);
+  const res = await API.post("pos/sale", payload);
+
+  console.log("SALE RESPONSE:", res.data);
+
   return res.data;
 };
 
