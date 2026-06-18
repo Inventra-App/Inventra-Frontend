@@ -25,6 +25,7 @@ import {
   addInventoryItem,
   getAllProducts,
   getLowStockAlerts,
+  getAllBatches
 } from "../../API/inventoryApi";
 import { useNavigate } from "react-router-dom";
 
@@ -108,9 +109,10 @@ const Inventory = () => {
   const fetchProducts = useCallback(async () => {
   setLoading(true);
   try {
-    const [productsRes, inventoryRes] = await Promise.all([
+    const [productsRes, inventoryRes, batchesRes] = await Promise.all([
       getAllProducts({ _t: Date.now() }),
       getInventoryItems({ _t: Date.now() }),
+      getAllBatches(),
     ]);
 
     const products = Array.isArray(productsRes)
@@ -119,11 +121,16 @@ const Inventory = () => {
     const inventory = Array.isArray(inventoryRes)
       ? inventoryRes
       : inventoryRes?.data || [];
+      const batches = Array.isArray(batchesRes) ? batchesRes : batchesRes?.data || [];
 
     const stored = JSON.parse(localStorage.getItem('stockReceived') || '{}')
 
     const mapped = products.map((prod) => {
       const inv = inventory.find((i) => i.productId === prod._id) || {};
+      const batch = batches.find((b) => b.productId === prod._id) || {};
+
+      console.log("PRODUCT:", prod);
+      console.log("INVENTORY:", inv);
       const total = Number(inv.totalStock) || 0;
       const reorderLevel = Number(prod.reorderLevel) || 10;
       const status =
@@ -135,19 +142,24 @@ const Inventory = () => {
 
       return {
         _id: prod._id,
-        inventoryId: inv._id,
-        id: prod._id,
-        name: prod.productName || "Unnamed Product",
-        category: prod.categoryName || "Uncategorized",
-        batch: prod.SKU || "N/A",
-        availableStock: Number(inv.availableStock) || 0,
-        totalStock: total,
-        reservedStock: Number(inv.reservedStock) || 0,
-        stockReceived: stored[prod._id] || 0, 
-        status: status,
-      };
+         inventoryId: inv._id,
+         id: prod._id,
+         name: prod.productName || "Unnamed Product",
+         category: prod.categoryName || "Uncategorized",
+         batch: prod.SKU || "N/A",
+         batchCode: batch.batchCode || "N/A",
+         expiryDate: batch.expiryDate || null,
+         price: Number(prod.unitPrice || 0),
+         createdAt: prod.createdAt,
+         availableStock: Number(inv.availableStock) || 0,
+         totalStock: total,
+         reservedStock: Number(inv.reservedStock) || 0,
+         stockReceived: stored[prod._id] || 0,
+         status,
+         };
     });
     mapped.reverse();
+    console.log("DEBUG: First product in the list is:", products[0]);
     setProductList(mapped);
   } catch (err) {
     console.error("Error fetching data:", err);
