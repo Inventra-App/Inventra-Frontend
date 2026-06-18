@@ -58,7 +58,6 @@ const normalizeLowStockItem = (item) => {
   }
 }
 
-formatAlertDate(item?.expiryDate ?? item?.expiresAt ?? item?.expires ?? product?.expiryDate);
 
 const normalizeExpiryAlert = (item) => {
   const expiryValue = item?.expiryDate ?? item?.expiresAt ?? item?.expires ?? item?.expirationDate
