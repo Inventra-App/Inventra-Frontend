@@ -48,37 +48,37 @@ const getDaysRemaining = (dateValue) => {
 };
 
 const normalizeLowStockItem = (item) => {
-  const product = item?.product ?? item?.productDetails ?? item;
   return {
-    id: item?._id ?? item?.id ?? product?._id ?? product?.id ?? product?.productId,
-    name: item?.productName ?? product?.productName ?? product?.name ?? "Unknown",
-    category: item?.categoryName ?? product?.categoryName ?? product?.category ?? "-",
-    units: Number(item?.availableStock ?? item?.quantity ?? item?.stock ?? product?.availableStock ?? product?.quantity ?? product?.stock ?? 0),
-    batch: item?.batch ?? item?.batchNumber ?? item?.SKU ?? product?.SKU ?? "Batch no",
-    expiryDate: formatAlertDate(item?.expiryDate ?? item?.expiresAt ?? item?.expires ?? product?.expiryDate),
-  };
-};
+    id: item?._id ?? item?.productId,
+    name: item?.productName ?? 'Unknown',
+    category: item?.categoryName ?? '-',
+    units: Number(item?.totalStock ?? item?.availableStock ?? item?.quantity ?? 0),
+    batch: item?.SKU ?? item?.batchCode ?? 'Batch no',
+    expiryDate: 'No date',
+  }
+}
+
+formatAlertDate(item?.expiryDate ?? item?.expiresAt ?? item?.expires ?? product?.expiryDate);
 
 const normalizeExpiryAlert = (item) => {
-  const product = item?.product ?? item?.productDetails ?? item;
-  const expiryValue = item?.expiryDate ?? item?.expiresAt ?? item?.expires ?? item?.expirationDate ?? product?.expiryDate;
-  const daysRemaining = Number(item?.daysRemaining ?? item?.daysLeftNumber ?? getDaysRemaining(expiryValue));
-  const expiredDays = Math.abs(daysRemaining);
+  const expiryValue = item?.expiryDate ?? item?.expiresAt ?? item?.expires ?? item?.expirationDate
+  const daysRemaining = Number(item?.daysLeft ?? item?.daysRemaining ?? getDaysRemaining(expiryValue))
+  const expiredDays = Math.abs(daysRemaining)
 
   return {
-    id: item?._id ?? item?.id ?? product?._id ?? product?.id ?? `${product?.productName}-${expiryValue}`,
-    name: item?.productName ?? product?.productName ?? product?.name ?? "Unnamed Product",
-    batch: item?.batch ?? item?.batchNumber ?? item?.SKU ?? product?.SKU ?? "N/A",
-    quantity: Number(item?.quantity ?? item?.availableStock ?? product?.quantity ?? product?.availableStock ?? 0),
-    category: item?.categoryName ?? product?.categoryName ?? product?.category ?? "General",
+    id: item?._id ?? item?.productId ?? `${item?.productName}-${expiryValue}`,
+    name: item?.productName ?? 'Unnamed Product',
+    batch: item?.batchCode ?? item?.batch ?? 'N/A',
+    quantity: Number(item?.quantityRemaining ?? item?.inventory?.totalStock ?? 0),
+    category: item?.categoryName ?? 'General',
     expiryDate: formatAlertDate(expiryValue),
     daysRemaining,
     daysLeft: daysRemaining <= 0
-      ? `${expiredDays} day${expiredDays === 1 ? "" : "s"} ago`
-      : `${daysRemaining} day${daysRemaining === 1 ? "" : "s"} left`,
-    status: daysRemaining <= 0 ? "EXPIRED" : "EXPIRING SOON",
-  };
-};
+      ? `${expiredDays} day${expiredDays === 1 ? '' : 's'} ago`
+      : `${daysRemaining} day${daysRemaining === 1 ? '' : 's'} left`,
+    status: daysRemaining <= 0 ? 'EXPIRED' : 'EXPIRING SOON',
+  }
+}
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -90,11 +90,10 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Modal states
   const [showModal, setShowModal] = useState(false);
-  const [modalType, setModalType] = useState(null); // "expired", "expiring", "lowstock"
+  const [modalType, setModalType] = useState(null); 
   const [modalItems, setModalItems] = useState([]);
-  const [modalQueue, setModalQueue] = useState([]); // Queue of modals to show
+  const [modalQueue, setModalQueue] = useState([]);
   const [sessionUser] = useState(() => getSessionUser());
   const [isFirstLogin] = useState(() => isNewSessionUser());
 
@@ -114,7 +113,6 @@ const Dashboard = () => {
 
       const [tsuRes, tpcRes, tsaRes, invRes, expiryRes, lowStockRes] = results;
 
-      // Total Stock Units
       const tsu =
         tsuRes.status === "fulfilled" && tsuRes.value
           ? typeof tsuRes.value === "number"
@@ -126,7 +124,6 @@ const Dashboard = () => {
           : null;
       setTotalStockUnits(tsu);
 
-      // Total Products Count
       const tpc =
         tpcRes.status === "fulfilled" && tpcRes.value
           ? typeof tpcRes.value === "number"
@@ -138,7 +135,6 @@ const Dashboard = () => {
           : null;
       setTotalProducts(tpc);
 
-      // Total Sales Amount
       const tsa =
         tsaRes.status === "fulfilled" && tsaRes.value
           ? typeof tsaRes.value === "number"
@@ -150,7 +146,6 @@ const Dashboard = () => {
           : null;
       setTotalSalesAmount(tsa);
 
-      // Low Stock — use API data or derive from inventory items
       let lowStock = [];
       if (lowStockRes.status === "fulfilled" && lowStockRes.value) {
         const apiLowStock = getArrayPayload(lowStockRes.value);
@@ -160,7 +155,6 @@ const Dashboard = () => {
         }
       }
 
-      // Fallback: derive from inventory items if API doesn't return data
       if (lowStock.length === 0) {
         const items = invRes.status === "fulfilled" ? getArrayPayload(invRes.value) : [];
 
@@ -173,12 +167,10 @@ const Dashboard = () => {
       }
       setLowStockItems(lowStock);
 
-      // Expiry Alerts
       const expiry = expiryRes.status === "fulfilled" ? getArrayPayload(expiryRes.value) : [];
       const normalizedExpiry = expiry.map(normalizeExpiryAlert);
       setExpiryItems(normalizedExpiry);
 
-      // Separate expired and expiring items for modals
       const expiredItems = normalizedExpiry.filter(
         (item) => item.status === "EXPIRED",
       );
@@ -186,7 +178,6 @@ const Dashboard = () => {
         (item) => item.daysRemaining >= 1 && item.daysRemaining <= 7,
       );
 
-      // Create modal queue
       const queue = [];
       if (expiredItems.length > 0) {
         queue.push({
@@ -209,7 +200,6 @@ const Dashboard = () => {
 
       setModalQueue(queue);
 
-      // Show first modal in queue
       if (queue.length > 0) {
         const firstModal = queue[0];
         setModalType(firstModal.type);
@@ -234,10 +224,9 @@ const Dashboard = () => {
     markReturningSessionUser();
   }, [isFirstLogin]);
 
-  // Modal handlers
   const handleDismissModal = () => {
     setShowModal(false);
-    // Show next modal in queue after a short delay
+
     setTimeout(() => {
       const currentIndex = modalQueue.findIndex((m) => m.type === modalType);
       if (currentIndex !== -1 && currentIndex + 1 < modalQueue.length) {

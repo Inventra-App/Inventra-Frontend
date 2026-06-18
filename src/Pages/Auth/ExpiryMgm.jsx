@@ -31,24 +31,24 @@ const formatDate = (dateValue) => {
 }
 
 const normalizeExpiryItem = (item) => {
-  const product = item?.product ?? item?.productDetails ?? item
-  const expiryValue = item?.expiryDate ?? item?.expiresAt ?? item?.expires ?? item?.expirationDate ?? product?.expiryDate
-  const days = Number(item?.daysRemaining ?? item?.daysLeftNumber ?? getDaysRemaining(expiryValue))
+  const days = Number(item?.daysLeft ?? getDaysRemaining(item?.expiryDate))
   const expiredDays = Math.abs(days)
 
   return {
-    id: item?._id ?? item?.id ?? product?._id ?? product?.id ?? `${product?.productName}-${expiryValue}`,
-    name: item?.productName ?? product?.productName ?? product?.name ?? 'Unnamed Product',
-    productId: item?.productId ?? product?.productId ?? product?._id ?? 'N/A',
-    category: item?.categoryName ?? product?.categoryName ?? product?.category ?? 'Uncategorized',
-    price: Number(item?.unitPrice ?? item?.price ?? product?.unitPrice ?? product?.price ?? 0),
-    batch: item?.batch ?? item?.batchNumber ?? item?.SKU ?? product?.SKU ?? 'N/A',
-    quantity: Number(item?.quantity ?? item?.availableStock ?? product?.quantity ?? product?.availableStock ?? 0),
-    expires: formatDate(expiryValue),
+    id: item?._id ?? item?.productId ?? `${item?.productName}-${item?.expiryDate}`,
+    name: item?.productName ?? 'Unnamed Product',
+    productId: item?.productId ?? 'N/A',
+    category: item?.categoryName ?? 'General',
+    price: Number(item?.unitPrice ?? item?.inventory?.unitPrice ?? 0),
+    batch: item?.batchCode ?? 'N/A',
+    quantity: Number(item?.quantityRemaining ?? item?.inventory?.totalStock ?? 0),
+    expires: formatDate(item?.expiryDate),
     daysNumber: days,
     status: days <= 0 ? 'EXPIRED' : 'EXPIRING SOON',
     daysLeft: days <= 0 ? '0d left' : `${days} day${days === 1 ? '' : 's'} left`,
-    expiredAgo: days <= 0 ? `Expired ${expiredDays} day${expiredDays === 1 ? '' : 's'} ago` : `${days} day${days === 1 ? '' : 's'} remaining`,
+    expiredAgo: days <= 0
+      ? `Expired ${expiredDays} day${expiredDays === 1 ? '' : 's'} ago`
+      : `${days} day${days === 1 ? '' : 's'} remaining`,
   }
 }
 
