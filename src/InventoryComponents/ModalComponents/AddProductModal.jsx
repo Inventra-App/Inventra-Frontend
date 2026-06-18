@@ -82,7 +82,7 @@ const AddProductModal = ({ isOpen, onClose, onAddProduct }) => {
 onAddProduct({
   id: response?.data?.productDetails?.productId || response?.productDetails?.productId || Date.now(),
   name: formData.productName,
-  batch: generatedBatch,
+  batch: response?.data?.productDetails?.SKU,
   category: selectedCategory?.categoryName || formData.categoryId,
   availableStock: 0,
   stockReceived: 0,
