@@ -3,6 +3,30 @@ import { Package, Pencil, X } from 'lucide-react'
 import '../Css/ProductDetailsModal.css'
 
 const ProductDetailsModal = ({ product, onClose, onManage }) => {
+   const [batchData, setBatchData] = useState(null)
+  const [loadingBatch, setLoadingBatch] = useState(true)
+
+  useEffect(() => {
+    const fetchBatchInfo = async () => {
+      if (product?.inventoryId) {
+        setLoadingBatch(true)
+        try {
+          const res = await getBatche(product.inventoryId)
+          const batches = Array.isArray(res?.data) ? res.data : res?.data ? [res.data] : []
+          setBatchData(batches[0] || null)
+        } catch (err) {
+          console.error("Error fetching batch:", err)
+          setBatchData(null)
+        } finally {
+          setLoadingBatch(false)
+        }
+      } else {
+        setLoadingBatch(false)
+      }
+    }
+    fetchBatchInfo()
+  }, [product])
+
   if (!product) return null
 
   return (
@@ -77,22 +101,27 @@ const ProductDetailsModal = ({ product, onClose, onManage }) => {
         </div>
 
         <div className="inv-modal-section">
-          <h5>Batch Information</h5>
-          <div className="inv-modal-batch-info">
-            <p className="inv-modal-batch-id">
-              {product.batchCode || "N/A"}
-              </p>
-            <p className="inv-modal-batch-meta">
-              Quantity: {product.availableStock} • Expires: {product.expiryDate 
-              ? new Date(product.expiryDate).toLocaleDateString("en-GB", {
-               day: "2-digit",
-               month: "short",
-               year: "numeric"
-              }) 
-              : "N/A"}
-            </p>
-          </div>
-        </div>
+           <h5>Batch Information</h5>
+             {loadingBatch ? (
+             <p className="inv-modal-empty">Loading batch info...</p>
+               ) : batchData ? (
+                 <div className="inv-modal-batch-info">
+                  <p className="inv-modal-batch-id">{batchData.batchCode || "N/A"}</p>
+                    <p className="inv-modal-batch-meta">
+                      Quantity: {batchData.quantityRemaining} • Supplier: {batchData.supplier} • Expires:{" "}
+                      {batchData.expiryDate
+                        ? new Date(batchData.expiryDate).toLocaleDateString("en-GB", {
+                            day: "2-digit",
+                           month: "short",
+                           year: "numeric",
+                          })
+                       : "N/A"}
+                      </p>
+                  </div>
+                  ) : (
+                  <p className="inv-modal-empty">No batch information available</p>
+                 )}
+             </div>
 
         <div className="inv-modal-section">
           <h5>Stock Movement History</h5>
