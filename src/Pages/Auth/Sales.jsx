@@ -15,13 +15,18 @@ import {
   X,
 } from "lucide-react";
 import { getAllProducts, getInventoryItems } from "../../API/inventoryApi";
-import { countSalesPos, makeSalesPos, getTotalSalesAmountPos } from "../../API/salesPosApi";
+import {
+  countSalesPos,
+  makeSalesPos,
+  getTotalSalesAmountPos,
+} from "../../API/salesPosApi";
 import "./Css/Sales.css";
 import calendar from "../../assets/calendar.png";
 import Container1 from "../../assets/Container (6).png";
 import Container2 from "../../assets/Container (7).png";
 import Container3 from "../../assets/Container (8).png";
 import Container4 from "../../assets/Button.png";
+import SalesHistory from './SalesHistory'
 
 const getArrayPayload = (payload) => {
   if (Array.isArray(payload)) return payload;
@@ -79,79 +84,81 @@ const Sales = () => {
   const [revenueToday, setRevenueToday] = useState(0);
 
   const loadSales = async () => {
-  try {
-    const [salesResponse, revenueResponse] = await Promise.all([
-      countSalesPos(),
-      getTotalSalesAmountPos(),
-    ]);
+    try {
+      const [salesResponse, revenueResponse] = await Promise.all([
+        countSalesPos(),
+        getTotalSalesAmountPos(),
+      ]);
 
-    console.log("SALES COUNT:", salesResponse);
-    console.log("SALES AMOUNT:", revenueResponse);
+      console.log("SALES COUNT:", salesResponse);
+      console.log("SALES AMOUNT:", revenueResponse);
 
-    setSalesToday(Number(
-      salesResponse?.data?.pagination?.totalSales ??
-      salesResponse?.pagination?.totalSales ??
-      0
-    ));
+      setSalesToday(
+        Number(
+          salesResponse?.data?.pagination?.totalSales ??
+            salesResponse?.pagination?.totalSales ??
+            0,
+        ),
+      );
 
-    setRevenueToday(Number(revenueResponse?.data ?? 0));
-  } catch (error) {
-    console.error("Sales stats fetch error:", error);
-    setSalesToday(0);
-    setRevenueToday(0);
-  }
-};
-  
-    const loadProducts = async () => {
+      setRevenueToday(Number(revenueResponse?.data ?? 0));
+    } catch (error) {
+      console.error("Sales stats fetch error:", error);
+      setSalesToday(0);
+      setRevenueToday(0);
+    }
+  };
+
+  const loadProducts = async () => {
     setLoadingProducts(true);
 
-   try {
-    const [productsRes, inventoryRes] = await Promise.all([
-      getAllProducts({ _t: Date.now() }),
-      getInventoryItems({ _t: Date.now() }),
-    ]);
+    try {
+      const [productsRes, inventoryRes] = await Promise.all([
+        getAllProducts({ _t: Date.now() }),
+        getInventoryItems({ _t: Date.now() }),
+      ]);
 
-    const productsData = getArrayPayload(productsRes);
-    const inventoryData = getArrayPayload(inventoryRes);
+      const productsData = getArrayPayload(productsRes);
+      const inventoryData = getArrayPayload(inventoryRes);
 
-    const mappedProducts = productsData
-      .map((product) => {
-        const inventory =
-           inventoryData.find((item) => {
-           const productId =
-           typeof item.productId === "object"
-           ? item.productId?._id
-           : item.productId;
+      const mappedProducts = productsData
+        .map((product) => {
+          const inventory =
+            inventoryData.find((item) => {
+              const productId =
+                typeof item.productId === "object"
+                  ? item.productId?._id
+                  : item.productId;
 
-          return productId === product._id;
-          }) || {};
+              return productId === product._id;
+            }) || {};
 
-        return {
-          id: asText(product._id ?? product.id ?? product.productId),
-          name: asText(product.productName || product.name, "Unnamed Product"),
-          price: Number(
-            product.price ||
-            product.sellingPrice ||
-            product.unitPrice ||
-            0
-          ),
-          stock: Number(inventory.availableStock || 0),
-          category: getProductCategoryText(product),
-        };
-      })
-      .reverse();
+          return {
+            id: asText(product._id ?? product.id ?? product.productId),
+            name: asText(
+              product.productName || product.name,
+              "Unnamed Product",
+            ),
+            price: Number(
+              product.price || product.sellingPrice || product.unitPrice || 0,
+            ),
+            stock: Number(inventory.availableStock || 0),
+            category: getProductCategoryText(product),
+          };
+        })
+        .reverse();
 
-    console.log("POS PRODUCTS:", mappedProducts);
+      console.log("POS PRODUCTS:", mappedProducts);
 
-    setProducts(mappedProducts);
-     } catch (error) {
-    console.error("POS products fetch error:", error);
-    setProducts([]);
-     } finally {
-    setLoadingProducts(false);
+      setProducts(mappedProducts);
+    } catch (error) {
+      console.error("POS products fetch error:", error);
+      setProducts([]);
+    } finally {
+      setLoadingProducts(false);
     }
-   };
-   useEffect(() => {
+  };
+  useEffect(() => {
     const timerId = window.setTimeout(() => {
       loadProducts();
       loadSales();
@@ -271,57 +278,51 @@ const Sales = () => {
   };
 
   const proceedSale = async () => {
-  if (cartItems.length === 0 || isSubmitting) return;
+    if (cartItems.length === 0 || isSubmitting) return;
 
-  setIsSubmitting(true);
-  setSalesError("");
+    setIsSubmitting(true);
+    setSalesError("");
 
-  const payload = {
-    paymentMethod: "cash",
-    items: cartItems.map((item) => ({
-      productId: item.id,
-      name: item.name,
-      productName: item.name,
-      quantity: Number(item.quantity),
-    })),
+    const payload = {
+      paymentMethod: "cash",
+      items: cartItems.map((item) => ({
+        productId: item.id,
+        name: item.name,
+        productName: item.name,
+        quantity: Number(item.quantity),
+      })),
+    };
+
+    console.log("SALE PAYLOAD:", JSON.stringify(payload, null, 2));
+
+    try {
+      const response = await makeSalesPos(payload);
+
+      console.log("SALE RESPONSE:", response);
+
+      setShowOrderModal(false);
+      setCartItems([]);
+      setShowSaleSuccess(true);
+
+      await loadSales();
+      await loadProducts();
+
+      setTimeout(() => {
+        setShowSaleSuccess(false);
+      }, 2500);
+    } catch (error) {
+      console.error("Complete sale error:", error);
+
+      console.log("FAILED PAYLOAD:", JSON.stringify(payload, null, 2));
+
+      setSalesError(
+        error?.response?.data?.message ||
+          "Failed to complete sale. Please try again.",
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
-
-  console.log(
-    "SALE PAYLOAD:",
-    JSON.stringify(payload, null, 2)
-  );
-
-  try {
-    const response = await makeSalesPos(payload);
-
-    console.log("SALE RESPONSE:", response);
-
-    setShowOrderModal(false);
-    setCartItems([]);
-    setShowSaleSuccess(true);
-
-    await loadSales();
-    await loadProducts();
-
-    setTimeout(() => {
-      setShowSaleSuccess(false);
-    }, 2500);
-  } catch (error) {
-    console.error("Complete sale error:", error);
-
-    console.log(
-      "FAILED PAYLOAD:",
-      JSON.stringify(payload, null, 2)
-    );
-
-    setSalesError(
-      error?.response?.data?.message ||
-      "Failed to complete sale. Please try again."
-    );
-  } finally {
-    setIsSubmitting(false);
-  }
-};
 
   return (
     <div className="sales-page">
@@ -376,36 +377,7 @@ const Sales = () => {
       </section>
 
       {showOrderHistory ? (
-        <section className="sales-panel sales-history-panel">
-          <h3>Sales History</h3>
-
-          <div className="sales-history-list">
-            {historyItems.length === 0 ? (
-              <p className="sales-empty-cart">No sales history to display</p>
-            ) : (
-              historyItems.map((item) => (
-                <button
-                  className="sales-history-item"
-                  type="button"
-                  key={item.id}
-                  onClick={() => setSelectedHistory(item)}
-                >
-                  <strong>{item.name}</strong>
-                  <span>
-                    Qty: {item.qty} x {formatNaira(item.price)} ={" "}
-                    {formatNaira(item.total)}
-                  </span>
-                  <small>
-                    <User size={13} />
-                    {item.user}
-                    <Calendar size={13} />
-                    {item.date}
-                  </small>
-                </button>
-              ))
-            )}
-          </div>
-        </section>
+        <SalesHistory />
       ) : (
         <section className="sales-workspace">
           <div className="sales-left-column">
