@@ -12,64 +12,74 @@ const ManageStockModal = ({ inventoryId, product, onClose, onUpdate }) => {
   const [quantity, setQuantity] = useState('')
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState(false)
+  const [error, setError] = useState(null)
 
 const handleSubmit = async (e) => {
   e.preventDefault();
   
   if (!inventoryId) {
-    alert("Error: Inventory record ID is missing.");
+    setError("Inventory record ID is missing.");
     return;
   }
 
   setLoading(true);
+  setError(null);
 
- const payload = {
-  actionType,
-  moveFrom,
-  moveTo,
-  quantity: parseInt(quantity)
-};
+  const payload = {
+    actionType,
+    moveFrom,
+    moveTo,
+    quantity: parseInt(quantity)
+  };
 
   try {
-    console.log("inventoryId:", inventoryId);
-    console.log("payload:", payload);
-    await moveInventoryStock(inventoryId, payload); 
-    onUpdate(); 
+    await moveInventoryStock(inventoryId, payload);
     setSuccess(true);
-    onClose();
+    onUpdate();
+    setTimeout(() => {
+      setSuccess(false);
+      onClose();
+    }, 3500)
   } catch (err) {
     console.error("Move stock error:", err);
-    alert("Failed to move stock.");
+    setError(err?.response?.data?.message || "Failed to move stock. Please try again.");
   } finally {
     setLoading(false);
   }
 }
 
   if (success) {
-    return (
-      <div className="manage-overlay" onClick={onClose}>
-        <div className="manage-success-modal" onClick={(e) => e.stopPropagation()}>
-          <div className="manage-success">
-            <div className="manage-success-icon">
-              <CheckCircle size={36} color="#00A63E" strokeWidth={1.5} />
+  return (
+    <div className="manage-overlay" onClick={onClose}>
+      <div className="manage-success-modal" onClick={(e) => e.stopPropagation()}>
+        <div className="manage-success">
+          <div className="manage-success-icon">
+            <CheckCircle size={36} color="#00A63E" strokeWidth={1.5} />
+          </div>
+          <h3 className="manage-success-title">Stock Moved!</h3>
+          <div className="manage-success-details">
+            <div className="manage-success-row">
+              <span className="manage-success-label">Product</span>
+              <span className="manage-success-value">{product.name}</span>
             </div>
-            <h3 className="manage-success-title">Success!</h3>
-            <div className="manage-success-details">
-              <div className="manage-success-row">
-                <span className="manage-success-label">Product</span>
-                <span className="manage-success-value">{product.name}</span>
-              </div>
-              <div className="manage-success-row">
-                <span className="manage-success-label">Updated Total</span>
-                <span className="manage-success-value manage-green">{product.totalStock}</span>
-              </div>
+            <div className="manage-success-row">
+              <span className="manage-success-label">Moved</span>
+              <span className="manage-success-value">{quantity} units</span>
             </div>
-            <button className="manage-back-btn" onClick={onClose}>Back to Inventory</button>
+            <div className="manage-success-row">
+              <span className="manage-success-label">From</span>
+              <span className="manage-success-value">{moveFrom}</span>
+            </div>
+            <div className="manage-success-row">
+              <span className="manage-success-label">To</span>
+              <span className="manage-success-value">{moveTo}</span>
+            </div>
           </div>
         </div>
       </div>
-    )
-  }
+    </div>
+  )
+}
 
   return (
     <div className="manage-overlay" onClick={onClose}>
@@ -134,6 +144,21 @@ const handleSubmit = async (e) => {
             <label>Quantity</label>
             <input type="number" required min="1" value={quantity} onChange={(e) => setQuantity(e.target.value)} />
           </div>
+
+          {error && (
+        <div style={{
+           color: '#DC2626',
+           backgroundColor: '#FEF2F2',
+           border: '1.5px solid #FECACA',
+           borderRadius: '8px',
+           padding: '10px 14px',
+           fontSize: '14px',
+           fontWeight: '500',
+           marginBottom: '12px'
+            }}>
+          ⚠ {error}
+        </div>
+         )}
 
           <div className="manage-actions">
             <button type="button" className="manage-cancel-btn" onClick={onClose}>Cancel</button>
