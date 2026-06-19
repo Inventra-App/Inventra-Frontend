@@ -14,7 +14,7 @@ import {
   User,
   X,
 } from "lucide-react";
-import { getAllProducts, getInventoryItems, getTotalSalesAmount,  } from "../../API/inventoryApi";
+import { getAllProducts, getInventoryItems } from "../../API/inventoryApi";
 import { countSalesPos, makeSalesPos, getTotalSalesAmountPos } from "../../API/salesPosApi";
 import "./Css/Sales.css";
 import calendar from "../../assets/calendar.png";
@@ -33,6 +33,31 @@ const getArrayPayload = (payload) => {
   if (Array.isArray(payload?.items)) return payload.items;
   return [];
 };
+
+const asText = (value, fallback = "") => {
+  if (value === undefined || value === null) return fallback;
+  if (typeof value === "object") {
+    return String(
+      value.productName ??
+        value.categoryName ??
+        value.name ??
+        value.title ??
+        value._id ??
+        value.id ??
+        fallback,
+    );
+  }
+  return String(value);
+};
+
+const getProductCategoryText = (product) =>
+  asText(
+    product?.categoryName ??
+      product?.category?.categoryName ??
+      product?.category?.name ??
+      product?.category,
+    "Uncategorized",
+  );
 
 const Sales = () => {
   const [selectedProduct, setSelectedProduct] = useState("");
@@ -102,8 +127,8 @@ const Sales = () => {
           }) || {};
 
         return {
-          id: product._id,
-          name: product.productName || "Unnamed Product",
+          id: asText(product._id ?? product.id ?? product.productId),
+          name: asText(product.productName || product.name, "Unnamed Product"),
           price: Number(
             product.price ||
             product.sellingPrice ||
@@ -111,7 +136,7 @@ const Sales = () => {
             0
           ),
           stock: Number(inventory.availableStock || 0),
-          category: product.categoryName || "Uncategorized",
+          category: getProductCategoryText(product),
         };
       })
       .reverse();
@@ -255,6 +280,8 @@ const Sales = () => {
     paymentMethod: "cash",
     items: cartItems.map((item) => ({
       productId: item.id,
+      name: item.name,
+      productName: item.name,
       quantity: Number(item.quantity),
     })),
   };

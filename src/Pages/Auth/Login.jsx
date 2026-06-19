@@ -19,6 +19,38 @@ import { loginStaff } from "../../API/userManagementAPI";
 import { contWithGoogle } from "../../API/googleAuthApi";
 import { getAccountPath, saveSessionUser } from "../../Utils/sessionUser";
 
+const getAuthToken = (response) =>
+  response?.token ||
+  response?.accessToken ||
+  response?.data?.token ||
+  response?.data?.accessToken ||
+  response?.staff?.token ||
+  response?.user?.token ||
+  "";
+
+const getResponseRole = (response, fallbackRole) =>
+  response?.staff?.role ||
+  response?.user?.role ||
+  response?.data?.staff?.role ||
+  response?.data?.user?.role ||
+  response?.data?.role ||
+  response?.role ||
+  fallbackRole;
+
+const loginWithAdminOrStaff = async (payload) => {
+  try {
+    const response = await loginAdmin(payload);
+    return { response, role: getResponseRole(response, "Admin") };
+  } catch (adminError) {
+    try {
+      const response = await loginStaff(payload);
+      return { response, role: getResponseRole(response, "Staff") };
+    } catch (staffError) {
+      throw staffError?.response ? staffError : adminError;
+    }
+  }
+};
+
 const Login = () => {
   const nav = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
@@ -91,19 +123,12 @@ const Login = () => {
       };
 
       console.log("=== LOGIN REQUEST ===", { email: payload.email });
-      let res;
-      let loginRole = "Admin";
-
-      try {
-        res = await loginAdmin(payload);
-      } catch {
-        res = await loginStaff(payload);
-        loginRole = res?.staff?.role || res?.user?.role || res?.data?.role || res?.role || "Staff";
-      }
+      const { response: res, role: loginRole } = await loginWithAdminOrStaff(payload);
       console.log("=== LOGIN SUCCESS ===", res);
 
-      if (res.token) {
-        localStorage.setItem("inventra_token", res.token);
+      const token = getAuthToken(res);
+      if (token) {
+        localStorage.setItem("inventra_token", token);
       }
       const sessionUser = saveSessionUser(res, { email: payload.email, role: loginRole });
 

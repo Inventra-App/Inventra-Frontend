@@ -4,19 +4,59 @@ import { useNavigate } from 'react-router-dom'
 import AddCategoryModal from '../../CategoryComponents/catComponents/AddCategoryModal'
 import DeleteCategory from '../../CategoryComponents/catComponents/DeleteCategory'
 import ViewCategory from '../../CategoryComponents/catComponents/ViewCategory'
-import { getAllCategories, addCategory, deleteCategory } from '../../API/inventoryApi'
+import { getAllCategories, getAllProducts, addCategory, deleteCategory } from '../../API/inventoryApi'
 import './Css/CategoriesList.css'
+
+const getArrayPayload = (payload) => {
+  if (Array.isArray(payload)) return payload
+  if (Array.isArray(payload?.data)) return payload.data
+  if (Array.isArray(payload?.products)) return payload.products
+  if (Array.isArray(payload?.items)) return payload.items
+  return []
+}
+
+const getCategoryId = (category) => String(category?._id ?? category?.id ?? category?.categoryId ?? '')
+const getCategoryName = (category) => String(category?.categoryName ?? category?.name ?? '')
+
+const getProductCategoryId = (product) => {
+  const category = product?.category ?? product?.categoryId ?? product?.categoryName
+  if (typeof category === 'object' && category !== null) {
+    return String(category._id ?? category.id ?? category.categoryId ?? '')
+  }
+  return String(product?.categoryId ?? '')
+}
+
+const getProductCategoryName = (product) => {
+  const category = product?.category ?? product?.categoryName ?? product?.categoryId
+  if (typeof category === 'object' && category !== null) {
+    return String(category.categoryName ?? category.name ?? '')
+  }
+  return String(product?.categoryName ?? product?.category ?? '')
+}
+
+const productBelongsToCategory = (product, category) => {
+  const categoryId = getCategoryId(category)
+  const categoryName = getCategoryName(category).toLowerCase()
+  const productCategoryId = getProductCategoryId(product)
+  const productCategoryName = getProductCategoryName(product).toLowerCase()
+
+  return (
+    (categoryId && productCategoryId && categoryId === productCategoryId) ||
+    (categoryName && productCategoryName && categoryName === productCategoryName)
+  )
+}
 
 const CategoriesList = () => {
   const navigate = useNavigate()
   const [categories, setCategories] = useState([])
   const [search, setSearch] = useState('')
   const [currentPage, setCurrentPage] = useState(1)
-  const [itemsPerPage, setItemsPerPage] = useState(7)
+  const [itemsPerPage] = useState(7)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [isDeleteOpen, setIsDeleteOpen] = useState(false)
   const [selectedCategory, setSelectedCategory] = useState(null)
   const [activeViewCategory, setActiveViewCategory] = useState(null)
+  const [products, setProducts] = useState([])
   const [notification, setNotification] = useState(null);
 
   const showNotification = (message) => {
@@ -27,9 +67,22 @@ const CategoriesList = () => {
     useEffect(() => {
     const fetchCategories = async () => {
     try {
-      const res = await getAllCategories();
-      const categoriesData = res.data || res; 
-      setCategories(Array.isArray(categoriesData) ? categoriesData : []);
+      const [categoriesRes, productsRes] = await Promise.all([
+        getAllCategories(),
+        getAllProducts(),
+      ]);
+      const categoriesData = getArrayPayload(categoriesRes);
+      const productsData = getArrayPayload(productsRes);
+
+      setProducts(productsData);
+      setCategories(categoriesData.map((category) => {
+        const categoryProducts = productsData.filter((product) => productBelongsToCategory(product, category))
+        return {
+          ...category,
+          totalProducts: category.totalProducts ?? categoryProducts.length,
+          products: categoryProducts,
+        }
+      }));
     } catch (error) {
       console.error("Error fetching categories:", error);
     }
@@ -41,6 +94,7 @@ const CategoriesList = () => {
     return (
       <ViewCategory 
         category={activeViewCategory} 
+        products={products.filter((product) => productBelongsToCategory(product, activeViewCategory))}
         onBack={() => setActiveViewCategory(null)} 
       />
     )
@@ -58,11 +112,6 @@ const CategoriesList = () => {
 
   const handlePageChange = (pageNumber) => {
     if (pageNumber >= 1 && pageNumber <= totalPages) setCurrentPage(pageNumber)
-  }
-
-  const handleItemsPerPageChange = (e) => {
-    setItemsPerPage(parseInt(e.target.value))
-    setCurrentPage(1)
   }
 
   const handleSaveCategory = async (newCat) => {

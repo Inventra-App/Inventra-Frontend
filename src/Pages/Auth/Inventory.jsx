@@ -278,6 +278,8 @@ useEffect(() => {
       );
     }
 
+    console.log("SELECTED PRODUCT STATE:", selectedProduct);
+
     return (
       <>
         <table className="inventory-table">

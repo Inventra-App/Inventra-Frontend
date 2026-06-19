@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { Package, Pencil, X } from 'lucide-react'
 import '../Css/ProductDetailsModal.css'
+import { getBatchesByInventoryId } from '../API/inventoryApi'
 
 const ProductDetailsModal = ({ product, onClose, onManage }) => {
    const [batchData, setBatchData] = useState(null)
@@ -11,7 +12,9 @@ const ProductDetailsModal = ({ product, onClose, onManage }) => {
       if (product?.inventoryId) {
         setLoadingBatch(true)
         try {
-          const res = await getBatche(product.inventoryId)
+          console.log("PRODUCT:", product);
+          console.log("INVENTORY ID:", product?.inventoryId);
+          const res = await getBatchesByInventoryId(product.inventoryId)
           const batches = Array.isArray(res?.data) ? res.data : res?.data ? [res.data] : []
           setBatchData(batches[0] || null)
         } catch (err) {
@@ -25,6 +28,7 @@ const ProductDetailsModal = ({ product, onClose, onManage }) => {
       }
     }
     fetchBatchInfo()
+    console.log("PRODUCT IN MODAL:", product);
   }, [product])
 
   if (!product) return null
