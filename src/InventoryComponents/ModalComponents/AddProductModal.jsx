@@ -226,6 +226,7 @@ const AddProductModal = ({ isOpen, onClose, onAddProduct }) => {
               onChange={handleChange}
               required
               disabled={isSubmitting}
+              min={new Date(Date.now() + 86400000).toISOString().split('T')[0]}
             />
           </div>
 

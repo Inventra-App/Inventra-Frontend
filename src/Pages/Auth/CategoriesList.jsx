@@ -24,12 +24,10 @@ const CategoriesList = () => {
     setTimeout(() => setNotification(null), 3000);
   };
 
-   // In CategoriesList.jsx
     useEffect(() => {
     const fetchCategories = async () => {
     try {
       const res = await getAllCategories();
-      // The API returns { data: [...] } based on your screenshots
       const categoriesData = res.data || res; 
       setCategories(Array.isArray(categoriesData) ? categoriesData : []);
     } catch (error) {
@@ -89,17 +87,23 @@ const CategoriesList = () => {
   }
 
   const handleConfirmDelete = async () => {
-    if (!selectedCategory) return
-    try {
-      await deleteCategory(selectedCategory._id);
-      setCategories(categories.filter(cat => cat._id !== selectedCategory._id));
-      setIsDeleteOpen(false);
-      setSelectedCategory(null);
-      showNotification("Category deleted successfully!");
-    } catch (error) {
-      console.error("Error deleting category:", error);
-    }
+  if (!selectedCategory) return
+  console.log("Deleting category ID:", selectedCategory._id)
+  try {
+    await deleteCategory(selectedCategory._id);
+    setCategories(categories.filter(cat => cat._id !== selectedCategory._id));
+    setIsDeleteOpen(false);
+    setSelectedCategory(null);
+    showNotification("Category deleted successfully!");
+  } catch (error) {
+    console.error("Error deleting category:", error);
+    setIsDeleteOpen(false);
+    showNotification(
+      error?.response?.data?.message || "Failed to delete category. Please try again.",
+      "error"
+    );
   }
+}
 
   return (
     <div className="cat-page">
