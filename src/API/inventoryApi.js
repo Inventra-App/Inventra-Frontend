@@ -96,3 +96,12 @@ export const getBatchesByInventoryId = async (inventoryId) => {
   return res.data;
 };
 
+export const getActivityLogs = async () => {
+  const res = await API.get('activity-logs');
+  return res.data;
+};
+
+export const getActivityLogDescriptions = async () => {
+  const res = await API.get('activity-logs/descriptions');
+  return res.data;
+};
