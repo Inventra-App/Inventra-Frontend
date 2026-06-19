@@ -3,7 +3,7 @@ import { Trash2 } from 'lucide-react'
 import '../../CategoryComponents/catStyle/DeleteCategory.css'
 
 const DeleteCategory = ({ isOpen, onClose, onConfirm, categoryName }) => {
-  const [isDeleting, setIsDeleting] = useState(false); // New state
+  const [isDeleting, setIsDeleting] = useState(false);
 
   if (!isOpen) return null
 
@@ -14,7 +14,7 @@ const DeleteCategory = ({ isOpen, onClose, onConfirm, categoryName }) => {
   const handleDelete = async () => {
     setIsDeleting(true);
     try {
-      await onConfirm(); // Await the API call
+      await onConfirm(); 
     } catch (error) {
       console.error("Failed to delete", error);
     } finally {

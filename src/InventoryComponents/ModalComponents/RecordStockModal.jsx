@@ -18,6 +18,20 @@ const RecordStockModal = ({ onClose, visible, onAddProduct }) => {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
   const [success, setSuccess] = useState(false)
+  const [selectedProductData, setSelectedProductData] = useState(null)
+
+useEffect(() => {
+  if (productId) {
+    const selected = products.find((p) => p._id === productId)
+    setSelectedProductData(selected || null)
+    if (selected?.packageType) {
+      setPackageType(selected.packageType)
+    }
+  } else {
+    setSelectedProductData(null)
+    setPackageType('')
+  }
+}, [productId, products])
 
   useEffect(() => {
     if (visible) {
@@ -162,7 +176,8 @@ const RecordStockModal = ({ onClose, visible, onAddProduct }) => {
                   placeholder="e.g. Carton, Box, Bottle"
                   required
                   value={packageType}
-                  onChange={(e) => setPackageType(e.target.value)}
+                  readOnly
+                  style={{ backgroundColor: '#f0f0f0', cursor: 'not-allowed' }}
                 />
               </div>
               <div className="record-field">
@@ -208,10 +223,14 @@ const RecordStockModal = ({ onClose, visible, onAddProduct }) => {
                   type="date"
                   required
                   value={deliveryDate}
+                  min={new Date().toISOString().split('T')[0]}
                   max={expiryDate || undefined}
                   onChange={(e) => {
                     setDeliveryDate(e.target.value)
                     setError(null)
+                    if (expiryDate && expiryDate <= e.target.value) {
+                      setExpiryDate('')
+                    }
                   }}
                 />
               </div>
@@ -221,7 +240,11 @@ const RecordStockModal = ({ onClose, visible, onAddProduct }) => {
                   type="date"
                   required
                   value={expiryDate}
-                  min={deliveryDate ? new Date(new Date(deliveryDate).getTime() + 86400000).toISOString().split('T')[0] : undefined}
+                  min={
+                    deliveryDate
+                    ? new Date(new Date(deliveryDate).getTime() + 86400000).toISOString().split('T')[0]
+                    : new Date(Date.now() + 86400000).toISOString().split('T')[0]
+                  }
                   onChange={(e) => {
                     setExpiryDate(e.target.value)
                     setError(null)
