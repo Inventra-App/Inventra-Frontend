@@ -22,3 +22,14 @@ export const getTotalSalesAmountPos = async () => {
   const res = await API.get("sale/amount");
   return res.data;
 };
+
+export const getSalesHistory = async (
+  page = 1,
+  limit = 10
+) => {
+  const res = await API.get(
+    `sales?page=${page}&limit=${limit}`
+  );
+
+  return res.data;
+};

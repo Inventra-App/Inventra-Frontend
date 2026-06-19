@@ -28,6 +28,8 @@ import Container3 from "../../assets/Container (8).png";
 import Container4 from "../../assets/Button.png";
 import SalesHistory from './SalesHistory'
 
+const NO_STOCK_MESSAGE = "No stock available";
+
 const getArrayPayload = (payload) => {
   if (Array.isArray(payload)) return payload;
   if (Array.isArray(payload?.data)) return payload.data;
@@ -76,7 +78,6 @@ const Sales = () => {
   const [showOrderHistory, setShowOrderHistory] = useState(false);
   const [selectedHistory, setSelectedHistory] = useState(null);
   const [products, setProducts] = useState([]);
-  const [historyItems] = useState([]);
   const [loadingProducts, setLoadingProducts] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [salesError, setSalesError] = useState("");
@@ -206,11 +207,24 @@ const Sales = () => {
   };
 
   const increaseQuantity = (productId) => {
-    setCartItems((currentItems) =>
-      currentItems.map((item) =>
+    setCartItems((currentItems) => {
+      const product = currentItems.find((item) => item.id === productId);
+
+      if (product && product.quantity >= product.stock) {
+        setSalesError(
+          product.stock <= 0
+            ? NO_STOCK_MESSAGE
+            : `Only ${product.stock} in stock`,
+        );
+        return currentItems;
+      }
+
+      setSalesError("");
+
+      return currentItems.map((item) =>
         item.id === productId ? { ...item, quantity: item.quantity + 1 } : item,
-      ),
-    );
+      );
+    });
   };
 
   const reduceQuantity = (productId) => {
@@ -226,12 +240,22 @@ const Sales = () => {
   const addToCart = () => {
     if (!selectedProductRecord) return;
 
+    if (selectedProductRecord.stock <= 0) {
+      setSalesError(NO_STOCK_MESSAGE);
+      return;
+    }
+
     setCartItems((currentItems) => {
-      const itemAlreadyExists = currentItems.some(
+      const itemAlreadyExists = currentItems.find(
         (item) => item.id === selectedProductRecord.id,
       );
 
       if (itemAlreadyExists) {
+        if (itemAlreadyExists.quantity >= selectedProductRecord.stock) {
+          setSalesError(`Only ${selectedProductRecord.stock} in stock`);
+          return currentItems;
+        }
+
         return currentItems.map((item) =>
           item.id === selectedProductRecord.id
             ? { ...item, quantity: item.quantity + 1 }
