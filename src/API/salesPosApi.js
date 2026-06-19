@@ -17,3 +17,8 @@ export const countSalesPos = async () => {
   const res = await API.get("sales");
   return res.data;
 };
+
+export const getTotalSalesAmountPos = async () => {
+  const res = await API.get("sale/amount");
+  return res.data;
+};

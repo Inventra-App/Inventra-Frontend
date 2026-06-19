@@ -15,7 +15,7 @@ import {
   X,
 } from "lucide-react";
 import { getAllProducts, getInventoryItems, getTotalSalesAmount,  } from "../../API/inventoryApi";
-import { countSalesPos, makeSalesPos } from "../../API/salesPosApi";
+import { countSalesPos, makeSalesPos, getTotalSalesAmountPos } from "../../API/salesPosApi";
 import "./Css/Sales.css";
 import calendar from "../../assets/calendar.png";
 import Container1 from "../../assets/Container (6).png";
@@ -57,21 +57,25 @@ const Sales = () => {
   try {
     const [salesResponse, revenueResponse] = await Promise.all([
       countSalesPos(),
-      getTotalSalesAmount(),
+      getTotalSalesAmountPos(),
     ]);
 
     console.log("SALES COUNT:", salesResponse);
     console.log("SALES AMOUNT:", revenueResponse);
-    console.log("SALES AMOUNT DATA:", revenueResponse?.data);
 
-    setSalesToday(Number(salesResponse?.data || 0));
-    setRevenueToday(Number(revenueResponse?.data || 0));
-   } catch (error) {
+    setSalesToday(Number(
+      salesResponse?.data?.pagination?.totalSales ??
+      salesResponse?.pagination?.totalSales ??
+      0
+    ));
+
+    setRevenueToday(Number(revenueResponse?.data ?? 0));
+  } catch (error) {
     console.error("Sales stats fetch error:", error);
     setSalesToday(0);
     setRevenueToday(0);
-    }
-  };
+  }
+};
   
     const loadProducts = async () => {
     setLoadingProducts(true);

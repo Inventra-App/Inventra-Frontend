@@ -90,3 +90,9 @@ export const getAllBatches = async () => {
   const res = await API.get('batch/getAll');
   return res.data;
 };
+
+export const getBatchesByInventoryId = async (inventoryId) => {
+  const res = await API.get(`batches/${inventoryId}`);
+  return res.data;
+};
+

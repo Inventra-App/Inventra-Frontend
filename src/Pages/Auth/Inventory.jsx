@@ -25,7 +25,6 @@ import {
   addInventoryItem,
   getAllProducts,
   getLowStockAlerts,
-  getAllBatches
 } from "../../API/inventoryApi";
 import { useNavigate } from "react-router-dom";
 
@@ -47,45 +46,20 @@ const getArrayPayload = (payload) => {
   return [];
 };
 
-const normalizeLowStockItem = (item) => {
-  console.log("Low Stock Item:", item);
-
-  const product = item?.productId; 
-
+const normalizeLowStockItem = (item, products = []) => {
   const availableStock = Number(item?.availableStock ?? 0);
   const totalStock = Number(item?.totalStock ?? 0);
-
-  console.log("Stock Debug:", {
-  product: item?.productId?.productName,
-  availableStock,
-  totalStock,
-  rawAvailableStock: item?.availableStock,
-});
+  const matchedProduct = products.find((p) => p._id === item?.productId)
 
   return {
-    id: item?._id ?? item?.id,
-
-    name:
-      product?.productName ??
-      item?.productName ??
-      "Unnamed Product",
-
-    category:
-      item?.categoryName ??
-      product?.categoryName ??
-      "Uncategorized",
-
-    batch:
-      item?.SKU ??
-      item?.batch ??
-      product?.SKU ??
-      "N/A",
-
+    id: item?._id ?? item?.productId,
+    name: item?.productName ?? "Unnamed Product",
+    category: item?.categoryName ?? "Uncategorized",
+    batch: matchedProduct?.batch || "N/A",
     availableStock,
     totalStock,
     stockReceived: 0,
     reservedStock: Number(item?.reservedStock ?? 0),
-
     status: "Low Stock",
   };
 };
@@ -109,10 +83,9 @@ const Inventory = () => {
   const fetchProducts = useCallback(async () => {
   setLoading(true);
   try {
-    const [productsRes, inventoryRes, batchesRes] = await Promise.all([
+    const [productsRes, inventoryRes] = await Promise.all([
       getAllProducts({ _t: Date.now() }),
       getInventoryItems({ _t: Date.now() }),
-      getAllBatches(),
     ]);
 
     const products = Array.isArray(productsRes)
@@ -121,16 +94,12 @@ const Inventory = () => {
     const inventory = Array.isArray(inventoryRes)
       ? inventoryRes
       : inventoryRes?.data || [];
-      const batches = Array.isArray(batchesRes) ? batchesRes : batchesRes?.data || [];
 
     const stored = JSON.parse(localStorage.getItem('stockReceived') || '{}')
 
     const mapped = products.map((prod) => {
       const inv = inventory.find((i) => i.productId === prod._id) || {};
-      const batch = batches.find((b) => b.productId === prod._id) || {};
 
-      console.log("PRODUCT:", prod);
-      console.log("INVENTORY:", inv);
       const total = Number(inv.totalStock) || 0;
       const reorderLevel = Number(prod.reorderLevel) || 10;
       const status =
@@ -147,8 +116,6 @@ const Inventory = () => {
          name: prod.productName || "Unnamed Product",
          category: prod.categoryName || "Uncategorized",
          batch: prod.SKU || "N/A",
-         batchCode: batch.batchCode || "N/A",
-         expiryDate: batch.expiryDate || null,
          price: Number(prod.unitPrice || 0),
          createdAt: prod.createdAt,
          availableStock: Number(inv.availableStock) || 0,
@@ -159,7 +126,6 @@ const Inventory = () => {
          };
     });
     mapped.reverse();
-    console.log("DEBUG: First product in the list is:", products[0]);
     setProductList(mapped);
   } catch (err) {
     console.error("Error fetching data:", err);
@@ -169,15 +135,14 @@ const Inventory = () => {
 }, []);
 
   const fetchLowStockAlerts = useCallback(async () => {
-    try {
-      const response = await getLowStockAlerts()
-      console.log("LOW STOCK API RESPONSE:", response);
-      setLowStockAlertItems(getArrayPayload(response).map(normalizeLowStockItem))
-    } catch (err) {
-      console.error("Low stock alerts fetch error:", err);
-      setLowStockAlertItems([]);
-    }
-  }, []);
+  try {
+    const response = await getLowStockAlerts()
+    setLowStockAlertItems(getArrayPayload(response).map((item) => normalizeLowStockItem(item)))
+  } catch (err) {
+    console.error("Low stock alerts fetch error:", err);
+    setLowStockAlertItems([]);
+  }
+}, []);
 
   useEffect(() => {
     fetchProducts();
