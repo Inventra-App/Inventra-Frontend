@@ -15,9 +15,14 @@ import {
   getInventoryItems,
   getExpiryAlerts,
   getLowStockAlerts,
+  getActivityLogs,
 } from "../../API/inventoryApi";
 import AlertModal from "../../Components/AlertModal";
-import { getSessionUser, isNewSessionUser, markReturningSessionUser } from "../../Utils/sessionUser";
+import {
+  getSessionUser,
+  isNewSessionUser,
+  markReturningSessionUser,
+} from "../../Utils/sessionUser";
 import "./Css/Dashboard.css";
 
 const getArrayPayload = (payload) => {
@@ -27,6 +32,26 @@ const getArrayPayload = (payload) => {
   if (Array.isArray(payload?.items)) return payload.items;
   if (Array.isArray(payload?.products)) return payload.products;
   return [];
+};
+
+const getModuleType = (module = "") => {
+  const m = module.toUpperCase();
+  if (m.includes("SALE") || m.includes("POS")) return "sale";
+  if (m.includes("STOCK") || m.includes("BATCH") || m.includes("RECEIV"))
+    return "receiving";
+  return "inventory";
+};
+
+const formatActivityDate = (dateStr) => {
+  if (!dateStr) return "-";
+  return new Date(dateStr).toLocaleString("en-GB", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+  });
 };
 
 const formatAlertDate = (dateValue) => {
@@ -50,34 +75,44 @@ const getDaysRemaining = (dateValue) => {
 const normalizeLowStockItem = (item) => {
   return {
     id: item?._id ?? item?.productId,
-    name: item?.productName ?? 'Unknown',
-    category: item?.categoryName ?? '-',
-    units: Number(item?.totalStock ?? item?.availableStock ?? item?.quantity ?? 0),
-    batch: item?.SKU ?? item?.batchCode ?? 'Batch no',
-    expiryDate: 'No date',
-  }
-}
-
+    name: item?.productName ?? "Unknown",
+    category: item?.categoryName ?? "-",
+    units: Number(
+      item?.totalStock ?? item?.availableStock ?? item?.quantity ?? 0,
+    ),
+    batch: item?.SKU ?? item?.batchCode ?? "Batch no",
+    expiryDate: "No date",
+  };
+};
 
 const normalizeExpiryAlert = (item) => {
-  const expiryValue = item?.expiryDate ?? item?.expiresAt ?? item?.expires ?? item?.expirationDate
-  const daysRemaining = Number(item?.daysLeft ?? item?.daysRemaining ?? getDaysRemaining(expiryValue))
-  const expiredDays = Math.abs(daysRemaining)
+  const expiryValue =
+    item?.expiryDate ??
+    item?.expiresAt ??
+    item?.expires ??
+    item?.expirationDate;
+  const daysRemaining = Number(
+    item?.daysLeft ?? item?.daysRemaining ?? getDaysRemaining(expiryValue),
+  );
+  const expiredDays = Math.abs(daysRemaining);
 
   return {
     id: item?._id ?? item?.productId ?? `${item?.productName}-${expiryValue}`,
-    name: item?.productName ?? 'Unnamed Product',
-    batch: item?.batchCode ?? item?.batch ?? 'N/A',
-    quantity: Number(item?.quantityRemaining ?? item?.inventory?.totalStock ?? 0),
-    category: item?.categoryName ?? 'General',
+    name: item?.productName ?? "Unnamed Product",
+    batch: item?.batchCode ?? item?.batch ?? "N/A",
+    quantity: Number(
+      item?.quantityRemaining ?? item?.inventory?.totalStock ?? 0,
+    ),
+    category: item?.categoryName ?? "General",
     expiryDate: formatAlertDate(expiryValue),
     daysRemaining,
-    daysLeft: daysRemaining <= 0
-      ? `${expiredDays} day${expiredDays === 1 ? '' : 's'} ago`
-      : `${daysRemaining} day${daysRemaining === 1 ? '' : 's'} left`,
-    status: daysRemaining <= 0 ? 'EXPIRED' : 'EXPIRING SOON',
-  }
-}
+    daysLeft:
+      daysRemaining <= 0
+        ? `${expiredDays} day${expiredDays === 1 ? "" : "s"} ago`
+        : `${daysRemaining} day${daysRemaining === 1 ? "" : "s"} left`,
+    status: daysRemaining <= 0 ? "EXPIRED" : "EXPIRING SOON",
+  };
+};
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -90,11 +125,12 @@ const Dashboard = () => {
   const [error, setError] = useState(null);
 
   const [showModal, setShowModal] = useState(false);
-  const [modalType, setModalType] = useState(null); 
+  const [modalType, setModalType] = useState(null);
   const [modalItems, setModalItems] = useState([]);
   const [modalQueue, setModalQueue] = useState([]);
   const [sessionUser] = useState(() => getSessionUser());
   const [isFirstLogin] = useState(() => isNewSessionUser());
+  const [recentActivities, setRecentActivities] = useState([]);
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -108,9 +144,18 @@ const Dashboard = () => {
         getInventoryItems().catch(() => []),
         getExpiryAlerts().catch(() => []),
         getLowStockAlerts().catch(() => []),
+        getActivityLogs().catch(() => null),
       ]);
 
-      const [tsuRes, tpcRes, tsaRes, invRes, expiryRes, lowStockRes] = results;
+      const [
+        tsuRes,
+        tpcRes,
+        tsaRes,
+        invRes,
+        expiryRes,
+        lowStockRes,
+        activityRes,
+      ] = results;
 
       const tsu =
         tsuRes.status === "fulfilled" && tsuRes.value
@@ -155,7 +200,8 @@ const Dashboard = () => {
       }
 
       if (lowStock.length === 0) {
-        const items = invRes.status === "fulfilled" ? getArrayPayload(invRes.value) : [];
+        const items =
+          invRes.status === "fulfilled" ? getArrayPayload(invRes.value) : [];
 
         lowStock = items
           .filter((p) => {
@@ -166,7 +212,32 @@ const Dashboard = () => {
       }
       setLowStockItems(lowStock);
 
-      const expiry = expiryRes.status === "fulfilled" ? getArrayPayload(expiryRes.value) : [];
+      if (activityRes.status === "fulfilled" && activityRes.value) {
+        const list = Array.isArray(activityRes.value?.data)
+          ? activityRes.value.data
+          : [];
+        const normalized = [...list]
+        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+        .slice(0, 5)
+        .map((item) => ({
+          id: item._id,
+          type: getModuleType(item.module),
+          label: item.action || item.title || "Activity",
+          desc: item.description || "-",
+          user: item.user || "System",
+          date: formatActivityDate(item.createdAt),
+          amount:
+            item.amount > 0
+              ? `+₦${Number(item.amount).toLocaleString()}`
+              : null,
+        }));
+        setRecentActivities(normalized);
+      }
+
+      const expiry =
+        expiryRes.status === "fulfilled"
+          ? getArrayPayload(expiryRes.value)
+          : [];
       const normalizedExpiry = expiry.map(normalizeExpiryAlert);
       setExpiryItems(normalizedExpiry);
 
@@ -319,9 +390,14 @@ const Dashboard = () => {
   return (
     <div className="dashboard-content">
       <div className="dashboard-welcome">
-        <h2>{isFirstLogin ? `Welcome to INVENTRA ${sessionUser.businessName}` : `Welcome back, ${sessionUser.businessName}!!`}</h2>
+        <h2>
+          {isFirstLogin
+            ? `Welcome to INVENTRA ${sessionUser.businessName}`
+            : `Welcome back, ${sessionUser.businessName}!!`}
+        </h2>
         <p>
-          Here's what's happening in your supermarket today. <span className="expiry-admin">({sessionUser.role})</span>
+          Here's what's happening in your supermarket today.{" "}
+          <span className="expiry-admin">({sessionUser.role})</span>
         </p>
       </div>
 
@@ -422,25 +498,76 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* Recent Activities */}
       <div className="activity-card">
         <div className="alert-card-header">
           <div className="alert-card-title">
             <Calendar size={18} className="alert-icon-blue" />
             <h4>Recent Activities</h4>
           </div>
+          <span className="alert-badge alert-badge-blue">
+            {recentActivities.length}
+          </span>
         </div>
         <div className="activity-list">
-          <div
-            className="activity-item"
-            style={{ justifyContent: "center", padding: "24px 0" }}
-          >
-            <p className="expiry-meta">No recent activities to display.</p>
-          </div>
+          {recentActivities.length === 0 ? (
+            <div
+              className="activity-item"
+              style={{ justifyContent: "center", padding: "24px 0" }}
+            >
+              <p className="expiry-meta">No recent activities to display.</p>
+            </div>
+          ) : (
+            recentActivities.map((act) => (
+              <div key={act.id} className="activity-item">
+                <div
+                  className={`activity-icon ${
+                    act.type === "sale"
+                      ? 'activity-icon-sale'
+                      : act.type === "receiving"
+                        ? 'activity-icon-receive'
+                        : 'activity-icon-create'
+                  }`}
+                >
+                  {act.type === "sale" ? (
+                    <ShoppingCart size={18} />
+                  ) : act.type === "receiving" ? (
+                    <TrendingDown size={18} />
+                  ) : (
+                    <Package size={18} />
+                  )}
+                </div>
+                <div className="activity-details">
+                  <div className="activity-top">
+                    <span className="activity-label">{act.label}</span>
+                    <span style={{ flex: 1 }} />
+                    <span
+                      className={`activity-tag ${
+                        act.type === "sale"
+                          ? "activity-tag-green"
+                          : act.type === "receiving"
+                            ? "activity-tag-purple"
+                            : "activity-tag-blue"
+                      }`}
+                    >
+                      {act.type === "sale"
+                        ? "Sale"
+                        : act.type === "receiving"
+                          ? "Receiving"
+                          : "Inventory"}
+                    </span>
+                  </div>
+                  <p className="activity-desc">{act.desc}</p>
+                  <p className="activity-meta">{act.date}</p>
+                </div>
+                {act.amount && (
+                  <div className="activity-amount">{act.amount}</div>
+                )}
+              </div>
+            ))
+          )}
         </div>
       </div>
 
-      {/* Alert Modal */}
       <AlertModal
         isOpen={showModal}
         type={modalType}
