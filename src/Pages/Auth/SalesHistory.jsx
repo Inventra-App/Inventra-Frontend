@@ -8,16 +8,10 @@ import {
   Package,
   X,
 } from "lucide-react";
-import { countSalesPos } from "../../API/salesPosApi";
-import API from "../../API/axios";
+import { getSalesHistory } from "../../API/salesPosApi";
 import "./Css/SalesHistory.css";
 
 const ITEMS_PER_PAGE = 10;
-
-const getSales = async (page = 1, limit = ITEMS_PER_PAGE) => {
-  const res = await API.get(`sales?page=${page}&limit=${limit}`);
-  return res.data;
-};
 
 const formatDate = (dateStr) => {
   if (!dateStr) return "-";
@@ -48,10 +42,7 @@ const SalesHistory = () => {
     setLoading(true);
     setError(null);
     try {
-      const res = await getSales(page);
-      console.log("SALES HISTORY RESPONSE:", res);
-      console.log("RES.DATA:", res?.data);
-      console.log("RES.PAGINATION:", res?.pagination);
+      const res = await getSalesHistory(page, ITEMS_PER_PAGE);
       const list = Array.isArray(res?.data) ? res.data : [];
       const sorted = [...list].sort(
         (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
