@@ -80,57 +80,47 @@ const Inventory = () => {
   const [showAddProduct, setShowAddProduct] = useState(false);
   const [showToast, setShowToast] = useState(false);
 
-  const fetchProducts = useCallback(async () => {
-  setLoading(true);
+  const fetchProducts = useCallback(async (silent = false) => {
+  if (!silent) setLoading(true);
   try {
     const [productsRes, inventoryRes] = await Promise.all([
       getAllProducts({ _t: Date.now() }),
       getInventoryItems({ _t: Date.now() }),
     ]);
 
-    const products = Array.isArray(productsRes)
-      ? productsRes
-      : productsRes?.data || [];
-    const inventory = Array.isArray(inventoryRes)
-      ? inventoryRes
-      : inventoryRes?.data || [];
-
+    const products = Array.isArray(productsRes) ? productsRes : productsRes?.data || [];
+    const inventory = Array.isArray(inventoryRes) ? inventoryRes : inventoryRes?.data || [];
     const stored = JSON.parse(localStorage.getItem('stockReceived') || '{}')
 
     const mapped = products.map((prod) => {
       const inv = inventory.find((i) => i.productId === prod._id) || {};
-
       const total = Number(inv.totalStock) || 0;
       const reorderLevel = Number(prod.reorderLevel) || 10;
       const status =
-        total > reorderLevel
-          ? "In Stock"
-          : total > 0
-            ? "Low Stock"
-            : "Out of Stock";
+        total > reorderLevel ? "In Stock" : total > 0 ? "Low Stock" : "Out of Stock";
 
       return {
         _id: prod._id,
-         inventoryId: inv._id,
-         id: prod._id,
-         name: prod.productName || "Unnamed Product",
-         category: prod.categoryName || "Uncategorized",
-         batch: prod.SKU || "N/A",
-         price: Number(prod.unitPrice || 0),
-         createdAt: prod.createdAt,
-         availableStock: Number(inv.availableStock) || 0,
-         totalStock: total,
-         reservedStock: Number(inv.reservedStock) || 0,
-         stockReceived: stored[prod._id] || 0,
-         status,
-         };
+        inventoryId: inv._id,
+        id: prod._id,
+        name: prod.productName || "Unnamed Product",
+        category: prod.categoryName || "Uncategorized",
+        batch: prod.SKU || "N/A",
+        price: Number(prod.unitPrice || 0),
+        createdAt: prod.createdAt,
+        availableStock: Number(inv.availableStock) || 0,
+        totalStock: total,
+        reservedStock: Number(inv.reservedStock) || 0,
+        stockReceived: stored[prod._id] || 0,
+        status,
+      };
     });
     mapped.reverse();
     setProductList(mapped);
   } catch (err) {
     console.error("Error fetching data:", err);
   } finally {
-    setLoading(false);
+    if (!silent) setLoading(false);
   }
 }, []);
 
@@ -186,7 +176,12 @@ const Inventory = () => {
     fetchLowStockAlerts();
   };
 
-  const handleAddProduct = (newBatch) => {
+  const handleAddProduct = (data) => {
+  if (!data) return
+
+  const newBatch = data.batch
+  const inventory = data.inventory
+
   if (!newBatch) return
 
   const storedEntries = JSON.parse(localStorage.getItem('stockEntries') || '[]')
@@ -211,8 +206,24 @@ const Inventory = () => {
   stored[newBatch.productId] = newBatch.quantity
   localStorage.setItem('stockReceived', JSON.stringify(stored))
 
-  fetchProducts()
-  fetchLowStockAlerts()
+  setProductList((prev) =>
+    prev.map((p) =>
+      p._id === newBatch.productId
+        ? {
+            ...p,
+            stockReceived: newBatch.quantity,
+            availableStock: Number(inventory?.availableStock ?? p.availableStock),
+            reservedStock: Number(inventory?.reservedStock ?? p.reservedStock),
+            totalStock: Number(inventory?.totalStock ?? p.totalStock),
+          }
+        : p
+    )
+  )
+
+  setTimeout(() => {
+    fetchProducts(true)
+    fetchLowStockAlerts()
+  }, 2000)
 }
 
 useEffect(() => {
@@ -277,8 +288,6 @@ useEffect(() => {
           : "No products available yet.",
       );
     }
-
-    console.log("SELECTED PRODUCT STATE:", selectedProduct);
 
     return (
       <>
