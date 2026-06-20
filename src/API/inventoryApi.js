@@ -17,7 +17,6 @@ export const getAllProducts = async () => {
 
 export const getTotalSalesAmount = async () => {
   const res = await API.get("dashboard/tsa");
-  console.log("TSA ENDPOINT RESPONSE:", res.data);
   return res.data;
 };
 
