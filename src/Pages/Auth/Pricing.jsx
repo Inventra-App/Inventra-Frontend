@@ -14,6 +14,11 @@ const Pricing = () => {
   const [billingCycle, setBillingCycle] = useState("monthly");
   const navigate = useNavigate();
   const isYearly = billingCycle === "yearly";
+  const toggleBillingCycle = () => {
+    setBillingCycle((currentCycle) =>
+      currentCycle === "yearly" ? "monthly" : "yearly",
+    );
+  };
 
   const freeFeatures = [
     "Real-time inventory tracking",
@@ -126,7 +131,7 @@ const Pricing = () => {
                   ))}
                 </ul>
               </div>
-              <button className="plan_btn" type="button">
+              <button className="plan_btn" type="button" onClick={toggleBillingCycle}>
                 Get Free Trial
               </button>
             </article>
@@ -198,7 +203,7 @@ const Pricing = () => {
         >
           <h2>Not sure which plan is right for you?</h2>
           <p>Start with our 14-day free trial and explore all features. No credit card required.</p>
-          <button type="button">Get Started Now</button>
+          <button type="button" onClick={() => navigate("/signup")}>Get Started Now</button>
         </section>
       </main>
     </>
