@@ -28,7 +28,6 @@ const ProductDetailsModal = ({ product, onClose, onManage }) => {
       }
     }
     fetchBatchInfo()
-    console.log("PRODUCT IN MODAL:", product);
   }, [product])
 
   if (!product) return null

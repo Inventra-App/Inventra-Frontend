@@ -53,7 +53,7 @@ const AddCategoryModal = ({ isOpen, onClose, onSave }) => {
 
         <form onSubmit={handleSubmit} className="cat-add-form">
           <div className="cat-add-form-group">
-            <label htmlFor="cat-name">Category Name *</label>
+            <label htmlFor="cat-name">Category Name <span className="cat-edit-required">*</span></label>
             <input
               id="cat-name"
               type="text"

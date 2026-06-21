@@ -75,6 +75,11 @@ export const deleteCategory = async (categoryId) => {
   return res.data;
 };
 
+export const updateCategory = async (id, payload) => {
+  const res = await API.patch(`category/${id}`, payload);
+  return res.data;
+};
+
 export const recordStockEntry = async (payload) => {
   const res = await API.post("stock/entry", payload);
   return res.data;

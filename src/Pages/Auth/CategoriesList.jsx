@@ -4,7 +4,8 @@ import { useNavigate } from 'react-router-dom'
 import AddCategoryModal from '../../CategoryComponents/catComponents/AddCategoryModal'
 import DeleteCategory from '../../CategoryComponents/catComponents/DeleteCategory'
 import ViewCategory from '../../CategoryComponents/catComponents/ViewCategory'
-import { getAllCategories, getAllProducts, addCategory, deleteCategory } from '../../API/inventoryApi'
+import EditCategory from '../../CategoryComponents/catComponents/EditCategory'
+import { getAllCategories, getAllProducts, addCategory, deleteCategory,  updateCategory } from '../../API/inventoryApi'
 import './Css/CategoriesList.css'
 
 const getArrayPayload = (payload) => {
@@ -58,6 +59,7 @@ const CategoriesList = () => {
   const [activeViewCategory, setActiveViewCategory] = useState(null)
   const [products, setProducts] = useState([])
   const [notification, setNotification] = useState(null);
+  const [isEditOpen, setIsEditOpen] = useState(false);
 
   const showNotification = (message) => {
     setNotification(message);
@@ -130,6 +132,46 @@ const CategoriesList = () => {
     }
   };
 
+  const handleEditCategory = async (updatedCategory) => {
+  try {
+    console.log("EDIT CATEGORY ID:", updatedCategory._id);
+    console.log("EDIT PAYLOAD:", {
+  categoryName: updatedCategory.categoryName,
+  description: updatedCategory.description,
+});
+    const response = await updateCategory(updatedCategory._id, {
+      categoryName: updatedCategory.categoryName,
+      description: updatedCategory.description,
+    });
+
+    const savedCategory = response.data || response;
+
+    setCategories((prev) =>
+      prev.map((cat) =>
+        cat._id === savedCategory._id
+          ? {
+              ...cat,
+              categoryName: savedCategory.categoryName,
+              description: savedCategory.description,
+            }
+          : cat
+      )
+    );
+
+    setIsEditOpen(false);
+    setSelectedCategory(null);
+    showNotification("Category updated successfully!");
+  } catch (error) {
+    console.error("Error updating category:", error);
+
+    showNotification(
+      error?.response?.data?.message ||
+      "Failed to update category."
+    );
+  }
+};
+
+
   const handleOpenDelete = (category) => {
     setSelectedCategory(category)
     setIsDeleteOpen(true)
@@ -138,6 +180,9 @@ const CategoriesList = () => {
   const handleConfirmDelete = async () => {
   if (!selectedCategory) return
   console.log("Deleting category ID:", selectedCategory._id)
+    const id = selectedCategory._id || selectedCategory.id || selectedCategory.categoryId;
+  console.log("Deleting category ID:", id);
+  
   try {
     await deleteCategory(selectedCategory._id);
     setCategories(categories.filter(cat => cat._id !== selectedCategory._id));
@@ -210,7 +255,11 @@ const CategoriesList = () => {
                   </td>
                   <td>
                     <div className="cat-action-group">
-                      <button className="cat-icon-btn edit">
+                      <button className="cat-icon-btn edit" 
+                      onClick={() => {
+                      setSelectedCategory(category)
+                      setIsEditOpen(true)
+                      }}>
                         <SquarePen size={20} />
                       </button>
                       <button className="cat-icon-btn delete" onClick={() => handleOpenDelete(category)}>
@@ -258,6 +307,15 @@ const CategoriesList = () => {
                 <Eye size={14} /> View
               </button>
               <div className="cat-action-group">
+                <button
+                  className="cat-icon-btn edit"
+                  onClick={() => {
+                    setSelectedCategory(category) 
+                    setIsEditOpen(true)
+                  }}
+                   >
+                  <SquarePen size={16} />
+                 </button>
                 <button className="cat-icon-btn delete" onClick={() => handleOpenDelete(category)}>
                   <Trash2 size={16} />
                 </button>
@@ -272,6 +330,16 @@ const CategoriesList = () => {
         onClose={() => setIsModalOpen(false)} 
         onSave={handleSaveCategory}
       />
+      <EditCategory
+        isOpen={isEditOpen}
+        onClose={() => {
+        setIsEditOpen(false)
+        setSelectedCategory(null)
+        }}
+       onSave={handleEditCategory}
+       category={selectedCategory}
+       />
+      
       <DeleteCategory
         isOpen={isDeleteOpen}
         onClose={() => setIsDeleteOpen(false)}

@@ -27,6 +27,7 @@ import Container2 from "../../assets/Container (7).png";
 import Container3 from "../../assets/Container (8).png";
 import Container4 from "../../assets/Button.png";
 import SalesHistory from './SalesHistory'
+import ReceiptModal from "../../InventoryComponents/ModalComponents/ReceiptModal";
 
 const NO_STOCK_MESSAGE = "No stock available";
 
@@ -83,6 +84,8 @@ const Sales = () => {
   const [salesError, setSalesError] = useState("");
   const [salesToday, setSalesToday] = useState(0);
   const [revenueToday, setRevenueToday] = useState(0);
+  const [showReceipt, setShowReceipt] = useState(false);
+  const [receiptData, setReceiptData] = useState(null);
 
   const loadSales = async () => {
     try {
@@ -321,6 +324,8 @@ const Sales = () => {
 
     try {
       const response = await makeSalesPos(payload);
+      setReceiptData(response.data);
+      setShowReceipt(true);
 
       console.log("SALE RESPONSE:", response);
 
@@ -827,6 +832,13 @@ const Sales = () => {
           </div>
         </div>
       )}
+
+      {showReceipt && (
+       <ReceiptModal
+        receipt={receiptData}
+        onClose={() => setShowReceipt(false)}
+       />
+     )}
     </div>
   );
 };
