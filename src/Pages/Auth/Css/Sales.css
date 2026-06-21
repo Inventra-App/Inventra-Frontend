@@ -160,7 +160,7 @@
   font-size: 1rem;
   outline: none;
   padding: 0 44px;
-  transition: border-color 180ms ease, box-shadow 180ms ease;
+  transition: border-color 180ms ease, box-shadow 180ms ease, background-color 0.4s, color 0.4s;
 }
 
 .sales-product-select input:focus {
@@ -248,6 +248,36 @@
   font-size: 13px;
   font-weight: 600;
   margin: 12px;
+}
+
+.sales-browse-trigger {
+  border-radius: 7px;
+  overflow: hidden;
+  transition: background-color 0.8s, border-color 0.8s;
+}
+
+.sales-browse-trigger:hover {
+  background-color: #16a34a !important;
+  border-color: #16a34a !important;
+}
+
+.sales-browse-trigger:hover input {
+  background-color: transparent !important;
+  color: #ffffff !important;
+  cursor: pointer;
+  border-color: transparent !important;
+  box-shadow: none !important;
+  transition: background-color 0.4s, color 0.4s;
+}
+
+.sales-browse-trigger:hover input::placeholder {
+  color: #ffffff !important;
+  opacity: 1;
+}
+
+.sales-browse-trigger:hover .sales-product-search-icon {
+  color: #ffffff !important;
+  stroke: #ffffff !important;
 }
 
 .sales-add-cart-btn {
