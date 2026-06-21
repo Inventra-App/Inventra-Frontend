@@ -9,12 +9,12 @@ import {
   Shield,
   UsersRound,
   Eye,
-  EyeOff
+  EyeOff,
 } from "lucide-react";
 import "./Css/Login.css";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
-import { loginAdmin } from "../../API/authApi"; 
+import { loginAdmin } from "../../API/authApi";
 import { loginStaff } from "../../API/userManagementAPI";
 import { contWithGoogle } from "../../API/googleAuthApi";
 import { getAccountPath, saveSessionUser } from "../../Utils/sessionUser";
@@ -38,17 +38,24 @@ const getResponseRole = (response, fallbackRole) =>
   fallbackRole;
 
 const loginWithAdminOrStaff = async (payload) => {
+  let adminError = null;
+  let staffError = null;
+
   try {
     const response = await loginAdmin(payload);
     return { response, role: getResponseRole(response, "Admin") };
-  } catch (adminError) {
-    try {
-      const response = await loginStaff(payload);
-      return { response, role: getResponseRole(response, "Staff") };
-    } catch (staffError) {
-      throw staffError?.response ? staffError : adminError;
-    }
+  } catch (err) {
+    adminError = err;
   }
+
+  try {
+    const response = await loginStaff(payload);
+    return { response, role: getResponseRole(response, "Staff") };
+  } catch (err) {
+    staffError = err;
+  }
+
+  throw staffError?.response ? staffError : adminError;
 };
 
 const Login = () => {
@@ -59,9 +66,9 @@ const Login = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-    rememberMe: false
+    email: "",
+    password: "",
+    rememberMe: false,
   });
 
   const [errors, setErrors] = useState({});
@@ -119,18 +126,22 @@ const Login = () => {
 
       const payload = {
         email: formData.email.trim(),
-        password: formData.password
+        password: formData.password,
       };
 
       console.log("=== LOGIN REQUEST ===", { email: payload.email });
-      const { response: res, role: loginRole } = await loginWithAdminOrStaff(payload);
+      const { response: res, role: loginRole } =
+        await loginWithAdminOrStaff(payload);
       console.log("=== LOGIN SUCCESS ===", res);
 
       const token = getAuthToken(res);
       if (token) {
         localStorage.setItem("inventra_token", token);
       }
-      const sessionUser = saveSessionUser(res, { email: payload.email, role: loginRole });
+      const sessionUser = saveSessionUser(res, {
+        email: payload.email,
+        role: loginRole,
+      });
 
       toast.success(res.message || "Login Successful");
 
@@ -138,18 +149,32 @@ const Login = () => {
       setTimeout(() => {
         nav(getAccountPath("/dashboard", sessionUser));
       }, 1000);
-
     } catch (error) {
       console.error("=== LOGIN ERROR ===", error);
-      
+
       const status = error.response?.status;
       const serverMessage = error.response?.data?.message;
 
+      if (
+        !error.response &&
+        (error.code === "ERR_NETWORK" || error.message === "Network Error")
+      ) {
+        toast.error(
+          "No internet connection. Please check your network and try again.",
+        );
+        return;
+      }
+
       if (status === 403 && serverMessage?.toLowerCase().includes("locked")) {
         try {
-          const timestamp = serverMessage.match(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z/g);
+          const timestamp = serverMessage.match(
+            /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z/g,
+          );
           if (timestamp) {
-            const localTime = new Date(timestamp[0]).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            const localTime = new Date(timestamp[0]).toLocaleTimeString([], {
+              hour: "2-digit",
+              minute: "2-digit",
+            });
             toast.error(`Account locked. Please try again after ${localTime}`);
             return;
           }
@@ -158,7 +183,16 @@ const Login = () => {
         }
       }
 
-      toast.error(serverMessage || "Something went wrong. Please check your credentials.");
+      if (
+        serverMessage?.toLowerCase().includes("not found") ||
+        serverMessage?.toLowerCase().includes("invalid credentials")
+      ) {
+        toast.error(
+          "No account found with these credentials. Please check your email and password.",
+        );
+      } else {
+        toast.error(serverMessage || "Something went wrong. Please try again.");
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -174,7 +208,8 @@ const Login = () => {
         redirectUri: `${window.location.origin}/login`,
       });
 
-      const redirectUrl = res?.url || res?.authUrl || res?.redirectUrl || res?.data?.url;
+      const redirectUrl =
+        res?.url || res?.authUrl || res?.redirectUrl || res?.data?.url;
       if (redirectUrl) {
         window.location.href = redirectUrl;
         return;
@@ -193,7 +228,10 @@ const Login = () => {
       }, 1000);
     } catch (error) {
       console.error("Google login error:", error);
-      toast.error(error?.response?.data?.message || "Google login failed. Please try again.");
+      toast.error(
+        error?.response?.data?.message ||
+          "Google login failed. Please try again.",
+      );
     } finally {
       setIsGoogleLoading(false);
     }
@@ -311,30 +349,36 @@ const Login = () => {
 
           <div className="loginField">
             <span>Email Address</span>
-            <input 
-              type="email" 
+            <input
+              type="email"
               name="email"
-              placeholder="Ajchibuzor@gmail.com" 
+              placeholder="Ajchibuzor@gmail.com"
               value={formData.email}
               onChange={handleChange}
               onBlur={handleBlur}
-              className={touched.email && errors.email ? "login-input-error" : ""}
+              className={
+                touched.email && errors.email ? "login-input-error" : ""
+              }
               disabled={isSubmitting}
             />
-            {touched.email && errors.email && <span className="login-error-text">{errors.email}</span>}
+            {touched.email && errors.email && (
+              <span className="login-error-text">{errors.email}</span>
+            )}
           </div>
 
           <div className="loginField">
             <span>Password</span>
             <div className="login-password-input-wrapper">
-              <input 
-                type={showPassword ? "text" : "password"} 
+              <input
+                type={showPassword ? "text" : "password"}
                 name="password"
-                placeholder="••••••••" 
+                placeholder="••••••••"
                 value={formData.password}
                 onChange={handleChange}
                 onBlur={handleBlur}
-                className={touched.password && errors.password ? "login-input-error" : ""}
+                className={
+                  touched.password && errors.password ? "login-input-error" : ""
+                }
                 disabled={isSubmitting}
               />
               <button
@@ -346,13 +390,15 @@ const Login = () => {
                 {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
               </button>
             </div>
-            {touched.password && errors.password && <span className="login-error-text">{errors.password}</span>}
+            {touched.password && errors.password && (
+              <span className="login-error-text">{errors.password}</span>
+            )}
           </div>
 
           <div className="loginOptions">
             <label className="rememberLogin">
-              <input 
-                type="checkbox" 
+              <input
+                type="checkbox"
                 name="rememberMe"
                 checked={formData.rememberMe}
                 onChange={handleChange}
@@ -363,11 +409,7 @@ const Login = () => {
             <a href="/resetpassword">Forgot Password?</a>
           </div>
 
-          <button 
-            className="loginSubmit" 
-            type="submit" 
-            disabled={isSubmitting}
-          >
+          <button className="loginSubmit" type="submit" disabled={isSubmitting}>
             {isSubmitting ? "Logging in..." : "Login"}
           </button>
 
@@ -388,7 +430,11 @@ const Login = () => {
             ) : (
               <>
                 <span className="googleMark" aria-hidden="true">
-                  <img src="https://www.google.com/favicon.ico" alt="Google" width={18} />
+                  <img
+                    src="https://www.google.com/favicon.ico"
+                    alt="Google"
+                    width={18}
+                  />
                 </span>
                 <span>Google</span>
               </>
