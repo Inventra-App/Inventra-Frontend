@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
-import { Pencil, X, Loader2, Save, SquarePen } from "lucide-react";
+import { X, Loader2, Save, SquarePen } from "lucide-react";
 import "../catStyle/EditCategory.css";
 
 const EditCategory = ({
