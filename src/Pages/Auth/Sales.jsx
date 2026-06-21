@@ -4,7 +4,6 @@ import {
   ArrowLeft,
   Calendar,
   CheckCircle,
-  ChevronDown,
   Minus,
   Package,
   Plus,
@@ -26,8 +25,9 @@ import Container1 from "../../assets/Container (6).png";
 import Container2 from "../../assets/Container (7).png";
 import Container3 from "../../assets/Container (8).png";
 import Container4 from "../../assets/Button.png";
-import SalesHistory from './SalesHistory'
+import SalesHistory from "./SalesHistory";
 import ReceiptModal from "../../InventoryComponents/ModalComponents/ReceiptModal";
+import CategoryProductPanel from "../../CategoryComponents/catComponents/CategoryProductPanel";
 
 const NO_STOCK_MESSAGE = "No stock available";
 
@@ -86,6 +86,7 @@ const Sales = () => {
   const [revenueToday, setRevenueToday] = useState(0);
   const [showReceipt, setShowReceipt] = useState(false);
   const [receiptData, setReceiptData] = useState(null);
+  const [showCategoryPanel, setShowCategoryPanel] = useState(false);
 
   const loadSales = async () => {
     try {
@@ -294,6 +295,29 @@ const Sales = () => {
     setShowClearCartModal(false);
   };
 
+  const handlePanelProductSelect = (product) => {
+    if (product.stock <= 0) {
+      setSalesError("No stock available");
+      return;
+    }
+    setCartItems((currentItems) => {
+      const existing = currentItems.find((item) => item.id === product.id);
+      if (existing) {
+        if (existing.quantity >= product.stock) {
+          setSalesError(`Only ${product.stock} in stock`);
+          return currentItems;
+        }
+        return currentItems.map((item) =>
+          item.id === product.id
+            ? { ...item, quantity: item.quantity + 1 }
+            : item,
+        );
+      }
+      return [...currentItems, { ...product, quantity: 1 }];
+    });
+    setSalesError("");
+  };
+
   const completeSale = () => {
     if (cartItems.length === 0) {
       setShowEmptyCartPopup(true);
@@ -410,82 +434,32 @@ const Sales = () => {
       ) : (
         <section className="sales-workspace">
           <div className="sales-left-column">
-            <form className="sales-panel sales-product-form">
+            <div className="sales-panel sales-product-form">
               <label htmlFor="product">Select Product</label>
 
               <div className="sales-product-row">
-                <div className="sales-product-select">
-                  <Search size={18} className="sales-product-search-icon" />
+                <div
+                  className="sales-product-select sales-browse-trigger"
+                  onClick={() => setShowCategoryPanel(true)}
+                  style={{ cursor: "pointer" }}
+                >
+                  <Package size={18} className="sales-product-search-icon" />
                   <input
                     id="product"
                     type="text"
                     placeholder={
                       loadingProducts
                         ? "Loading products..."
-                        : "Search product name"
+                        : "Browse categories & add products..."
                     }
                     value={selectedProduct}
-                    onFocus={() => setIsProductDropdownOpen(true)}
-                    onChange={(event) => {
-                      setSelectedProduct(event.target.value);
-                      setSelectedProductId("");
-                      setIsProductDropdownOpen(true);
-                    }}
-                    aria-label="Select product"
+                    readOnly
+                    style={{ cursor: "pointer" }}
+                    aria-label="Browse products by category"
                   />
-                  <button
-                    className="sales-product-arrow"
-                    type="button"
-                    onClick={() =>
-                      setIsProductDropdownOpen(!isProductDropdownOpen)
-                    }
-                    aria-label="Open products"
-                  >
-                    <ChevronDown size={18} />
-                  </button>
-
-                  {isProductDropdownOpen && (
-                    <div className="sales-product-menu">
-                      {dropdownProducts.length === 0 ? (
-                        <p className="sales-product-empty">
-                          {loadingProducts
-                            ? "Loading products..."
-                            : "No product found"}
-                        </p>
-                      ) : (
-                        dropdownProducts.map((product) => (
-                          <button
-                            key={product.id}
-                            type="button"
-                            className="sales-product-option"
-                            onClick={() => {
-                              setSelectedProduct(product.name);
-                              setSelectedProductId(product.id);
-                              setIsProductDropdownOpen(false);
-                            }}
-                          >
-                            <span>{product.name}</span>
-                            <small>
-                              {product.category} • {formatNaira(product.price)}{" "}
-                              • {product.stock} in stock
-                            </small>
-                          </button>
-                        ))
-                      )}
-                    </div>
-                  )}
                 </div>
-
-                <button
-                  className="sales-add-cart-btn"
-                  type="button"
-                  disabled={!selectedProductRecord}
-                  onClick={addToCart}
-                >
-                  Add to Cart
-                </button>
               </div>
-            </form>
+            </div>
 
             <div className="sales-panel sales-cart-panel">
               <h3>Cart Items</h3>
@@ -834,11 +808,19 @@ const Sales = () => {
       )}
 
       {showReceipt && (
-       <ReceiptModal
-        receipt={receiptData}
-        onClose={() => setShowReceipt(false)}
-       />
-     )}
+        <ReceiptModal
+          receipt={receiptData}
+          onClose={() => setShowReceipt(false)}
+        />
+      )}
+
+      <CategoryProductPanel
+        isOpen={showCategoryPanel}
+        onClose={() => setShowCategoryPanel(false)}
+        products={products}
+        onSelectProduct={handlePanelProductSelect}
+        formatNaira={formatNaira}
+      />
     </div>
   );
 };
