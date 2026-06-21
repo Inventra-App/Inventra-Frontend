@@ -17,7 +17,6 @@ export const getAllProducts = async () => {
 
 export const getTotalSalesAmount = async () => {
   const res = await API.get("dashboard/tsa");
-  console.log("TSA ENDPOINT RESPONSE:", res.data);
   return res.data;
 };
 
@@ -73,6 +72,11 @@ export const addCategory = async (payload) => {
 
 export const deleteCategory = async (categoryId) => {
   const res = await API.delete(`d/category/${categoryId}`);
+  return res.data;
+};
+
+export const updateCategory = async (id, payload) => {
+  const res = await API.patch(`category/${id}`, payload);
   return res.data;
 };
 

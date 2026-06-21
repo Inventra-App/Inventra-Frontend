@@ -99,8 +99,10 @@ useEffect(() => {
     try {
       setLoading(true)
       const res = await recordStockEntry(payload)
+      console.log('FULL STOCK ENTRY RESPONSE:', res)
+      console.log('NEW BATCH DATA:', res?.data?.batch)
       setSuccess(true)
-      onAddProduct?.(res?.data?.newBatch)
+      onAddProduct?.(res?.data)
       setTimeout(() => {
         setSuccess(false)
         resetForm()

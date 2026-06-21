@@ -1,0 +1,232 @@
+.cat-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 99999;
+  animation: catFadeIn 0.2s ease-out;
+}
+
+.cat-edit-container {
+  background-color: #ffffff;
+  width: 100%;
+  max-width: 480px;
+  border-radius: 16px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.1);
+  padding: 24px;
+  margin: 16px;
+  box-sizing: border-box;
+  animation: catSlideUp 0.25s ease-out;
+}
+
+.cat-edit-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.cat-edit-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 20px;
+  font-weight: 700;
+  color: #0F172A;
+  margin: 0;
+}
+
+.cat-edit-title h2 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.cat-edit-required {
+  color: #DC2626;
+  font-weight: 700;
+}
+
+.cat-edit-title svg {
+  color: #432DD7;
+}
+
+.cat-edit-close-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #4A5565;
+  padding: 6px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.cat-edit-close-btn:hover:not(:disabled) {
+  background-color: #F1F5F9;
+  color: #0F172A;
+}
+
+.cat-edit-close-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.cat-edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.cat-edit-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.cat-edit-form-group label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #0F172A;
+}
+
+.cat-edit-form-group input,
+.cat-edit-form-group textarea {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid #D1D5DC;
+  border-radius: 10px;
+  font-weight: 400;
+  font-size: 14px;
+  color: #101828;
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  resize: vertical;
+}
+
+.cat-edit-form-group input:focus,
+.cat-edit-form-group textarea:focus {
+  border-color: #432DD7;
+  box-shadow: 0 0 0 3px rgba(67, 45, 215, 0.12);
+}
+
+.cat-edit-form-group input:disabled,
+.cat-edit-form-group textarea:disabled {
+  background-color: #F3F4F6;
+  cursor: not-allowed;
+}
+
+.cat-edit-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.cat-edit-btn-cancel {
+  flex: 1;
+  padding: 12px;
+  border: 1px solid #D1D5DC;
+  border-radius: 10px;
+  background-color: #ffffff;
+  color: #364153;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.cat-edit-btn-cancel:hover:not(:disabled) {
+  background-color: #F9FAFB;
+  border-color: #CBD5E1;
+}
+
+.cat-edit-btn-cancel:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.cat-edit-btn-submit {
+  flex: 1.4;
+  padding: 12px;
+  border: none;
+  border-radius: 10px;
+  background-color: #432DD7;
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease;
+}
+
+.cat-edit-btn-submit:hover:not(:disabled) {
+  background-color: #3522B5;
+}
+
+.cat-edit-btn-submit:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.cat-spin {
+  animation: catSpin 0.8s linear infinite;
+}
+
+@keyframes catFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes catSlideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes catSpin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 480px) {
+  .cat-edit-container {
+    padding: 20px;
+  }
+
+  .cat-edit-title h2 {
+    font-size: 18px;
+  }
+
+  .cat-edit-actions {
+    flex-direction: column;
+  }
+
+  .cat-edit-btn-cancel,
+  .cat-edit-btn-submit {
+    width: 100%;
+  }
+}

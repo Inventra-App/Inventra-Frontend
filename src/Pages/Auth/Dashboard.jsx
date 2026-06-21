@@ -342,10 +342,10 @@ const Dashboard = () => {
     },
     {
       label: "Sales Today",
-      value:
-        totalSalesAmount !== null
-          ? `₦${Number(totalSalesAmount).toLocaleString()}`
-          : "₦0",
+      value: totalSalesAmount !== null ? `${Number(totalSalesAmount).toLocaleString()}` : "0",
+      sub:  totalSalesAmount === 0 || totalSalesAmount === null
+            ? "no transactions yet"
+            : `transaction${Number(totalSalesAmount) === 1 ? "" : "s"} completed`,
       icon: <ShoppingCart size={22} />,
       color: "purple",
     },
@@ -433,9 +433,9 @@ const Dashboard = () => {
                 No expiry alerts to display.
               </p>
             ) : (
-              expiryItems.map((item) => (
+              expiryItems.map((item, index) => (
                 <div
-                  key={item.id}
+                  key={`${item.id}-${index}`}
                   className={`dashboard-expiry-item dashboard-expiry-${
                     item.daysRemaining <= 0 ? "expired" : "expiring"
                   }`}
