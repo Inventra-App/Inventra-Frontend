@@ -1,7 +1,7 @@
 import API from "./axios";
 
 export const getStaffs = async () => {
-  const res = await API.get("/staffs");
+  const res = await API.get("/staff");
   return res.data;
 };
 

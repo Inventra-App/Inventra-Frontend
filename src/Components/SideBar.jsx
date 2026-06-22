@@ -3,6 +3,8 @@ import { NavLink, useParams } from 'react-router-dom'
 import { LayoutDashboard, Package, ShoppingCart, AlertTriangle, ClipboardList, Users, Settings, LogOut } from 'lucide-react'
 import Logo from './Logo'
 import '../Css/SideBar.css'
+import { getSessionUser } from '../Utils/sessionUser'
+import { filterNavItemsByRole } from '../Utils/authRoles'
 
 const navItems = [
   { path: '/dashboard', icon: <LayoutDashboard size={20} />, label: 'Dashboard' },
@@ -17,6 +19,8 @@ const navItems = [
 const SideBar = ({ onItemClick, onLogout }) => {
   const { accountId } = useParams()
   const basePath = accountId ? `/${accountId}` : ''
+  const sessionUser = getSessionUser()
+  const visibleNavItems = filterNavItemsByRole(navItems, sessionUser.role)
 
   return (
     <div className="sidebar">
@@ -26,7 +30,7 @@ const SideBar = ({ onItemClick, onLogout }) => {
       </div>
 
       <nav className="sidebar-nav">
-        {navItems.map((item) => (
+        {visibleNavItems.map((item) => (
           <NavLink
             key={item.path}
             to={`${basePath}${item.path}`}
