@@ -58,24 +58,6 @@ const RecordStockModal = ({ onClose, visible, onAddProduct, product }) => {
     try {
       setLoading(true);
       const res = await recordStockEntry(payload);
-
-      const stored = JSON.parse(localStorage.getItem("stockEntries") || "[]");
-
-      const newEntry = {
-        id: res?.data?.batch?._id,
-        productName: selectedName,
-        supplier: supplierName,
-        quantity: parseInt(packageQuantity),
-        expiryDate,
-        type: "restock",
-        timestamp: new Date().toISOString(),
-      };
-
-      localStorage.setItem(
-        "stockEntries",
-        JSON.stringify([newEntry, ...stored]),
-      );
-
       onAddProduct?.(res?.data);
       setSuccess(true);
 
@@ -95,7 +77,8 @@ const RecordStockModal = ({ onClose, visible, onAddProduct, product }) => {
   };
 
   if (success) {
-    const totalAdded = (Number(packageQuantity) || 0) * (Number(unitPerPackage) || 0);
+    const totalAdded =
+      (Number(packageQuantity) || 0) * (Number(unitPerPackage) || 0);
     const newTotalStock = (Number(totalStock) || 0) + totalAdded;
 
     return (
@@ -104,7 +87,9 @@ const RecordStockModal = ({ onClose, visible, onAddProduct, product }) => {
           <div className="record-success-header">
             <CheckCircle size={45} color="#00A63E" />
             <h2>Success!</h2>
-            <p>Stock Entry: {totalAdded} units received from {supplierName}</p>
+            <p>
+              Stock Entry: {totalAdded} units received from {supplierName}
+            </p>
           </div>
 
           <div className="record-success-details">
@@ -118,7 +103,9 @@ const RecordStockModal = ({ onClose, visible, onAddProduct, product }) => {
             </div>
             <div className="record-success-row">
               <span className="record-success-label">Updated Stock</span>
-              <span className="record-success-value record-success-green">+{totalAdded}</span>
+              <span className="record-success-value record-success-green">
+                +{totalAdded}
+              </span>
             </div>
             <div className="record-success-row total-row">
               <span className="record-success-label">Total Stock Now</span>
@@ -126,11 +113,19 @@ const RecordStockModal = ({ onClose, visible, onAddProduct, product }) => {
             </div>
             <div className="record-success-row">
               <span className="record-success-label">Timestamp</span>
-              <span className="record-success-timestamp">{new Date().toLocaleString()}</span>
+              <span className="record-success-timestamp">
+                {new Date().toLocaleString()}
+              </span>
             </div>
           </div>
 
-          <button className="record-back-btn" onClick={() => { setSuccess(false); onClose(); }}>
+          <button
+            className="record-back-btn"
+            onClick={() => {
+              setSuccess(false);
+              onClose();
+            }}
+          >
             Back to Inventory
           </button>
         </div>
