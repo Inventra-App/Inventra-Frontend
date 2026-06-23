@@ -286,7 +286,7 @@ const Inventory = () => {
               inventoryId: inventory._id,
               availableStock: inventory.availableStock ?? 0,
               backroomStock: inventory.backroomStock ?? 0,
-              totalStock: inventory.totalStock ?? 0,
+              totalStock: (inventory.availableStock ?? 0) + (inventory.backroomStock ?? 0),
             }
           : p,
       ),
