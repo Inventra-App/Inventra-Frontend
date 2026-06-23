@@ -1,130 +1,89 @@
-import React, { useState, useEffect } from 'react'
-import { X, CheckCircle } from 'lucide-react'
-import './ModalStyles/RecordStockModal.css'
-import Logo from '../../Components/Logo'
-import { recordStockEntry, getAllProducts } from '../../API/inventoryApi'
+import React, { useState, useEffect } from "react";
+import { X, CheckCircle } from "lucide-react";
+import "./ModalStyles/RecordStockModal.css";
+import Logo from "../../Components/Logo";
+import { recordStockEntry } from "../../API/inventoryApi";
 
-const RecordStockModal = ({ onClose, visible, onAddProduct }) => {
-  const [products, setProducts] = useState([])
-  const [productId, setProductId] = useState('')
-  const [supplierName, setSupplierName] = useState('')
-  const [packageType, setPackageType] = useState('')
-  const [packageQuantity, setPackageQuantity] = useState('')
-  const [unitPerPackage, setUnitPerPackage] = useState('')
-  const [expiryDate, setExpiryDate] = useState('')
-  const [deliveryDate, setDeliveryDate] = useState('')
-  const [availableStock, setAvailableStock] = useState('')
-  const [reservedStock, setReservedStock] = useState('')
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState(null)
-  const [success, setSuccess] = useState(false)
-  const [selectedProductData, setSelectedProductData] = useState(null)
-
-useEffect(() => {
-  if (productId) {
-    const selected = products.find((p) => p._id === productId)
-    setSelectedProductData(selected || null)
-    if (selected?.packageType) {
-      setPackageType(selected.packageType)
-    }
-  } else {
-    setSelectedProductData(null)
-    setPackageType('')
-  }
-}, [productId, products])
+const RecordStockModal = ({ onClose, visible, onAddProduct, product }) => {
+  const [supplierName, setSupplierName] = useState("");
+  const [packageQuantity, setPackageQuantity] = useState("");
+  const [unitPerPackage, setUnitPerPackage] = useState("");
+  const [expiryDate, setExpiryDate] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(false);
+  const [expiryError, setExpiryError] = useState("");
 
   useEffect(() => {
-    if (visible) {
-      getAllProducts()
-        .then((data) => {
-          console.log('Products response:', data)
-          const list = data?.data || []
-          setProducts(Array.isArray(list) ? [...list].reverse() : [])
-        })
-        .catch((err) => {
-          console.error('Failed to fetch products:', err)
-          setProducts([])
-        })
+    if (product) {
+      setPackageQuantity(product.packageQuantity || "");
+      setUnitPerPackage(product.unitPerPackage || "");
     }
-  }, [visible])
+  }, [product]);
 
-  if (!visible) return null
+  if (!visible) return null;
 
-  const totalReceived = (parseInt(packageQuantity) || 0) * (parseInt(unitPerPackage) || 0)
-  const totalAllocated = (parseInt(availableStock) || 0) + (parseInt(reservedStock) || 0)
-  const isAllocated = totalAllocated === totalReceived && totalReceived > 0
+  const selectedName =
+    product?.name ||
+    product?.productName ||
+    product?.title ||
+    "Unnamed Product";
 
-  const dateError = deliveryDate && expiryDate && expiryDate <= deliveryDate
-    ? 'Expiry date must be after the delivery date.'
-    : null
-
-  const allocationError = totalReceived > 0 && totalAllocated !== totalReceived
-    ? totalAllocated > totalReceived
-      ? `Over-allocated by ${totalAllocated - totalReceived} units`
-      : `Under-allocated by ${totalReceived - totalAllocated} units remaining`
-    : null
-
-  const resetForm = () => {
-    setProductId(''); setSupplierName(''); setPackageType('')
-    setPackageQuantity(''); setUnitPerPackage(''); setExpiryDate('')
-    setDeliveryDate(''); setAvailableStock(''); setReservedStock('')
-    setError(null)
-  }
+  const availableStock = product?.availableStock ?? 0;
+  const totalStock = product?.totalStock ?? 0;
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
-    setError(null)
+    e.preventDefault();
+    setError(null);
 
-    if (dateError) {
-      setError(dateError)
-      return
-    }
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    tomorrow.setHours(0, 0, 0, 0);
 
-    if (allocationError || !isAllocated) {
-      setError('Please allocate exactly the total received units before submitting.')
-      return
+    if (new Date(expiryDate) < tomorrow) {
+      setExpiryError("Expiry date must be a future date.");
+      return;
     }
+    setExpiryError("");
 
     const payload = {
-      productId,
+      productId: product?._id,
       supplier: supplierName,
       expiryDate,
-      packageType,
       packageQuantity: parseInt(packageQuantity),
       unitPerPackage: parseInt(unitPerPackage),
-      availableStock: parseInt(availableStock),
-      reservedStock: parseInt(reservedStock),
-    }
+    };
 
     try {
-      setLoading(true)
-      const res = await recordStockEntry(payload)
-      console.log('FULL STOCK ENTRY RESPONSE:', res)
-      console.log('NEW BATCH DATA:', res?.data?.batch)
-      setSuccess(true)
-      onAddProduct?.(res?.data)
+      setLoading(true);
+      const res = await recordStockEntry(payload);
+      onAddProduct?.(res?.data);
+      setSuccess(true);
+
       setTimeout(() => {
-        setSuccess(false)
-        resetForm()
-        onClose()
-      }, 1800)
+        setSuccess(false);
+        setSupplierName("");
+        setPackageQuantity("");
+        setUnitPerPackage("");
+        setExpiryDate("");
+        onClose();
+      }, 1500);
     } catch (err) {
-      setError(err?.response?.data?.message || 'Failed to record stock entry. Please try again.')
+      setError(err?.response?.data?.message || "Failed to restock product");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   if (success) {
     return (
       <div className="record-overlay">
         <div className="record-modal record-success-modal">
-          <CheckCircle size={52} color="#00A63E" />
-          <h2>Stock Entry Recorded!</h2>
-          <p>The batch has been created and inventory updated.</p>
+          <CheckCircle size={50} color="#00A63E" />
+          <h2>Restock Confirmed</h2>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -132,185 +91,129 @@ useEffect(() => {
       <div className="record-modal" onClick={(e) => e.stopPropagation()}>
         <div className="record-modal-header">
           <Logo variant="black" />
-          <button className="record-close" onClick={onClose}><X size={20} /></button>
+          <button className="record-close" onClick={onClose}>
+            <X size={20} />
+          </button>
         </div>
 
-        <h2 className="record-title">Record Incoming Stock</h2>
+        <h2 className="record-title">Restock Product</h2>
 
-        {error && <div className="record-error">{error}</div>}
+        {error && <div className="record-allocation-error">{error}</div>}
 
         <form className="record-form" onSubmit={handleSubmit}>
-          <div className="record-card">
-            <div className="record-row">
-              <div className="record-field">
-                <label>Product *</label>
-                <select
-                  required
-                  value={productId}
-                  onChange={(e) => setProductId(e.target.value)}
-                  className="record-select"
-                >
-                  <option value="">Select a product</option>
-                  {products.map((p) => (
-                    <option key={p._id} value={p._id}>
-                      {p.name || p.productName || p.title || 'Unnamed'}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div className="record-field">
-                <label>Supplier Name *</label>
-                <input
-                  type="text"
-                  placeholder="Enter supplier name"
-                  required
-                  value={supplierName}
-                  onChange={(e) => setSupplierName(e.target.value)}
-                />
+          {product && (
+            <div className="record-card">
+              <div className="record-product-preview">
+                <h3 style={{ marginBottom: 6 }}>{selectedName}</h3>
+
+                <p style={{ color: "#6B7280", fontSize: 14 }}>
+                  Current Stock:{" "}
+                  <strong>
+                    {availableStock} available • {totalStock} total
+                  </strong>
+                </p>
+
+                <p style={{ color: "#6B7280", fontSize: 13 }}>
+                  Package Type: <strong>{product?.packageType || "N/A"}</strong>
+                </p>
               </div>
             </div>
+          )}
 
+          <div className="record-card">
             <div className="record-row">
-              <div className="record-field">
-                <label>Package Type *</label>
-                <input
-                  type="text"
-                  placeholder="e.g. Carton, Box, Bottle"
-                  required
-                  value={packageType}
-                  readOnly
-                  style={{ backgroundColor: '#f0f0f0', cursor: 'not-allowed' }}
-                />
-              </div>
               <div className="record-field">
                 <label>Package Qty *</label>
                 <input
                   type="number"
-                  placeholder="Enter pkg qty"
-                  required
                   min="1"
+                  step="1"
                   value={packageQuantity}
-                  onChange={(e) => setPackageQuantity(e.target.value)}
-                />
-              </div>
-            </div>
-
-            <div className="record-row">
-              <div className="record-field">
-                <label>Units / Pkg *</label>
-                <input
-                  type="number"
-                  placeholder="Enter units per pkg"
-                  required
-                  min="1"
-                  value={unitPerPackage}
-                  onChange={(e) => setUnitPerPackage(e.target.value)}
-                />
-              </div>
-              <div className="record-field">
-                <label>Batch Number</label>
-                <input
-                  type="text"
-                  value="SYSTEM GENERATED"
-                  disabled
-                  style={{ backgroundColor: '#f0f0f0', cursor: 'not-allowed' }}
-                />
-              </div>
-            </div>
-
-            <div className="record-row">
-              <div className="record-field">
-                <label>Delivery Date *</label>
-                <input
-                  type="date"
-                  required
-                  value={deliveryDate}
-                  min={new Date().toISOString().split('T')[0]}
-                  max={expiryDate || undefined}
-                  onChange={(e) => {
-                    setDeliveryDate(e.target.value)
-                    setError(null)
-                    if (expiryDate && expiryDate <= e.target.value) {
-                      setExpiryDate('')
+                  onChange={(e) =>
+                    setPackageQuantity(e.target.value.replace(/[^\d]/g, ""))
+                  }
+                  onKeyDown={(e) => {
+                    if (["e", "E", "+", "-", "."].includes(e.key)) {
+                      e.preventDefault();
                     }
                   }}
+                  required
                 />
               </div>
+
+              <div className="record-field">
+                <label>Units Per Package *</label>
+                <input
+                  type="number"
+                  min="1"
+                  step="1"
+                  value={unitPerPackage}
+                  onChange={(e) =>
+                    setUnitPerPackage(e.target.value.replace(/[^\d]/g, ""))
+                  }
+                  onKeyDown={(e) => {
+                    if (["e", "E", "+", "-", "."].includes(e.key)) {
+                      e.preventDefault();
+                    }
+                  }}
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="record-row">
+              <div className="record-field">
+                <label>Supplier Name *</label>
+                <input
+                  type="text"
+                  value={supplierName}
+                  onChange={(e) => setSupplierName(e.target.value)}
+                  required
+                />
+              </div>
+
               <div className="record-field">
                 <label>Expiry Date *</label>
                 <input
                   type="date"
-                  required
                   value={expiryDate}
                   min={
-                    deliveryDate
-                    ? new Date(new Date(deliveryDate).getTime() + 86400000).toISOString().split('T')[0]
-                    : new Date(Date.now() + 86400000).toISOString().split('T')[0]
+                    new Date(Date.now() + 86400000).toISOString().split("T")[0]
                   }
                   onChange={(e) => {
-                    setExpiryDate(e.target.value)
-                    setError(null)
+                    setExpiryDate(e.target.value);
+                    setExpiryError("");
                   }}
+                  required
                 />
+                {expiryError && (
+                  <div className="record-field-error">{expiryError}</div>
+                )}
               </div>
-            </div>
-
-            {dateError && (
-              <div className="record-allocation-error">
-                ⚠ {dateError}
-              </div>
-            )}
-          </div>
-
-          <div className="record-card">
-            <h3 className="record-allocation-title">Stock Allocation</h3>
-            <p className="record-allocation-sub">Total Received: <strong>{totalReceived}</strong> units</p>
-
-            <div className="record-row">
-              <div className="record-field">
-                <label>Available Stock</label>
-                <input
-                  type="number"
-                  min="0"
-                  value={availableStock}
-                  onChange={(e) => setAvailableStock(e.target.value)}
-                />
-              </div>
-              <div className="record-field">
-                <label>Reserved Stock</label>
-                <input
-                  type="number"
-                  min="0"
-                  value={reservedStock}
-                  onChange={(e) => setReservedStock(e.target.value)}
-                />
-              </div>
-            </div>
-
-            {allocationError && (
-              <div className="record-allocation-error">
-                ⚠ {allocationError}
-              </div>
-            )}
-
-            <div className={`record-allocated ${isAllocated ? 'record-allocated--ok' : ''}`}>
-              <span>Allocated: {totalAllocated} / {totalReceived}</span>
-              {isAllocated && <CheckCircle size={16} color="#00A63E" />}
             </div>
 
             <div className="record-actions">
-              <button type="button" className="record-cancel-btn" onClick={onClose} disabled={loading}>
+              <button
+                type="button"
+                className="record-cancel-btn"
+                onClick={onClose}
+              >
                 Cancel
               </button>
-              <button type="submit" className="record-submit-btn" disabled={loading}>
-                {loading ? 'Recording...' : 'Record Stock Entry'}
+
+              <button
+                type="submit"
+                className="record-submit-btn"
+                disabled={loading}
+              >
+                {loading ? "Processing..." : "Confirm Restock"}
               </button>
             </div>
           </div>
         </form>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default RecordStockModal
+export default RecordStockModal;

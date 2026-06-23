@@ -216,6 +216,17 @@
   outline: none;
   background-color: #F3F3F5;
 }
+.manage-field select {
+  height: 44px;
+  border: 1.5px solid #00000000;
+  border-radius: 10px;
+  padding: 0 14px;
+  font-size: 13px;
+  font-weight: 400;
+  color: #0A0A0A;
+  outline: none;
+  background-color: #F3F3F5;
+}
 
 .manage-field input:focus {
   border-color: #432DD7;

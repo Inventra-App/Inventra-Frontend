@@ -1,92 +1,102 @@
-import React, { useState } from 'react'
-import { X, ArrowRight, CheckCircle } from 'lucide-react'
-import '../Css/ManageStockModal.css'
-import { moveInventoryStock } from '../API/inventoryApi'
+import React, { useState } from "react";
+import { X, ArrowRight, CheckCircle } from "lucide-react";
+import "../Css/ManageStockModal.css";
+import { moveInventoryStock } from "../API/inventoryApi";
 
 const ManageStockModal = ({ inventoryId, product, onClose, onUpdate }) => {
-  if (!product) return null
+  if (!product) return null;
 
-  const [actionType, setActionType] = useState('')
-  const [moveFrom, setMoveFrom] = useState('')
-  const [moveTo, setMoveTo] = useState('')
-  const [quantity, setQuantity] = useState('')
-  const [loading, setLoading] = useState(false)
-  const [success, setSuccess] = useState(false)
-  const [error, setError] = useState(null)
+  const [actionType, setActionType] = useState("");
+  const [moveFrom, setMoveFrom] = useState("");
+  const [moveTo, setMoveTo] = useState("");
+  const [quantity, setQuantity] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [error, setError] = useState(null);
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
-  
-  if (!inventoryId) {
-    setError("Inventory record ID is missing.");
-    return;
-  }
+  const actionTypes = ["RESTOCK", "SALE", "RETURN", "ADJUSTMENT", "DAMAGED"];
 
-  setLoading(true);
-  setError(null);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-  const payload = {
-    actionType,
-    moveFrom,
-    moveTo,
-    quantity: parseInt(quantity)
+    if (!inventoryId) {
+      setError("Inventory record ID is missing.");
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+
+    const payload = {
+      actionType,
+      moveFrom,
+      moveTo,
+      quantity: parseInt(quantity),
+    };
+
+    try {
+      await moveInventoryStock(inventoryId, payload);
+      setSuccess(true);
+      onUpdate();
+      setTimeout(() => {
+        setSuccess(false);
+        onClose();
+      }, 3500);
+    } catch (err) {
+      console.error("Move stock error:", err);
+      setError(
+        err?.response?.data?.message ||
+          "Failed to move stock. Please try again.",
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
-  try {
-    await moveInventoryStock(inventoryId, payload);
-    setSuccess(true);
-    onUpdate();
-    setTimeout(() => {
-      setSuccess(false);
-      onClose();
-    }, 3500)
-  } catch (err) {
-    console.error("Move stock error:", err);
-    setError(err?.response?.data?.message || "Failed to move stock. Please try again.");
-  } finally {
-    setLoading(false);
-  }
-}
-
   if (success) {
-  return (
-    <div className="manage-overlay" onClick={onClose}>
-      <div className="manage-success-modal" onClick={(e) => e.stopPropagation()}>
-        <div className="manage-success">
-          <div className="manage-success-icon">
-            <CheckCircle size={36} color="#00A63E" strokeWidth={1.5} />
-          </div>
-          <h3 className="manage-success-title">Stock Moved!</h3>
-          <div className="manage-success-details">
-            <div className="manage-success-row">
-              <span className="manage-success-label">Product</span>
-              <span className="manage-success-value">{product.name}</span>
+    return (
+      <div className="manage-overlay" onClick={onClose}>
+        <div
+          className="manage-success-modal"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div className="manage-success">
+            <div className="manage-success-icon">
+              <CheckCircle size={36} color="#00A63E" strokeWidth={1.5} />
             </div>
-            <div className="manage-success-row">
-              <span className="manage-success-label">Moved</span>
-              <span className="manage-success-value">{quantity} units</span>
-            </div>
-            <div className="manage-success-row">
-              <span className="manage-success-label">From</span>
-              <span className="manage-success-value">{moveFrom}</span>
-            </div>
-            <div className="manage-success-row">
-              <span className="manage-success-label">To</span>
-              <span className="manage-success-value">{moveTo}</span>
+            <h3 className="manage-success-title">Stock Moved!</h3>
+            <div className="manage-success-details">
+              <div className="manage-success-row">
+                <span className="manage-success-label">Product</span>
+                <span className="manage-success-value">{product.name}</span>
+              </div>
+              <div className="manage-success-row">
+                <span className="manage-success-label">Moved</span>
+                <span className="manage-success-value">{quantity} units</span>
+              </div>
+              <div className="manage-success-row">
+                <span className="manage-success-label">From</span>
+                <span className="manage-success-value">{moveFrom}</span>
+              </div>
+              <div className="manage-success-row">
+                <span className="manage-success-label">To</span>
+                <span className="manage-success-value">{moveTo}</span>
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
-  )
-}
+    );
+  }
 
   return (
     <div className="manage-overlay" onClick={onClose}>
       <div className="manage-modal" onClick={(e) => e.stopPropagation()}>
         <div className="manage-header">
           <h3>Manage Stock</h3>
-          <button type="button" className="manage-close" onClick={onClose}><X size={18} /></button>
+          <button type="button" className="manage-close" onClick={onClose}>
+            <X size={18} />
+          </button>
         </div>
 
         <div className="manage-product-info">
@@ -94,15 +104,21 @@ const handleSubmit = async (e) => {
           <div className="manage-stock-row">
             <div>
               <p className="manage-stock-label">Total Stock</p>
-              <p className="manage-stock-value manage-dark">{product.totalStock}</p>
+              <p className="manage-stock-value manage-dark">
+                {product.totalStock}
+              </p>
             </div>
             <div>
               <p className="manage-stock-label">Available Stock</p>
-              <p className="manage-stock-value manage-green">{product.availableStock}</p>
+              <p className="manage-stock-value manage-green">
+                {product.availableStock}
+              </p>
             </div>
             <div>
               <p className="manage-stock-label">Reserved Stock</p>
-              <p className="manage-stock-value manage-purple">{product.reservedStock}</p>
+              <p className="manage-stock-value manage-purple">
+                {product.reservedStock}
+              </p>
             </div>
           </div>
         </div>
@@ -110,14 +126,30 @@ const handleSubmit = async (e) => {
         <form className="manage-form" onSubmit={handleSubmit}>
           <div className="manage-field">
             <label>Action Type</label>
-            <input type="text" value={actionType} onChange={(e) => setActionType(e.target.value)} />
+
+            <select
+              value={actionType}
+              onChange={(e) => setActionType(e.target.value)}
+            >
+              <option value="">Select Action Type</option>
+
+              {actionTypes.map((type) => (
+                <option key={type} value={type}>
+                  {type}
+                </option>
+              ))}
+            </select>
           </div>
 
           <div className="manage-move-row">
             <div className="manage-field manage-field-half">
               <label>Move From</label>
               <div className="manage-select-wrapper">
-                <select required value={moveFrom} onChange={(e) => setMoveFrom(e.target.value)}>
+                <select
+                  required
+                  value={moveFrom}
+                  onChange={(e) => setMoveFrom(e.target.value)}
+                >
                   <option value=""></option>
                   <option value="all stock">All Stock</option>
                   <option value="reserved stock">Reserved Stock</option>
@@ -131,7 +163,11 @@ const handleSubmit = async (e) => {
             <div className="manage-field manage-field-half">
               <label>Move To</label>
               <div className="manage-select-wrapper">
-                <select required value={moveTo} onChange={(e) => setMoveTo(e.target.value)}>
+                <select
+                  required
+                  value={moveTo}
+                  onChange={(e) => setMoveTo(e.target.value)}
+                >
                   <option value=""></option>
                   <option value="available stock">Available Stock</option>
                   <option value="reserved stock">Reserved Stock</option>
@@ -142,34 +178,52 @@ const handleSubmit = async (e) => {
 
           <div className="manage-field">
             <label>Quantity</label>
-            <input type="number" required min="1" value={quantity} onChange={(e) => setQuantity(e.target.value)} />
+            <input
+              type="number"
+              required
+              min="1"
+              value={quantity}
+              onChange={(e) => setQuantity(e.target.value)}
+            />
           </div>
 
           {error && (
-        <div style={{
-           color: '#DC2626',
-           backgroundColor: '#FEF2F2',
-           border: '1.5px solid #FECACA',
-           borderRadius: '8px',
-           padding: '10px 14px',
-           fontSize: '14px',
-           fontWeight: '500',
-           marginBottom: '12px'
-            }}>
-          ⚠ {error}
-        </div>
-         )}
+            <div
+              style={{
+                color: "#DC2626",
+                backgroundColor: "#FEF2F2",
+                border: "1.5px solid #FECACA",
+                borderRadius: "8px",
+                padding: "10px 14px",
+                fontSize: "14px",
+                fontWeight: "500",
+                marginBottom: "12px",
+              }}
+            >
+              ⚠ {error}
+            </div>
+          )}
 
           <div className="manage-actions">
-            <button type="button" className="manage-cancel-btn" onClick={onClose}>Cancel</button>
-            <button type="submit" className="manage-confirm-btn" disabled={loading}>
+            <button
+              type="button"
+              className="manage-cancel-btn"
+              onClick={onClose}
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="manage-confirm-btn"
+              disabled={loading}
+            >
               {loading ? "Processing..." : "Confirm Action"}
             </button>
           </div>
         </form>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default ManageStockModal
+export default ManageStockModal;
