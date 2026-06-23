@@ -21,10 +21,11 @@ const AddProductModal = ({
     unitPrice: "",
     packageQuantity: "",
     unitPerPackage: "",
+    availableStock: "",
+    reservedStock: "",
     packageType: "",
     expiryDate: "",
     customPackageType: "",
-    reservedStock: "",
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -45,8 +46,11 @@ const AddProductModal = ({
       unitPrice: "",
       packageQuantity: "",
       unitPerPackage: "",
+      availableStock: "",
+      reservedStock: "",
       packageType: "",
       expiryDate: "",
+      customPackageType: "",
     });
     setServerError("");
   };
@@ -63,6 +67,18 @@ const AddProductModal = ({
     }
   };
 
+  const totalStock =
+    Number(formData.packageQuantity || 0) *
+    Number(formData.unitPerPackage || 0);
+
+  const remaining =
+    totalStock -
+    (Number(formData.availableStock || 0) +
+      Number(formData.reservedStock || 0));
+
+  const totalQty =
+    Number(formData.packageQuantity) * Number(formData.unitPerPackage);
+
   const handleSelectCategory = (cat) => {
     setSelectedCategory(cat);
     setStep(STEPS.FORM);
@@ -77,10 +93,15 @@ const AddProductModal = ({
   const handleChange = (e) => {
     const { name, value } = e.target;
 
-    const numericFields = ["packageQuantity", "reservedStock"];
+    const numericFields = [
+      "packageQuantity",
+      "unitPerPackage",
+      "availableStock",
+      "reservedStock",
+    ];
 
     if (numericFields.includes(name)) {
-      const cleaned = value.replace(/[^0-9]/g, ""); // only digits
+      const cleaned = value.replace(/[^0-9]/g, "");
       setFormData((prev) => ({ ...prev, [name]: cleaned }));
       return;
     }
@@ -92,6 +113,22 @@ const AddProductModal = ({
     e.preventDefault();
     setServerError("");
     setIsSubmitting(true);
+
+    const totalQty =
+      Number(formData.packageQuantity || 0) *
+      Number(formData.unitPerPackage || 0);
+
+    const allocated =
+      Number(formData.availableStock || 0) +
+      Number(formData.reservedStock || 0);
+
+    if (allocated !== totalQty) {
+      setServerError(
+        `Available Stock + Backroom Stock cannot exceed Total Stock (${totalQty.toLocaleString()}).`,
+      );
+      setIsSubmitting(false);
+      return;
+    }
 
     try {
       const payload = {
@@ -121,14 +158,13 @@ const AddProductModal = ({
         batchCode: response?.data?.batch?.batchCode,
         expiryDate: response?.data?.batch?.expiryDate,
         category: selectedCategory?.categoryName || selectedCategory?._id,
-        availableStock: 0,
-        stockReceived: 0,
-        reservedStock: 0,
+        availableStock: Number(formData.availableStock || 0),
+        reservedStock: Number(formData.reservedStock || 0),
         totalStock: totalQty,
         status:
-          totalQty > 10
+          Number(formData.availableStock || 0) > 10
             ? "In Stock"
-            : totalQty > 0
+            : Number(formData.availableStock || 0) > 0
               ? "Low Stock"
               : "Out of Stock",
       });
@@ -353,12 +389,86 @@ const AddProductModal = ({
 
               <div className="form-row">
                 <div className="form-group">
-                  <label>Available Stock *</label>
+                  <label>Package Qty *</label>
                   <input
                     className="input"
                     type="text"
                     name="packageQuantity"
                     value={formData.packageQuantity}
+                    onChange={handleChange}
+                    onKeyDown={(e) => {
+                      if (
+                        !/[0-9]/.test(e.key) &&
+                        e.key !== "Backspace" &&
+                        e.key !== "Tab" &&
+                        e.key !== "Delete" &&
+                        e.key !== "ArrowLeft" &&
+                        e.key !== "ArrowRight"
+                      ) {
+                        e.preventDefault();
+                      }
+                    }}
+                    onPaste={(e) => {
+                      const pasted = e.clipboardData.getData("text");
+                      if (!/^\d+$/.test(pasted)) {
+                        e.preventDefault();
+                      }
+                    }}
+                    required
+                    disabled={isSubmitting}
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label>Units Per Package *</label>
+                  <input
+                    className="input"
+                    type="text"
+                    name="unitPerPackage"
+                    value={formData.unitPerPackage}
+                    onChange={handleChange}
+                    onKeyDown={(e) => {
+                      if (
+                        !/[0-9]/.test(e.key) &&
+                        e.key !== "Backspace" &&
+                        e.key !== "Tab" &&
+                        e.key !== "Delete" &&
+                        e.key !== "ArrowLeft" &&
+                        e.key !== "ArrowRight"
+                      ) {
+                        e.preventDefault();
+                      }
+                    }}
+                    onPaste={(e) => {
+                      const pasted = e.clipboardData.getData("text");
+                      if (!/^\d+$/.test(pasted)) {
+                        e.preventDefault();
+                      }
+                    }}
+                    required
+                    disabled={isSubmitting}
+                  />
+                </div>
+              </div>
+
+              <div className="form-group full">
+                <label>Total Stock</label>
+                <input
+                  className="input"
+                  type="text"
+                  value={totalStock.toLocaleString()}
+                  readOnly
+                />
+              </div>
+
+              <div className="form-row">
+                <div className="form-group">
+                  <label>Available Stock *</label>
+                  <input
+                    className="input"
+                    type="text"
+                    name="availableStock"
+                    value={formData.availableStock}
                     onChange={handleChange}
                     onKeyDown={(e) => {
                       if (
@@ -381,7 +491,7 @@ const AddProductModal = ({
                 </div>
 
                 <div className="form-group">
-                  <label>Reserved Stock</label>
+                  <label>Backroom Stock *</label>
                   <input
                     className="input"
                     type="text"
@@ -408,6 +518,21 @@ const AddProductModal = ({
                   />
                 </div>
               </div>
+
+              {totalStock > 0 && (
+                <p
+                  className="stock-allocation-info"
+                  style={{
+                    marginTop: "-8px",
+                    marginBottom: "12px",
+                    fontSize: "13px",
+                    fontWeight: "600",
+                    color: remaining === 0 ? "#00A63E" : "#ef4444",
+                  }}
+                >
+                  Remaining to allocate: {remaining.toLocaleString()}
+                </p>
+              )}
 
               <div className="form-group full">
                 <label>Expiry Date</label>
