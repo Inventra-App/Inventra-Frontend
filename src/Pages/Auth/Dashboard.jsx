@@ -114,14 +114,33 @@ const normalizeExpiryAlert = (item) => {
   };
 };
 
+const dashboardCache = {
+  data: null,
+  timestamp: null,
+};
+const CACHE_TTL = 2 * 60 * 1000;
+
 const Dashboard = () => {
   const navigate = useNavigate();
-  const [totalProducts, setTotalProducts] = useState(null);
-  const [totalStockUnits, setTotalStockUnits] = useState(null);
-  const [totalSalesAmount, setTotalSalesAmount] = useState(null);
-  const [expiryItems, setExpiryItems] = useState([]);
-  const [lowStockItems, setLowStockItems] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [totalProducts, setTotalProducts] = useState(
+    dashboardCache.data?.totalProducts ?? null,
+  );
+  const [totalStockUnits, setTotalStockUnits] = useState(
+    dashboardCache.data?.totalStockUnits ?? null,
+  );
+  const [totalSalesAmount, setTotalSalesAmount] = useState(
+    dashboardCache.data?.totalSalesAmount ?? null,
+  );
+  const [expiryItems, setExpiryItems] = useState(
+    dashboardCache.data?.expiryItems ?? [],
+  );
+  const [lowStockItems, setLowStockItems] = useState(
+    dashboardCache.data?.lowStockItems ?? [],
+  );
+  const [recentActivities, setRecentActivities] = useState(
+    dashboardCache.data?.recentActivities ?? [],
+  );
+  const [loading, setLoading] = useState(!dashboardCache.data);
   const [error, setError] = useState(null);
 
   const [showModal, setShowModal] = useState(false);
@@ -130,7 +149,6 @@ const Dashboard = () => {
   const [modalQueue, setModalQueue] = useState([]);
   const [sessionUser] = useState(() => getSessionUser());
   const [isFirstLogin] = useState(() => isNewSessionUser());
-  const [recentActivities, setRecentActivities] = useState([]);
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -212,25 +230,26 @@ const Dashboard = () => {
       }
       setLowStockItems(lowStock);
 
+      let normalized = [];
       if (activityRes.status === "fulfilled" && activityRes.value) {
         const list = Array.isArray(activityRes.value?.data)
           ? activityRes.value.data
           : [];
-        const normalized = [...list]
-        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-        .slice(0, 5)
-        .map((item) => ({
-          id: item._id,
-          type: getModuleType(item.module),
-          label: item.action || item.title || "Activity",
-          desc: item.description || "-",
-          user: item.user || "System",
-          date: formatActivityDate(item.createdAt),
-          amount:
-            item.amount > 0
-              ? `+₦${Number(item.amount).toLocaleString()}`
-              : null,
-        }));
+        normalized = [...list]
+          .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+          .slice(0, 5)
+          .map((item) => ({
+            id: item._id,
+            type: getModuleType(item.module),
+            label: item.action || item.title || "Activity",
+            desc: item.description || "-",
+            user: item.user || "System",
+            date: formatActivityDate(item.createdAt),
+            amount:
+              item.amount > 0
+                ? `+₦${Number(item.amount).toLocaleString()}`
+                : null,
+          }));
         setRecentActivities(normalized);
       }
 
@@ -276,6 +295,16 @@ const Dashboard = () => {
         setModalItems(firstModal.items);
         setShowModal(true);
       }
+
+      dashboardCache.data = {
+        totalProducts: tpc,
+        totalStockUnits: tsu,
+        totalSalesAmount: tsa,
+        expiryItems: normalizedExpiry,
+        lowStockItems: lowStock,
+        recentActivities: normalized,
+      };
+      dashboardCache.timestamp = Date.now();
     } catch (err) {
       console.error("Dashboard fetch error:", err);
       setError("Failed to load dashboard data. Please try again.");
@@ -285,6 +314,12 @@ const Dashboard = () => {
   }, []);
 
   useEffect(() => {
+    const isCacheFresh =
+      dashboardCache.timestamp &&
+      Date.now() - dashboardCache.timestamp < CACHE_TTL;
+
+    if (isCacheFresh) return;
+
     const timerId = window.setTimeout(fetchData, 0);
     return () => window.clearTimeout(timerId);
   }, [fetchData]);
@@ -342,10 +377,14 @@ const Dashboard = () => {
     },
     {
       label: "Sales Today",
-      value: totalSalesAmount !== null ? `${Number(totalSalesAmount).toLocaleString()}` : "0",
-      sub:  totalSalesAmount === 0 || totalSalesAmount === null
-            ? "no transactions yet"
-            : `transaction${Number(totalSalesAmount) === 1 ? "" : "s"} completed`,
+      value:
+        totalSalesAmount !== null
+          ? `${Number(totalSalesAmount).toLocaleString()}`
+          : "0",
+      sub:
+        totalSalesAmount === 0 || totalSalesAmount === null
+          ? "no transactions yet"
+          : `transaction${Number(totalSalesAmount) === 1 ? "" : "s"} completed`,
       icon: <ShoppingCart size={22} />,
       color: "purple",
     },
@@ -361,9 +400,56 @@ const Dashboard = () => {
   if (loading) {
     return (
       <div className="dashboard-content">
-        <div className="dashboard-welcome">
-          <h2>Loading dashboard...</h2>
-          <p>Fetching your latest inventory data.</p>
+        <div className="dash-skel-welcome">
+          <div className="dash-skel-line w-48" />
+          <div className="dash-skel-line w-72 short" />
+        </div>
+
+        <div className="dashboard-stats">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="stat-card dash-skel-card">
+              <div className="dash-skel-card-left">
+                <div className="dash-skel-line w-24 short" />
+                <div className="dash-skel-line w-16" />
+                <div className="dash-skel-line w-32 short" />
+              </div>
+              <div className="dash-skel-icon" />
+            </div>
+          ))}
+        </div>
+
+        <div className="dashboard-alerts">
+          {[1, 2].map((i) => (
+            <div key={i} className="alert-card">
+              <div className="dash-skel-alert-header">
+                <div className="dash-skel-line w-32" />
+                <div className="dash-skel-badge" />
+              </div>
+              {[1, 2, 3].map((j) => (
+                <div key={j} className="dash-skel-alert-row">
+                  <div className="dash-skel-line w-full short" />
+                  <div className="dash-skel-line w-48 short" />
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
+
+        <div className="activity-card">
+          <div className="dash-skel-alert-header">
+            <div className="dash-skel-line w-32" />
+            <div className="dash-skel-badge" />
+          </div>
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="dash-skel-activity-row">
+              <div className="dash-skel-activity-icon" />
+              <div className="dash-skel-activity-lines">
+                <div className="dash-skel-line w-48" />
+                <div className="dash-skel-line w-full short" />
+                <div className="dash-skel-line w-32 short" />
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     );
@@ -522,10 +608,10 @@ const Dashboard = () => {
                 <div
                   className={`activity-icon ${
                     act.type === "sale"
-                      ? 'activity-icon-sale'
+                      ? "activity-icon-sale"
                       : act.type === "receiving"
-                        ? 'activity-icon-receive'
-                        : 'activity-icon-create'
+                        ? "activity-icon-receive"
+                        : "activity-icon-create"
                   }`}
                 >
                   {act.type === "sale" ? (
