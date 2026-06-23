@@ -219,7 +219,7 @@ const SignUpRight = ({ nav }) => {
             {isSubmitting ? 'Creating Account...' : 'Create Account'}
           </button>
 
-          <div className="signup-divider"><span>or continue with</span></div>
+          {/* <div className="signup-divider"><span>or continue with</span></div>
           <button
             type="button"
             className="signup-google-btn"
@@ -228,7 +228,7 @@ const SignUpRight = ({ nav }) => {
           >
             <img src="https://www.google.com/favicon.ico" alt="Google" width={18} />
             {isGoogleLoading ? "Connecting..." : "Google"}
-          </button>
+          </button> */}
         </form>
       </div>
     </div>
