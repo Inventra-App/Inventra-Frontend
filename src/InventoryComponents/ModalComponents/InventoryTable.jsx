@@ -80,7 +80,7 @@ const InventoryTable = ({
                 {" "}
                 <span className="inv-quantity-reserved">
                   {" "}
-                  {product.reservedStock}{" "}
+                  {product.backroomStock}{" "}
                 </span>{" "}
               </td>
               <td>
@@ -180,7 +180,7 @@ const InventoryTable = ({
               <div className="inv-mobile-card-item">
                 <label>BACKROOM STOCK</label>
                 <span className="inv-quantity-reserved">
-                  {product.reservedStock}
+                  {product.backroomStock}
                 </span>
               </div>
 

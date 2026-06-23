@@ -35,12 +35,6 @@ const DashboardLayout = () => {
   }
   const closeLogoutModal = () => setIsLogoutModalOpen(false)
 
-  // Called when the user clicks "Logout" in the confirmation modal.
-  // `logoutUser` already:
-  //   - POSTs to /logout
-  //   - removes every known token from localStorage
-  //   - resets redux auth + user-scoped data
-  // So this handler just needs to handle UX (toast + navigation).
   const confirmLogout = async () => {
     if (isLoggingOut) return;
     setIsLoggingOut(true);
@@ -50,8 +44,6 @@ const DashboardLayout = () => {
       toast.success("You've been logged out successfully.");
     } catch (error) {
       console.error("Logout error:", error);
-      // logoutUser still ran its local cleanup via finally, so the user
-      // is safely signed-out client-side. We still show feedback.
       toast.success("Logged out locally (server was unreachable).");
     } finally {
       setIsLogoutModalOpen(false);

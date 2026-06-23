@@ -1,7 +1,7 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import { AnimatePresence, motion } from "framer-motion";
+
 import LandingPage from "./Pages/Auth/LandingPage";
 import Pricing from "./Pages/Auth/Pricing";
 import AboutUs from "./Pages/Auth/AboutUs";
@@ -30,6 +30,8 @@ import NotFound from "./Pages/Auth/NotFound";
 import StaffLogin from "./Components/StaffLogin";
 import CashierLogin from "./Components/CashierLogin";
 
+import PublicAnimationLayout from "./Components/PublicAnimationLayout";
+
 function ScrollToTop() {
   const { pathname } = useLocation();
 
@@ -40,46 +42,31 @@ function ScrollToTop() {
   return null;
 }
 
-const AnimatedRoutes = ({ children }) => {
-  const location = useLocation();
-
-  return (
-    <AnimatePresence mode="wait">
-      <motion.div
-        key={location.pathname}
-        initial={{ opacity: 0, y: 15 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y2: -15 }}
-      >
-        <Routes location={location}>{children}</Routes>
-      </motion.div>
-    </AnimatePresence>
-  );
-};
-
 function App() {
   return (
     <BrowserRouter>
       <ScrollToTop />
 
-      <AnimatedRoutes>
-        <Route path="/" element={<LandingPage />} />
-        <Route path="/pricing" element={<Pricing />} />
-        <Route path="/about" element={<AboutUs />} />
-        <Route path="/contact" element={<ContactUs />} />
-        <Route path="/signup" element={<SignUp />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/staff-login" element={<StaffLogin />} />
-        <Route path="/cashier-login" element={<CashierLogin />} />
-        <Route path="/signupverify" element={<SignUpVerify />} />
-        <Route path="/supermarket-info" element={<SupermarketInfo />} />
-        <Route path="/setting-up" element={<SettingUp />} />
-        <Route path="/created" element={<Created />} />
-        <Route path="/resetpassword" element={<ForgetPassUi />} />
-        <Route path="/forgot-password" element={<ForgetPassUi />} />
-        <Route path="/demo" element={<Demo />} />
-        <Route path="/plan-setup/:plan" element={<PlanSetup />} />
-        <Route path="/payment-success" element={<PaymentSuccess />} />
+      <Routes>
+        <Route element={<PublicAnimationLayout />}>
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/pricing" element={<Pricing />} />
+          <Route path="/about" element={<AboutUs />} />
+          <Route path="/contact" element={<ContactUs />} />
+          <Route path="/signup" element={<SignUp />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/staff-login" element={<StaffLogin />} />
+          <Route path="/cashier-login" element={<CashierLogin />} />
+          <Route path="/signupverify" element={<SignUpVerify />} />
+          <Route path="/supermarket-info" element={<SupermarketInfo />} />
+          <Route path="/setting-up" element={<SettingUp />} />
+          <Route path="/created" element={<Created />} />
+          <Route path="/resetpassword" element={<ForgetPassUi />} />
+          <Route path="/forgot-password" element={<ForgetPassUi />} />
+          <Route path="/demo" element={<Demo />} />
+          <Route path="/plan-setup/:plan" element={<PlanSetup />} />
+          <Route path="/payment-success" element={<PaymentSuccess />} />
+        </Route>
 
         <Route element={<ProtectedRoute />}>
           <Route element={<DashboardLayout />}>
@@ -108,7 +95,7 @@ function App() {
         </Route>
 
         <Route path="*" element={<NotFound />} />
-      </AnimatedRoutes>
+      </Routes>
     </BrowserRouter>
   );
 }

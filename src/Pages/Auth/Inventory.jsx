@@ -104,6 +104,8 @@ const Inventory = () => {
         getAllProducts({ _t: Date.now() }),
         getInventoryItems({ _t: Date.now() }),
       ]);
+      console.log("productsRes", productsRes);
+      console.log("inventoryRes", inventoryRes);
 
       const products = Array.isArray(productsRes)
         ? productsRes
@@ -115,6 +117,8 @@ const Inventory = () => {
 
       const mapped = products.map((prod) => {
         const inv = inventory.find((i) => i.productId === prod._id) || {};
+        console.log("PRODUCT", prod.productName);
+        console.log("INVENTORY", inv);
         const total = Number(inv.totalStock) || 0;
         const reorderLevel = Number(prod.reorderLevel) || 10;
         const status =
@@ -140,7 +144,7 @@ const Inventory = () => {
           createdAt: prod.createdAt,
           availableStock: Number(inv.availableStock) || 0,
           totalStock: total,
-          reservedStock: Number(inv.reservedStock) || 0,
+          backroomStock: Number(inv.backroomStock) || 0,
           stockReceived: stored[prod._id] || 0,
           status,
         };
@@ -171,8 +175,10 @@ const Inventory = () => {
     fetchLowStockAlerts();
   }, [fetchProducts, fetchLowStockAlerts]);
 
-  const handleSaveNewProduct = (newProduct) => {
-    setProductList((prev) => [newProduct, ...prev]);
+  const handleSaveNewProduct = async () => {
+    await fetchProducts(true);
+    await fetchLowStockAlerts();
+
     setShowToast(true);
   };
 
@@ -189,7 +195,7 @@ const Inventory = () => {
       }
     } catch (error) {
       console.error("Error saving category:", error?.response?.data);
-      throw error; 
+      throw error;
     }
   };
 
@@ -242,17 +248,19 @@ const Inventory = () => {
   };
 
   const handleAddProduct = (data) => {
-    console.log("handleAddProduct data:", JSON.stringify(data, null, 2));
+    console.log("ADD PRODUCT RAW:", data);
+
     if (!data) return;
 
-    const newBatch = data?.data?.batch ?? data?.batch;
-    const inventory = data?.data?.inventory ?? data?.inventory;
+    const newBatch = data?.batch;
+    const inventory = data?.inventory;
 
-    if (!newBatch) return;
+    if (!newBatch || !inventory) return;
 
     const storedEntries = JSON.parse(
       localStorage.getItem("stockEntries") || "[]",
     );
+
     const productName =
       productList.find((p) => p._id === newBatch.productId)?.name || "Unknown";
 
@@ -261,40 +269,24 @@ const Inventory = () => {
       productName,
       batch: newBatch.batchCode,
       quantity: newBatch.quantity,
-      supplier: newBatch.supplier,
       expiryDate: new Date(newBatch.expiryDate).toLocaleDateString("en-GB"),
       user: "You",
-      timestamp: new Date(newBatch.createdAt || Date.now()).toISOString(),
+      timestamp: new Date().toISOString(),
     };
 
     const updatedEntries = [newEntry, ...storedEntries];
     localStorage.setItem("stockEntries", JSON.stringify(updatedEntries));
-    setStockEntries(
-      updatedEntries.map((e) => ({ ...e, timestamp: new Date(e.timestamp) })),
-    );
-
-    const stored = JSON.parse(localStorage.getItem("stockReceived") || "{}");
-    stored[newBatch.productId] = newBatch.quantity;
-    localStorage.setItem("stockReceived", JSON.stringify(stored));
+    setStockEntries(updatedEntries);
 
     setProductList((prev) =>
       prev.map((p) =>
         p._id === newBatch.productId
           ? {
               ...p,
-              inventoryId:
-                newBatch?.inventoryId ??
-                inventory?.id ??
-                inventory?._id ??
-                p.inventoryId,
-              stockReceived: newBatch.quantity,
-              availableStock: Number(
-                inventory?.availableStock ?? p.availableStock,
-              ),
-              reservedStock: Number(
-                inventory?.reservedStock ?? p.reservedStock,
-              ),
-              totalStock: Number(inventory?.totalStock ?? p.totalStock),
+              inventoryId: inventory._id,
+              availableStock: inventory.availableStock ?? 0,
+              backroomStock: inventory.backroomStock ?? 0,
+              totalStock: inventory.totalStock ?? 0,
             }
           : p,
       ),
@@ -303,7 +295,7 @@ const Inventory = () => {
     setTimeout(() => {
       fetchProducts(true);
       fetchLowStockAlerts();
-    }, 2000);
+    }, 1000);
   };
 
   useEffect(() => {
