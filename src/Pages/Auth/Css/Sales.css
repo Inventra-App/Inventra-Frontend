@@ -143,8 +143,9 @@
 
 .sales-product-row {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 148px;
+  grid-template-columns: 1fr;
   gap: 14px;
+  width: 100%;
 }
 
 .sales-product-select {
@@ -154,13 +155,14 @@
 .sales-product-select input {
   width: 100%;
   height: 52px;
-  border: 1px solid #cfd6e4;
+  border: none;
   border-radius: 7px;
-  color: #101828;
+  color: #ffffff;
   font-size: 1rem;
   outline: none;
   padding: 0 44px;
-  transition: border-color 180ms ease, box-shadow 180ms ease, background-color 0.4s, color 0.4s;
+  background-color: transparent;
+  cursor: pointer;
 }
 
 .sales-product-select input:focus {
@@ -168,11 +170,16 @@
   box-shadow: 0 0 0 3px rgba(97, 95, 255, 0.14);
 }
 
+.sales-product-select input::placeholder {
+  color: rgba(255, 255, 255, 0.9);
+  opacity: 1;
+}
+
 .sales-product-search-icon {
   position: absolute;
   left: 14px;
   top: 17px;
-  color: #98a2b3;
+  color: #ffffff;
   z-index: 2;
 }
 
@@ -251,33 +258,13 @@
 }
 
 .sales-browse-trigger {
+  position: relative;
   border-radius: 7px;
   overflow: hidden;
-  transition: background-color 0.8s, border-color 0.8s;
-}
-
-.sales-browse-trigger:hover {
-  background-color: #16a34a !important;
-  border-color: #16a34a !important;
-}
-
-.sales-browse-trigger:hover input {
-  background-color: transparent !important;
-  color: #ffffff !important;
-  cursor: pointer;
-  border-color: transparent !important;
-  box-shadow: none !important;
-  transition: background-color 0.4s, color 0.4s;
-}
-
-.sales-browse-trigger:hover input::placeholder {
-  color: #ffffff !important;
-  opacity: 1;
-}
-
-.sales-browse-trigger:hover .sales-product-search-icon {
-  color: #ffffff !important;
-  stroke: #ffffff !important;
+  background-color: #432DD7; 
+  border: 1px solid #432DD7;
+  transition: all 0.3s ease;
+  width: 100%;
 }
 
 .sales-add-cart-btn {

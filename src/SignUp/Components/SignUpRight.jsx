@@ -149,7 +149,7 @@ const SignUpRight = ({ nav }) => {
             <label>Phone Number</label>
             <input 
               type="tel" 
-              placeholder="080******15" 
+              placeholder="09069273334" 
               {...register("phoneNumber")} 
             />
             {errors.phoneNumber && <span className="signup-error-text">{errors.phoneNumber.message}</span>}

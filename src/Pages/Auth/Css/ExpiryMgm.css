@@ -591,7 +591,6 @@
   min-height: 27px;
   border: none;
   border-radius: 6px;
-  background: #ef0612;
   color: #ffffff;
   font-size: 9px;
   font-weight: 800;
@@ -600,6 +599,18 @@
   justify-content: center;
   gap: 8px;
   cursor: pointer;
+}
+
+.expiry-remove-stock-btn-expired {
+  background: #ef4444;
+}
+
+.expiry-remove-stock-btn-warning {
+  background: #f97316;
+}
+
+.expiry-remove-stock-btn-info {
+  background: #ca8a04;
 }
 
 .expiry-remove-backdrop {

@@ -112,6 +112,11 @@ const ExpiryMgm = () => {
     : selectedProductTone === 'warning'
       ? 'Warning'
       : 'Info'
+  const selectedProductSectionText = selectedProductTone === 'expired'
+    ? 'Critical'
+    : selectedProductTone === 'warning'
+      ? 'Warning'
+      : 'Info'
   const selectedProductStatusBadge = selectedProductStatusText.toUpperCase()
   const selectedProductActions = {
     expired: [
@@ -127,13 +132,9 @@ const ExpiryMgm = () => {
       'Monitor this batch during routine inventory checks',
     ],
   }[selectedProductTone]
-  const selectedProductRemoveLabel = selectedProductTone === 'expired'
-    ? 'Remove Expired Stock'
-    : selectedProductTone === 'warning'
-      ? 'Review Warning Stock'
-      : 'Review Info Stock'
+  const selectedProductRemoveLabel = `Remove ${selectedProductSectionText} Stock`
   const removingProductLabel = removingProductTone === 'expired'
-    ? 'Expired'
+    ? 'Critical'
     : removingProductTone === 'warning'
       ? 'Warning'
       : 'Info'
@@ -405,7 +406,7 @@ const ExpiryMgm = () => {
               ))}
             </section>
 
-            <button className="expiry-remove-stock-btn" type="button" onClick={openRemovePopup}>
+            <button className={`expiry-remove-stock-btn expiry-remove-stock-btn-${selectedProductTone}`} type="button" onClick={openRemovePopup}>
               <Trash2 size={16} /> {selectedProductRemoveLabel}
             </button>
           </aside>

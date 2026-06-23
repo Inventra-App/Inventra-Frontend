@@ -1,5 +1,6 @@
 const SESSION_USER_KEY = "inventra_user";
 const NEW_USER_KEY = "inventra_is_new_user";
+const INVENTORY_GUIDE_KEY = "inventra_show_inventory_guide";
 
 const pick = (...values) => values.find((value) => value !== undefined && value !== null && String(value).trim() !== "");
 const toSlug = (value) => String(value || "account")
@@ -59,9 +60,22 @@ export const buildSessionUser = (source = {}, fallback = {}) => {
 };
 
 export const saveSessionUser = (source, fallback, options = {}) => {
+  const previousUser = readJson(SESSION_USER_KEY);
+  const hadPendingGuide = localStorage.getItem(INVENTORY_GUIDE_KEY) === "true";
   const sessionUser = buildSessionUser(source, fallback);
+  const isNewUser = options.isNewUser === true;
+  const previousEmail = String(previousUser?.email || "").toLowerCase();
+  const currentEmail = String(sessionUser.email || "").toLowerCase();
+  const isSamePendingAccount =
+    hadPendingGuide &&
+    !("isNewUser" in options) &&
+    previousUser &&
+    (previousUser.accountId === sessionUser.accountId ||
+      (previousEmail && previousEmail === currentEmail));
+
   localStorage.setItem(SESSION_USER_KEY, JSON.stringify(sessionUser));
-  if (options.isNewUser) localStorage.setItem(NEW_USER_KEY, "true");
+  localStorage.setItem(NEW_USER_KEY, isNewUser || isSamePendingAccount ? "true" : "false");
+  localStorage.setItem(INVENTORY_GUIDE_KEY, isNewUser || isSamePendingAccount ? "true" : "false");
   return sessionUser;
 };
 
@@ -73,6 +87,13 @@ export const isNewSessionUser = () => localStorage.getItem(NEW_USER_KEY) === "tr
 
 export const markReturningSessionUser = () => {
   localStorage.setItem(NEW_USER_KEY, "false");
+};
+
+export const shouldShowInventoryGuide = () =>
+  localStorage.getItem(INVENTORY_GUIDE_KEY) === "true";
+
+export const markInventoryGuideSeen = () => {
+  localStorage.setItem(INVENTORY_GUIDE_KEY, "false");
 };
 
 export const getAccountPath = (path = "/dashboard", user = getSessionUser()) => {

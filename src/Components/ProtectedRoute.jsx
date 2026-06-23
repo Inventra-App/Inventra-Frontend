@@ -1,6 +1,7 @@
 import React from "react";
 import { Navigate, Outlet, useLocation, useParams } from "react-router-dom";
 import { getSessionUser } from "../Utils/sessionUser";
+import { canAccessPath, getStaffLoginDestination } from "../Utils/authRoles";
 
 const ProtectedRoute = () => {
   const { accountId } = useParams();
@@ -19,6 +20,16 @@ const ProtectedRoute = () => {
   if (accountId !== sessionUser.accountId) {
     const currentPage = location.pathname.replace(/^\/[^/]+/, "") || "/dashboard";
     return <Navigate to={`/${sessionUser.accountId}${currentPage}`} replace />;
+  }
+
+  const currentPage = location.pathname.replace(/^\/[^/]+/, "") || "/dashboard";
+  if (!canAccessPath(sessionUser.role, currentPage)) {
+    return (
+      <Navigate
+        to={`/${sessionUser.accountId}${getStaffLoginDestination(sessionUser.role)}`}
+        replace
+      />
+    );
   }
 
   return <Outlet />;
