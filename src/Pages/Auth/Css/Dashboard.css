@@ -216,12 +216,37 @@
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
 }
 
+.alert-card,
+.activity-card {
+  background-color: #ffffff;
+  border-radius: 14px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+
+  display: flex;
+  flex-direction: column;
+
+  height: 420px;
+}
+
+.alert-list {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+}
+
+.activity-list {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+}
+
 .alert-card-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
 }
+
 
 .alert-card-title {
   display: flex;
