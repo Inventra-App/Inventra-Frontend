@@ -7,6 +7,8 @@ import SideBar from './SideBar'
 import DashboardHeader from './DashboardHeader'
 import { logoutUser } from '../API/logoutUser'
 import NoInternet from '../Pages/Auth/NoInternet'
+import { getLoginPathForRole } from '../Utils/authRoles'
+import { getSessionUser } from '../Utils/sessionUser'
 
 const DashboardLayout = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
@@ -38,6 +40,7 @@ const DashboardLayout = () => {
   const confirmLogout = async () => {
     if (isLoggingOut) return;
     setIsLoggingOut(true);
+    const loginPath = getLoginPathForRole(getSessionUser().role);
 
     try {
       await logoutUser();
@@ -48,7 +51,7 @@ const DashboardLayout = () => {
     } finally {
       setIsLogoutModalOpen(false);
       setIsLoggingOut(false);
-      navigate('/login', { replace: true });
+      navigate(loginPath, { replace: true });
     }
   };
 

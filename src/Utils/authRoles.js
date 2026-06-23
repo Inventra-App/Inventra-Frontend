@@ -47,6 +47,19 @@ export const getStaffLoginDestination = (role) => {
   return "/dashboard";
 };
 
+export const getLoginPathForRole = (role) => {
+  const normalizedRole = normalizeRole(role);
+  if (normalizedRole === "Cashier") return "/cashier-login";
+  if (normalizedRole === "Manager") return "/staff-login";
+  return "/login";
+};
+
+export const isJwtExpired = (token) => {
+  const payload = decodeJwtPayload(token);
+  if (!payload?.exp) return false;
+  return payload.exp * 1000 <= Date.now();
+};
+
 const rolePermissions = {
   Admin: [
     "/dashboard",

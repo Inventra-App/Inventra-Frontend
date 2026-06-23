@@ -16,6 +16,7 @@ import {
   getExpiryAlerts,
   getLowStockAlerts,
   getActivityLogs,
+  getAllProducts,
 } from "../../API/inventoryApi";
 import AlertModal from "../../Components/AlertModal";
 import {
@@ -85,7 +86,47 @@ const normalizeLowStockItem = (item) => {
   };
 };
 
-const normalizeExpiryAlert = (item) => {
+const getValue = (...values) =>
+  values.find((value) => value !== undefined && value !== null && value !== "");
+
+const getProductId = (item) =>
+  String(
+    getValue(item?.productId?._id, item?.productId, item?.product?._id, ""),
+  );
+
+const findMatchingProduct = (item, products) => {
+  const productId = getProductId(item);
+  const productName = String(
+    item?.productName ?? item?.product?.productName ?? "",
+  ).toLowerCase();
+
+  return products.find((product) => {
+    const currentId = String(product?._id ?? product?.id ?? product?.productId ?? "");
+    const currentName = String(product?.productName ?? product?.name ?? "").toLowerCase();
+
+    return (
+      (productId && currentId === productId) ||
+      (productName && currentName === productName)
+    );
+  });
+};
+
+const getCategoryName = (item, matchedProduct) =>
+  getValue(
+    item?.categoryName,
+    item?.category?.categoryName,
+    item?.category?.name,
+    item?.product?.categoryName,
+    item?.product?.category?.categoryName,
+    item?.product?.category?.name,
+    matchedProduct?.categoryName,
+    matchedProduct?.category?.categoryName,
+    matchedProduct?.category?.name,
+    "Uncategorized",
+  );
+
+const normalizeExpiryAlert = (item, products = []) => {
+  const matchedProduct = findMatchingProduct(item, products);
   const expiryValue =
     item?.expiryDate ??
     item?.expiresAt ??
@@ -103,7 +144,7 @@ const normalizeExpiryAlert = (item) => {
     quantity: Number(
       item?.quantityRemaining ?? item?.inventory?.totalStock ?? 0,
     ),
-    category: item?.categoryName ?? "General",
+    category: getCategoryName(item, matchedProduct),
     expiryDate: formatAlertDate(expiryValue),
     daysRemaining,
     daysLeft:
@@ -163,6 +204,7 @@ const Dashboard = () => {
         getExpiryAlerts().catch(() => []),
         getLowStockAlerts().catch(() => []),
         getActivityLogs().catch(() => null),
+        getAllProducts().catch(() => []),
       ]);
 
       const [
@@ -173,6 +215,7 @@ const Dashboard = () => {
         expiryRes,
         lowStockRes,
         activityRes,
+        productsRes,
       ] = results;
 
       const tsu =
@@ -257,7 +300,13 @@ const Dashboard = () => {
         expiryRes.status === "fulfilled"
           ? getArrayPayload(expiryRes.value)
           : [];
-      const normalizedExpiry = expiry.map(normalizeExpiryAlert);
+      const products =
+        productsRes.status === "fulfilled"
+          ? getArrayPayload(productsRes.value)
+          : [];
+      const normalizedExpiry = expiry.map((item) =>
+        normalizeExpiryAlert(item, products),
+      );
       setExpiryItems(normalizedExpiry);
 
       const expiredItems = normalizedExpiry.filter(
