@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { AlertTriangle, Package, Calendar, Eye, Box, Truck, Trash2, X } from 'lucide-react'
 import './Css/ExpiryMgm.css'
-import { getExpiryAlerts } from '../../API/inventoryApi'
+import { getAllProducts, getExpiryAlerts, getInventoryItems } from '../../API/inventoryApi'
 
 const getArrayPayload = (payload) => {
   if (Array.isArray(payload)) return payload
@@ -30,16 +30,79 @@ const formatDate = (dateValue) => {
   })
 }
 
-const normalizeExpiryItem = (item) => {
+const getValue = (...values) => values.find((value) => value !== undefined && value !== null && value !== '')
+
+const getCategoryName = (item, matchedProduct) => {
+  const category = getValue(
+    item?.categoryName,
+    item?.category?.categoryName,
+    item?.category?.name,
+    item?.product?.categoryName,
+    item?.product?.category?.categoryName,
+    item?.product?.category?.name,
+    matchedProduct?.categoryName,
+    matchedProduct?.category?.categoryName,
+    matchedProduct?.category?.name,
+    matchedProduct?.product?.categoryName,
+    matchedProduct?.product?.category?.categoryName,
+    matchedProduct?.product?.category?.name,
+  )
+
+  return category || 'Uncategorized'
+}
+
+const getProductPrice = (item, matchedProduct) => Number(getValue(
+  item?.unitPrice,
+  item?.price,
+  item?.sellingPrice,
+  item?.product?.unitPrice,
+  item?.product?.price,
+  item?.product?.sellingPrice,
+  item?.inventory?.unitPrice,
+  matchedProduct?.unitPrice,
+  matchedProduct?.price,
+  matchedProduct?.sellingPrice,
+  matchedProduct?.product?.unitPrice,
+  matchedProduct?.product?.price,
+  matchedProduct?.product?.sellingPrice,
+  0,
+))
+
+const getProductId = (item) => String(getValue(
+  item?.productId?._id,
+  item?.productId,
+  item?.product?._id,
+  '',
+))
+
+const findMatchingProduct = (item, products) => {
+  const productId = getProductId(item)
+  const productName = String(item?.productName ?? item?.product?.productName ?? '').toLowerCase()
+
+  return products.find((product) => {
+    const currentId = String(product?._id ?? product?.id ?? product?.productId ?? '')
+    const nestedProductId = String(product?.product?._id ?? product?.productId?._id ?? '')
+    const currentName = String(product?.productName ?? product?.name ?? '').toLowerCase()
+    const nestedProductName = String(product?.product?.productName ?? product?.product?.name ?? '').toLowerCase()
+
+    return (
+      (productId && (currentId === productId || nestedProductId === productId)) ||
+      (productName && (currentName === productName || nestedProductName === productName))
+    )
+  })
+}
+
+const normalizeExpiryItem = (item, products = []) => {
+  const matchedProduct = findMatchingProduct(item, products)
   const days = Number(item?.daysLeft ?? getDaysRemaining(item?.expiryDate))
   const expiredDays = Math.abs(days)
 
   return {
     id: item?._id ?? item?.productId ?? `${item?.productName}-${item?.expiryDate}`,
     name: item?.productName ?? 'Unnamed Product',
-    productId: item?.productId ?? 'N/A',
-    category: item?.categoryName ?? 'General',
-    price: Number(item?.unitPrice ?? item?.inventory?.unitPrice ?? 0),
+    productId: getProductId(item) || 'N/A',
+    category: getCategoryName(item, matchedProduct),
+    price: getProductPrice(item, matchedProduct),
     batch: item?.batchCode ?? 'N/A',
     quantity: Number(item?.quantityRemaining ?? item?.inventory?.totalStock ?? 0),
     expires: formatDate(item?.expiryDate),
@@ -67,8 +130,16 @@ const ExpiryMgm = () => {
       setError('')
 
       try {
-        const response = await getExpiryAlerts()
-        setExpiryItems(getArrayPayload(response).map(normalizeExpiryItem))
+        const [response, productsResponse, inventoryResponse] = await Promise.all([
+          getExpiryAlerts(),
+          getAllProducts().catch(() => []),
+          getInventoryItems().catch(() => []),
+        ])
+        const products = [
+          ...getArrayPayload(productsResponse),
+          ...getArrayPayload(inventoryResponse),
+        ]
+        setExpiryItems(getArrayPayload(response).map((item) => normalizeExpiryItem(item, products)))
       } catch (err) {
         console.error('Expiry alerts fetch error:', err)
         setError('Failed to load expiry alerts.')
@@ -92,7 +163,7 @@ const ExpiryMgm = () => {
     { label: 'Info', value: infoItems.length, color: 'yellow', bg: 'yellow-bg' },
   ]
 
-  const formatNaira = (amount) => `₦${amount.toFixed(2)}`
+  const formatNaira = (amount) => `₦${Number(amount || 0).toFixed(2)}`
   const batchValue = selectedProduct ? selectedProduct.quantity * selectedProduct.price : 0
   const getProductTone = (product) => {
     if (!product) return 'warning'

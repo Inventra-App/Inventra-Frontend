@@ -2,31 +2,7 @@ import API from "./axios";
 import { store } from "../redux/store";
 import { clearAuth } from "../redux/apiSlice";
 import { clearUsersData } from "../redux/usersSlice";
-
-// All the localStorage keys that the shared axios instance looks for
-// when attaching the bearer token. We remove every variant so a leftover
-// token from a previous version of the app can't keep the user "logged in".
-const TOKEN_KEYS = [
-  "inventra_token",
-  "inventra_access_token",
-  "accessToken",
-  "token",
-  "refreshToken",
-  "inventra_refresh_token",
-  "inventra_user",
-  "inventra_is_new_user",
-  "inventra_show_inventory_guide",
-];
-
-const removeAllTokens = () => {
-  TOKEN_KEYS.forEach((key) => {
-    try {
-      localStorage.removeItem(key);
-    } catch {
-      /* ignore (e.g. private mode / SSR) */
-    }
-  });
-};
+import { clearAuthStorage } from "../Utils/authSession";
 
 // Calls the backend logout endpoint and fully tears down the local session.
 //
@@ -48,7 +24,8 @@ export const logoutUser = async () => {
     console.error("Logout request failed:", error);
     throw error;
   } finally {
-    removeAllTokens();
+    clearAuthStorage();
+    localStorage.removeItem("inventra_user");
 
     try {
       store.dispatch(clearAuth());

@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Box, Eye, EyeOff } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import { loginStaff } from "../API/userManagementAPI";
 import { getAccountPath, saveSessionUser } from "../Utils/sessionUser";
-import { getRoleFromToken, getStaffLoginDestination } from "../Utils/authRoles";
+import { getRoleFromToken, getStaffLoginDestination, normalizeRole } from "../Utils/authRoles";
+import { consumeSessionExpiredMessage } from "../Utils/authSession";
 import loginBg from "../assets/LoginBg.png";
 import "./StaffLogin.css";
 
@@ -17,6 +18,15 @@ const getAuthToken = (response) =>
   response?.user?.token ||
   "";
 
+const getResponseRole = (response) =>
+  response?.staff?.role ||
+  response?.user?.role ||
+  response?.data?.staff?.role ||
+  response?.data?.user?.role ||
+  response?.data?.role ||
+  response?.role ||
+  "";
+
 const StaffLogin = () => {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
@@ -25,6 +35,11 @@ const StaffLogin = () => {
     email: "",
     password: "",
   });
+
+  useEffect(() => {
+    const message = consumeSessionExpiredMessage();
+    if (message) toast.error(message);
+  }, []);
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -48,10 +63,10 @@ const StaffLogin = () => {
       };
       const response = await loginStaff(payload);
       const token = getAuthToken(response);
-      const tokenRole = getRoleFromToken(token);
+      const tokenRole = getRoleFromToken(token) || normalizeRole(getResponseRole(response));
 
-      if (tokenRole !== "Manager" && tokenRole !== "Cashier") {
-        toast.error("Only manager or cashier staff accounts can sign in here.");
+      if (tokenRole !== "Manager") {
+        toast.error("Only manager staff accounts can sign in here.");
         return;
       }
 

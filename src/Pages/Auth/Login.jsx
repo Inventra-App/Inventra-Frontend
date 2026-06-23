@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   BarChart3,
   Box,
@@ -16,8 +16,8 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import { loginAdmin } from "../../API/authApi";
 import { loginStaff } from "../../API/userManagementAPI";
-import { contWithGoogle } from "../../API/googleAuthApi";
 import { getAccountPath, saveSessionUser } from "../../Utils/sessionUser";
+import { consumeSessionExpiredMessage } from "../../Utils/authSession";
 
 const getAuthToken = (response) =>
   response?.token ||
@@ -38,8 +38,8 @@ const getResponseRole = (response, fallbackRole) =>
   fallbackRole;
 
 const loginWithAdminOrStaff = async (payload) => {
-  let adminError = null;
-  let staffError = null;
+  let adminError;
+  let staffError;
 
   try {
     const response = await loginAdmin(payload);
@@ -62,7 +62,6 @@ const Login = () => {
   const nav = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [isLoggingIn, setIsLoggingIn] = useState(false);
-  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [formData, setFormData] = useState({
@@ -73,6 +72,11 @@ const Login = () => {
 
   const [errors, setErrors] = useState({});
   const [touched, setTouched] = useState({});
+
+  useEffect(() => {
+    const message = consumeSessionExpiredMessage();
+    if (message) toast.error(message);
+  }, []);
 
   const validateField = (name, value) => {
     let error = "";
@@ -195,45 +199,6 @@ const Login = () => {
       }
     } finally {
       setIsSubmitting(false);
-    }
-  };
-
-  const handleGoogleLogin = async () => {
-    if (isGoogleLoading) return;
-
-    try {
-      setIsGoogleLoading(true);
-      const res = await contWithGoogle({
-        authType: "login",
-        redirectUri: `${window.location.origin}/login`,
-      });
-
-      const redirectUrl =
-        res?.url || res?.authUrl || res?.redirectUrl || res?.data?.url;
-      if (redirectUrl) {
-        window.location.href = redirectUrl;
-        return;
-      }
-
-      const token = res?.token || res?.accessToken || res?.data?.token;
-      if (token) {
-        localStorage.setItem("inventra_token", token);
-      }
-
-      const sessionUser = saveSessionUser(res, { role: "Admin" });
-      toast.success(res?.message || "Google login successful");
-      setIsLoggingIn(true);
-      setTimeout(() => {
-        nav(getAccountPath("/dashboard", sessionUser));
-      }, 1000);
-    } catch (error) {
-      console.error("Google login error:", error);
-      toast.error(
-        error?.response?.data?.message ||
-          "Google login failed. Please try again.",
-      );
-    } finally {
-      setIsGoogleLoading(false);
     }
   };
 
