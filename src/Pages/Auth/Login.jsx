@@ -413,7 +413,7 @@ const Login = () => {
             {isSubmitting ? "Logging in..." : "Login"}
           </button>
 
-          <div className="loginDivider">
+          {/* <div className="loginDivider">
             <span></span>
             <p>or continue with</p>
             <span></span>
@@ -439,7 +439,7 @@ const Login = () => {
                 <span>Google</span>
               </>
             )}
-          </button>
+          </button> */}
 
           <div className="formRule"></div>
 
