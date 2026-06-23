@@ -63,17 +63,24 @@ const getArrayPayload = (payload) => {
 const normalizeLowStockItem = (item, products = []) => {
   const availableStock = Number(item?.availableStock ?? 0);
   const totalStock = Number(item?.totalStock ?? 0);
+  const reservedStock = Number(item?.reservedStock ?? 0);
+
   const matchedProduct = products.find((p) => p._id === item?.productId);
 
   return {
-    id: item?._id ?? item?.productId,
-    name: item?.productName ?? "Unnamed Product",
-    category: item?.categoryName ?? "Uncategorized",
-    batch: matchedProduct?.batch || "N/A",
+    id: item?.productId || item?.id || item?.product,
+    name: item?.product || item?.productName || "Unnamed Product",
+
+    category: item?.categoryName || matchedProduct?.category || "Uncategorized",
+
+    backroomStock: item?.backroomStock ?? matchedProduct?.backroomStock ?? 0,
+
     availableStock,
     totalStock,
+    reservedStock,
+
     stockReceived: 0,
-    reservedStock: Number(item?.reservedStock ?? 0),
+
     status: "Low Stock",
   };
 };
@@ -84,6 +91,20 @@ const Inventory = () => {
   const [lowStockAlertItems, setLowStockAlertItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [stockEntries, setStockEntries] = useState([]);
+
+  const getCurrentUser = () => {
+    try {
+      return JSON.parse(localStorage.getItem("inventra_user")) || {};
+    } catch {
+      return {};
+    }
+  };
+
+  const currentUser = getCurrentUser();
+
+  const userName =
+    currentUser?.fullName || currentUser?.firstName || "Unknown User";
+
   const [stockHistory, setStockHistory] = useState([]);
   const [search, setSearch] = useState("");
   const [activeTab, setActiveTab] = useState("All Products");
@@ -98,6 +119,7 @@ const Inventory = () => {
   const [showNewUserGuide, setShowNewUserGuide] = useState(
     shouldShowInventoryGuide(),
   );
+
   const [openProductAfterCategory, setOpenProductAfterCategory] =
     useState(false);
 
@@ -248,18 +270,12 @@ const Inventory = () => {
   };
 
   const handleAddProduct = (data) => {
-    console.log("ADD PRODUCT RAW:", data);
-
     if (!data) return;
 
     const newBatch = data?.batch;
     const inventory = data?.inventory;
 
     if (!newBatch || !inventory) return;
-
-    const storedEntries = JSON.parse(
-      localStorage.getItem("stockEntries") || "[]",
-    );
 
     const productName =
       productList.find((p) => p._id === newBatch.productId)?.name || "Unknown";
@@ -270,13 +286,20 @@ const Inventory = () => {
       batch: newBatch.batchCode,
       quantity: newBatch.quantity,
       expiryDate: new Date(newBatch.expiryDate).toLocaleDateString("en-GB"),
-      user: "You",
+      user: {
+        id: currentUser?.id || currentUser?._id || "unknown",
+        name: userName,
+        role: currentUser?.role || "staff",
+      },
+      supplier: data?.batch?.supplier || "N/A",
       timestamp: new Date().toISOString(),
     };
 
-    const updatedEntries = [newEntry, ...storedEntries];
-    localStorage.setItem("stockEntries", JSON.stringify(updatedEntries));
-    setStockEntries(updatedEntries);
+    setStockEntries((prev) => {
+      const updated = [newEntry, ...prev];
+      localStorage.setItem("stockEntries", JSON.stringify(updated));
+      return updated;
+    });
 
     setProductList((prev) =>
       prev.map((p) =>
@@ -304,8 +327,12 @@ const Inventory = () => {
     const storedEntries = JSON.parse(
       localStorage.getItem("stockEntries") || "[]",
     );
+
     setStockEntries(
-      storedEntries.map((e) => ({ ...e, timestamp: new Date(e.timestamp) })),
+      storedEntries.map((e) => ({
+        ...e,
+        timestamp: e.timestamp ? new Date(e.timestamp) : new Date(),
+      })),
     );
   }, []);
 
@@ -461,12 +488,16 @@ const Inventory = () => {
                         <div className="stock-entry-details">
                           <div className="stock-entry-detail-item">
                             <User size={14} />
-                            <span>
-                              Admin:{" "}
-                              <span className="detail-value">
-                                {entry.user || "Admin User"}
-                              </span>
+
+                            <span className="detail-value">
+                              {entry.user?.name || "Unknown"}
                             </span>
+
+                            {entry.user?.role && (
+                              <span className="role-tag">
+                                {entry.user.role}
+                              </span>
+                            )}
                           </div>
                           <div className="stock-entry-detail-item">
                             <User size={14} />
