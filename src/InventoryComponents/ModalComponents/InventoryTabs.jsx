@@ -5,7 +5,7 @@ const tabIcons = {
   "All Products": <Package size={16} />,
   "Stock Entry": <ClipboardPlus size={16} />,
   "Low Stock": <AlertTriangle size={16} />,
-  "Stock History": <Clock size={16} />,
+//   "Stock History": <Clock size={16} />,
   "Out of Stock": <XCircle size={16} />,
 };
 
