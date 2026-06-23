@@ -14,15 +14,22 @@ const Pricing = () => {
   const [billingCycle, setBillingCycle] = useState("monthly");
   const navigate = useNavigate();
   const isYearly = billingCycle === "yearly";
+  const toggleBillingCycle = () => {
+    setBillingCycle((currentCycle) =>
+      currentCycle === "yearly" ? "monthly" : "yearly",
+    );
+  };
 
   const freeFeatures = [
     "Real-time inventory tracking",
-    "Basic stock tracking",
-    "Sales tracking",
+    "Stock tracking",
+    "Sales (Pos)",
     "Up to 100 products",
-    "Email support",
-    "Basic reporting",
-    "Single user access",
+    "10 categories",
+    "500 stock record",
+    "Limited User Management",
+    "10 Expiry alerts",
+    "Dashboard Access",
   ];
 
   const standardFeatures = [
@@ -30,24 +37,19 @@ const Pricing = () => {
     "Unlimited products",
     "Advanced inventory management",
     "Expiry date tracking",
-    "Low stock alerts",
+    "200 Low stock alerts",
     "Multiple users (up to 5)",
-    "Advanced analytics",
-    "Priority email support",
-    "Custom reports",
-    "API access",
+    "Sales (Pos)",
+    "500 Categories",
   ];
 
   const premiumFeatures = [
-    "Unlimited users",
-    "Advanced analytics",
-    "Custom integrations",
-    "Dedicated account manager",
-    "Phone support",
-    "Custom training",
-    "Advanced security",
-    "SLA guarantee",
-    "White-label options",
+    "Access to every features in Standard",
+    "Unlimited categories",
+    "Unlimited Expiry alerts",
+    "Unlimited Stock record",
+    "Unlimited low stock alert",
+    "User management access",
     "Custom development",
   ];
 
@@ -115,7 +117,8 @@ const Pricing = () => {
                 <h2>Free for 14 days</h2>
                 <p className="plan_caption">Try before committing</p>
                 <div className="plan_price">
-                  N0 <span>/Per Month</span>
+                  <strong key={`free-${billingCycle}`} className="plan_price_amount">N0</strong>
+                  <span>/Per Month</span>
                 </div>
                 <ul className="plan_features">
                   {freeFeatures.map((feature) => (
@@ -126,7 +129,7 @@ const Pricing = () => {
                   ))}
                 </ul>
               </div>
-              <button className="plan_btn" type="button">
+              <button className="plan_btn" type="button" onClick={toggleBillingCycle}>
                 Get Free Trial
               </button>
             </article>
@@ -137,7 +140,10 @@ const Pricing = () => {
                 <h2>Standard</h2>
                 <p className="plan_caption">For small to medium business</p>
                 <div className="plan_price">
-                  N{isYearly ? "300,000" : "25,000"} <span>/{isYearly ? "Yearly" : "Monthly"}</span>
+                  <strong key={`standard-${billingCycle}`} className="plan_price_amount">
+                    N{isYearly ? "300,000" : "25,000"}
+                  </strong>
+                  <span>/{isYearly ? "Yearly" : "Monthly"}</span>
                 </div>
                 <ul className="plan_features">
                   {standardFeatures.map((feature) => (
@@ -158,7 +164,10 @@ const Pricing = () => {
                 <h2>Premium</h2>
                 <p className="plan_caption">Everything in standard, plus:</p>
                 <div className="plan_price">
-                  N{isYearly ? "840,000" : "70,000"} <span>/{isYearly ? "Yearly" : "Monthly"}</span>
+                  <strong key={`premium-${billingCycle}`} className="plan_price_amount">
+                    N{isYearly ? "840,000" : "70,000"}
+                  </strong>
+                  <span>/{isYearly ? "Yearly" : "Monthly"}</span>
                 </div>
                 <ul className="plan_features">
                   {premiumFeatures.map((feature) => (
@@ -198,7 +207,7 @@ const Pricing = () => {
         >
           <h2>Not sure which plan is right for you?</h2>
           <p>Start with our 14-day free trial and explore all features. No credit card required.</p>
-          <button type="button">Get Started Now</button>
+          <button type="button" onClick={() => navigate("/signup")}>Get Started Now</button>
         </section>
       </main>
     </>

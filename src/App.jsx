@@ -27,6 +27,8 @@ import PlanSetup from "./Pages/Auth/PlanSetup";
 import PaymentSuccess from "./Pages/Auth/PaymentSuccess";
 import CategoriesList from "./Pages/Auth/CategoriesList";
 import NotFound from "./Pages/Auth/NotFound";
+import StaffLogin from "./Components/StaffLogin";
+import CashierLogin from "./Components/CashierLogin";
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -67,6 +69,8 @@ function App() {
         <Route path="/contact" element={<ContactUs />} />
         <Route path="/signup" element={<SignUp />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/staff-login" element={<StaffLogin />} />
+        <Route path="/cashier-login" element={<CashierLogin />} />
         <Route path="/signupverify" element={<SignUpVerify />} />
         <Route path="/supermarket-info" element={<SupermarketInfo />} />
         <Route path="/setting-up" element={<SettingUp />} />
