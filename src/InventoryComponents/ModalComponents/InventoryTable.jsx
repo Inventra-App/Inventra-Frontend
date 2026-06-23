@@ -43,9 +43,8 @@ const InventoryTable = ({
             <th>PRODUCT</th>
             <th>CATEGORY</th>
             <th>AVAILABLE STOCK</th>
-            <th>RECEIVED STOCK</th>
-            <th>RESERVED STOCK</th>
-            <th>TOTAL</th>
+            <th>BACKROOM STOCK</th>
+            <th>TOTAL INVENTORY</th>
             <th>STATUS</th>
             <th>ACTIONS</th>
           </tr>
@@ -75,13 +74,6 @@ const InventoryTable = ({
                 <span className="inv-quantity-reserved">
                   {" "}
                   {product.availableStock}{" "}
-                </span>{" "}
-              </td>
-              <td>
-                {" "}
-                <span className="inv-quantity-received">
-                  {" "}
-                  {product.stockReceived}{" "}
                 </span>{" "}
               </td>
               <td>
@@ -186,21 +178,14 @@ const InventoryTable = ({
               </div>
 
               <div className="inv-mobile-card-item">
-                <label>STOCK RECEIVED</label>
-                <span className="inv-quantity-received">
-                  {product.stockReceived}
-                </span>
-              </div>
-
-              <div className="inv-mobile-card-item">
-                <label>RESERVED STOCK</label>
+                <label>BACKROOM STOCK</label>
                 <span className="inv-quantity-reserved">
                   {product.reservedStock}
                 </span>
               </div>
 
               <div className="inv-mobile-card-item">
-                <label>TOTAL STOCK</label>
+                <label>TOTAL INVENTORY</label>
                 <span>{product.totalStock}</span>
               </div>
 

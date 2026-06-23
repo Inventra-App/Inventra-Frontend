@@ -38,7 +38,7 @@ const tabs = [
   "All Products",
   "Stock Entry",
   "Low Stock",
-  "Stock History",
+  // "Stock History",
   "Out of Stock",
 ];
 
