@@ -14,7 +14,7 @@ const ManageStockModal = ({ inventoryId, product, onClose, onUpdate }) => {
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState(null);
 
-  const actionTypes = ["RESTOCK", "SALE", "RETURN", "ADJUSTMENT", "DAMAGED"];
+  const actionTypes = ["RESTOCK", "ADJUSTMENT"];
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -152,7 +152,7 @@ const ManageStockModal = ({ inventoryId, product, onClose, onUpdate }) => {
                 >
                   <option value=""></option>
                   <option value="all stock">All Stock</option>
-                  <option value="reserved stock">Reserved Stock</option>
+                  <option value="reserved stock">Backroom Stock</option>
                   <option value="available stock">Available Stock</option>
                 </select>
               </div>
@@ -170,7 +170,7 @@ const ManageStockModal = ({ inventoryId, product, onClose, onUpdate }) => {
                 >
                   <option value=""></option>
                   <option value="available stock">Available Stock</option>
-                  <option value="reserved stock">Reserved Stock</option>
+                  <option value="reserved stock">Backroom Stock</option>
                 </select>
               </div>
             </div>

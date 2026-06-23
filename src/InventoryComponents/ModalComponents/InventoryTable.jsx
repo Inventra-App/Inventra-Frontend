@@ -52,7 +52,7 @@ const InventoryTable = ({
 
         <tbody>
           {data.map((product) => (
-            <tr key={product._id}>
+            <tr key={product._id || product.id || product.batch || Math.random()}>
               <td>
                 <div className="inv-product-cell">
                   <div className="inv-product-icon">
@@ -154,7 +154,7 @@ const InventoryTable = ({
 
       <div className="inv-mobile-cards">
         {data.map((product) => (
-          <div key={product._id} className="inv-mobile-card">
+          <div key={product._id || product.id || product.batch || Math.random()} className="inv-mobile-card">
 
             <div className="inv-mobile-card-top">
               <div className="inv-mobile-card-product">
