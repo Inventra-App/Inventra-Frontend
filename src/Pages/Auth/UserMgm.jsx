@@ -39,12 +39,25 @@ const normalizeStaff = (staff) => {
   const fullName = staff?.fullName ?? staff?.name ?? `${staff?.firstName ?? ''} ${staff?.lastName ?? ''}`.trim()
   const rawRole = staff?.role ?? 'Cashier'
   const role = String(rawRole).charAt(0).toUpperCase() + String(rawRole).slice(1).toLowerCase()
+  const rawStatus = String(staff?.status ?? staff?.loginStatus ?? '').toLowerCase()
+  const isActive = Boolean(
+    staff?.isLoggedIn ||
+    staff?.loggedIn ||
+    staff?.online ||
+    staff?.isOnline ||
+    staff?.active ||
+    staff?.isActive ||
+    rawStatus === 'active' ||
+    rawStatus === 'online' ||
+    rawStatus === 'logged in',
+  )
+
   return {
     id: staff?._id ?? staff?.id ?? staff?.staffId ?? `${staff?.email}-${fullName}`,
     name: fullName || 'User',
     username: staff?.email ?? staff?.username ?? staff?.gmail ?? 'No email',
     role,
-    status: staff?.isLoggedIn || staff?.loggedIn || staff?.online || staff?.status === 'Active' ? 'Active' : (staff?.status ?? 'Inactive'),
+    status: isActive ? 'Active' : (staff?.status ?? 'Inactive'),
     joined: staff?.createdAt ? new Date(staff.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'Not available',
     lastLogin: staff?.lastLogin ? new Date(staff.lastLogin).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' }) : 'Not available',
   }
@@ -95,22 +108,39 @@ const UserMgm = () => {
   const roles = ['manager', 'cashier']
 
   useEffect(() => {
-    const loadStaffs = async () => {
-      setLoadingUsers(true)
+    let isMounted = true
+
+    const loadStaffs = async (silent = false) => {
+      if (!silent) {
+        setLoadingUsers(true)
+      }
 
       try {
         const response = await getStaffs()
         const staffs = getArrayPayload(response).map(normalizeStaff)
+        if (!isMounted) return
         setUsers([currentAdminUser, ...staffs])
       } catch (error) {
         console.error('Staff fetch error:', error)
+        if (!isMounted) return
         setUsers([currentAdminUser])
       } finally {
-        setLoadingUsers(false)
+        if (isMounted && !silent) {
+          setLoadingUsers(false)
+        }
       }
     }
 
     loadStaffs()
+    const intervalId = window.setInterval(() => loadStaffs(true), 30000)
+    const refreshOnFocus = () => loadStaffs(true)
+    window.addEventListener('focus', refreshOnFocus)
+
+    return () => {
+      isMounted = false
+      window.clearInterval(intervalId)
+      window.removeEventListener('focus', refreshOnFocus)
+    }
   }, [currentAdminUser])
 
   // Default permission state per role (used when no custom config exists yet)

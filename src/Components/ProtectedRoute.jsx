@@ -1,7 +1,13 @@
 import React from "react";
 import { Navigate, Outlet, useLocation, useParams } from "react-router-dom";
 import { getSessionUser } from "../Utils/sessionUser";
-import { canAccessPath, getStaffLoginDestination } from "../Utils/authRoles";
+import {
+  canAccessPath,
+  getLoginPathForRole,
+  getStaffLoginDestination,
+  isJwtExpired,
+} from "../Utils/authRoles";
+import { clearAuthStorage, setSessionExpiredMessage } from "../Utils/authSession";
 
 const ProtectedRoute = () => {
   const { accountId } = useParams();
@@ -10,7 +16,25 @@ const ProtectedRoute = () => {
   const sessionUser = getSessionUser();
 
   if (!token) {
-    return <Navigate to="/login" replace state={{ from: location }} />;
+    return (
+      <Navigate
+        to={getLoginPathForRole(sessionUser.role)}
+        replace
+        state={{ from: location }}
+      />
+    );
+  }
+
+  if (isJwtExpired(token)) {
+    setSessionExpiredMessage();
+    clearAuthStorage();
+    return (
+      <Navigate
+        to={getLoginPathForRole(sessionUser.role)}
+        replace
+        state={{ from: location }}
+      />
+    );
   }
 
   if (!accountId) {
