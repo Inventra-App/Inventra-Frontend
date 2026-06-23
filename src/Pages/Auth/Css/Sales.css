@@ -261,34 +261,10 @@
   position: relative;
   border-radius: 7px;
   overflow: hidden;
-  background-color: #16a34a; 
-  border: 1px solid #16a34a;
+  background-color: #432DD7; 
+  border: 1px solid #432DD7;
   transition: all 0.3s ease;
   width: 100%;
-}
-
-.sales-browse-trigger:hover {
-  background-color: #16a34a !important;
-  border-color: #16a34a !important;
-}
-
-.sales-browse-trigger:hover input {
-  background-color: transparent !important;
-  color: #ffffff !important;
-  cursor: pointer;
-  border-color: transparent !important;
-  box-shadow: none !important;
-  transition: background-color 0.4s, color 0.4s;
-}
-
-.sales-browse-trigger:hover input::placeholder {
-  color: #ffffff !important;
-  opacity: 1;
-}
-
-.sales-browse-trigger:hover .sales-product-search-icon {
-  color: #ffffff !important;
-  stroke: #ffffff !important;
 }
 
 .sales-add-cart-btn {
