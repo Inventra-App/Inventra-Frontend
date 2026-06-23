@@ -60,37 +60,37 @@ const SignUpRight = ({ nav }) => {
     }
   };
 
-  const handleGoogleSignup = async () => {
-    if (isGoogleLoading) return
+  // const handleGoogleSignup = async () => {
+  //   if (isGoogleLoading) return
 
-    try {
-      setIsGoogleLoading(true)
-      const response = await contWithGoogle({
-        authType: "signup",
-        redirectUri: `${window.location.origin}/signup`,
-      })
+  //   try {
+  //     setIsGoogleLoading(true)
+  //     const response = await contWithGoogle({
+  //       authType: "signup",
+  //       redirectUri: `${window.location.origin}/signup`,
+  //     })
 
-      const redirectUrl = response?.url || response?.authUrl || response?.redirectUrl || response?.data?.url
-      if (redirectUrl) {
-        window.location.href = redirectUrl
-        return
-      }
+  //     const redirectUrl = response?.url || response?.authUrl || response?.redirectUrl || response?.data?.url
+  //     if (redirectUrl) {
+  //       window.location.href = redirectUrl
+  //       return
+  //     }
 
-      const token = response?.token || response?.accessToken || response?.data?.token
-      if (token) {
-        localStorage.setItem("inventra_token", token)
-      }
+  //     const token = response?.token || response?.accessToken || response?.data?.token
+  //     if (token) {
+  //       localStorage.setItem("inventra_token", token)
+  //     }
 
-      const sessionUser = saveSessionUser(response, {}, { isNewUser: true })
-      toast.success(response?.message || "Google signup successful")
-      nav(getAccountPath("/dashboard", sessionUser))
-    } catch (error) {
-      const errorMessage = error.response?.data?.message || "Google signup failed. Please try again."
-      toast.error(errorMessage)
-    } finally {
-      setIsGoogleLoading(false)
-    }
-  }
+  //     const sessionUser = saveSessionUser(response, {}, { isNewUser: true })
+  //     toast.success(response?.message || "Google signup successful")
+  //     nav(getAccountPath("/dashboard", sessionUser))
+  //   } catch (error) {
+  //     const errorMessage = error.response?.data?.message || "Google signup failed. Please try again."
+  //     toast.error(errorMessage)
+  //   } finally {
+  //     setIsGoogleLoading(false)
+  //   }
+  // }
 
   return (
     <div className="signup-right">

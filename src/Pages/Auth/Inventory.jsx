@@ -32,6 +32,11 @@ import InventoryTable from "../../InventoryComponents/ModalComponents/InventoryT
 import SearchBar from "../../InventoryComponents/ModalComponents/SearchBar";
 import AddCategoryModal from "../../CategoryComponents/catComponents/AddCategoryModal";
 import { addCategory } from "../../API/inventoryApi";
+import NewUserGuide from "../../Components/NewUserGuide";
+import {
+  markInventoryGuideSeen,
+  shouldShowInventoryGuide,
+} from "../../Utils/sessionUser";
 
 const ITEMS_PER_PAGE = 6;
 const tabs = [
@@ -86,6 +91,11 @@ const Inventory = () => {
   const [showToast, setShowToast] = useState(false);
   const [activeMenuProduct, setActiveMenuProduct] = useState(null);
   const [showAddCategory, setShowAddCategory] = useState(false);
+  const [showNewUserGuide, setShowNewUserGuide] = useState(
+    shouldShowInventoryGuide(),
+  );
+  const [openProductAfterCategory, setOpenProductAfterCategory] =
+    useState(false);
 
   const fetchProducts = useCallback(async (silent = false) => {
     if (!silent) setLoading(true);
@@ -173,11 +183,30 @@ const Inventory = () => {
         description: newCat.description,
       });
       setShowAddCategory(false);
-      setShowAddProduct(true);
+      if (openProductAfterCategory) {
+        setShowAddProduct(true);
+        setOpenProductAfterCategory(false);
+      }
     } catch (error) {
       console.error("Error saving category:", error?.response?.data);
       throw error; 
     }
+  };
+
+  const closeNewUserGuide = () => {
+    markInventoryGuideSeen();
+    setShowNewUserGuide(false);
+  };
+
+  const openCreateCategory = () => {
+    setOpenProductAfterCategory(true);
+    setShowAddProduct(false);
+    setShowAddCategory(true);
+  };
+
+  const openAddProduct = () => {
+    setShowAddCategory(false);
+    setShowAddProduct(true);
   };
 
   const getTabFiltered = useCallback(() => {
@@ -333,6 +362,14 @@ const Inventory = () => {
 
   return (
     <div className="inventory-page">
+      {showNewUserGuide && (
+        <NewUserGuide
+          onClose={closeNewUserGuide}
+          onCreateCategory={openCreateCategory}
+          onAddProduct={openAddProduct}
+        />
+      )}
+
       <div className="inventory-top">
         <div>
           <h2 className="inventory-title">Inventory Management</h2>
@@ -514,6 +551,7 @@ const Inventory = () => {
         onAddProduct={handleSaveNewProduct}
         onCreateCategory={() => {
           setShowAddProduct(false);
+          setOpenProductAfterCategory(true);
           setShowAddCategory(true);
         }}
       />
@@ -522,7 +560,10 @@ const Inventory = () => {
         isOpen={showAddCategory}
         onClose={() => {
           setShowAddCategory(false);
-          setShowAddProduct(true);
+          if (openProductAfterCategory) {
+            setShowAddProduct(true);
+            setOpenProductAfterCategory(false);
+          }
         }}
         onSave={handleSaveCategory}
       />
