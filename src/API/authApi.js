@@ -42,8 +42,3 @@ export const verifyPasswordOtp = async (payload) => {
   return res.data;
 };
 
-// Now edit this onboard staff in user management, change the username to email(it should accept only email) and remove the password input,
-
-// Then remove all the dummy data of hardcoded staffs in the user management and make the api call with the endpoint onboardStaff in usermanagementapi.js where I can add staffs too,
-
-// Now call the api for staff login in login .jsx  with the endpoint in authAPi

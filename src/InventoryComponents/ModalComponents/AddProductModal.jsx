@@ -124,7 +124,7 @@ const AddProductModal = ({
 
     if (allocated !== totalQty) {
       setServerError(
-        `Available Stock + Backroom Stock cannot exceed Total Stock (${totalQty.toLocaleString()}).`,
+        `Available Stock + Backroom Stock must equal Total Stock (${totalQty.toLocaleString()}).`,
       );
       setIsSubmitting(false);
       return;
@@ -142,34 +142,15 @@ const AddProductModal = ({
             ? formData.customPackageType
             : formData.packageType,
         expiryDate: formData.expiryDate,
+        availableStock: Number(formData.availableStock || 0),
+        backroomStock: Number(formData.reservedStock || 0),
       };
 
       const response = await addInventoryItem(payload);
-      const totalQty =
-        Number(formData.packageQuantity) * Number(formData.unitPerPackage);
-
-      onAddProduct({
-        id:
-          response?.data?.productDetails?.productId ||
-          response?.productDetails?.productId ||
-          Date.now(),
-        name: formData.productName,
-        batch: response?.data?.productDetails?.SKU,
-        batchCode: response?.data?.batch?.batchCode,
-        expiryDate: response?.data?.batch?.expiryDate,
-        category: selectedCategory?.categoryName || selectedCategory?._id,
-        availableStock: Number(formData.availableStock || 0),
-        reservedStock: Number(formData.reservedStock || 0),
-        totalStock: totalQty,
-        status:
-          Number(formData.availableStock || 0) > 10
-            ? "In Stock"
-            : Number(formData.availableStock || 0) > 0
-              ? "Low Stock"
-              : "Out of Stock",
-      });
-
+      console.log("ADD PRODUCT RESPONSE", response);
+      onAddProduct(response.data);
       onClose();
+
     } catch (err) {
       const errorMsg =
         err?.response?.data?.message || "Failed to save product.";
@@ -341,6 +322,9 @@ const AddProductModal = ({
                     disabled={isSubmitting}
                   >
                     <option value="">Select package type</option>
+                    <option value="Carton">Carton</option>
+                    <option value="Bottle">Bottle</option>
+                    <option value="Packet">Packet</option>
                     <option value="Can">Can</option>
                     <option value="Loaf">Loaf</option>
                     <option value="Piece">Piece</option>
