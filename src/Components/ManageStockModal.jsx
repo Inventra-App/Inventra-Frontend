@@ -28,16 +28,17 @@ const ManageStockModal = ({ inventoryId, product, onClose, onUpdate }) => {
     setError(null);
 
     const payload = {
-      actionType,
       moveFrom,
       moveTo,
       quantity: parseInt(quantity),
+      ...(actionType ? { actionType } : {}),
     };
 
     try {
       await moveInventoryStock(inventoryId, payload);
       setSuccess(true);
       onUpdate();
+
       setTimeout(() => {
         setSuccess(false);
         onClose();
@@ -46,7 +47,7 @@ const ManageStockModal = ({ inventoryId, product, onClose, onUpdate }) => {
       console.error("Move stock error:", err);
       setError(
         err?.response?.data?.message ||
-          "Failed to move stock. Please try again.",
+          "Failed to move stock. Please try again."
       );
     } finally {
       setLoading(false);
@@ -64,20 +65,25 @@ const ManageStockModal = ({ inventoryId, product, onClose, onUpdate }) => {
             <div className="manage-success-icon">
               <CheckCircle size={36} color="#00A63E" strokeWidth={1.5} />
             </div>
+
             <h3 className="manage-success-title">Stock Moved!</h3>
+
             <div className="manage-success-details">
               <div className="manage-success-row">
                 <span className="manage-success-label">Product</span>
                 <span className="manage-success-value">{product.name}</span>
               </div>
+
               <div className="manage-success-row">
                 <span className="manage-success-label">Moved</span>
                 <span className="manage-success-value">{quantity} units</span>
               </div>
+
               <div className="manage-success-row">
                 <span className="manage-success-label">From</span>
                 <span className="manage-success-value">{moveFrom}</span>
               </div>
+
               <div className="manage-success-row">
                 <span className="manage-success-label">To</span>
                 <span className="manage-success-value">{moveTo}</span>
@@ -101,23 +107,26 @@ const ManageStockModal = ({ inventoryId, product, onClose, onUpdate }) => {
 
         <div className="manage-product-info">
           <p className="manage-product-name">{product.name}</p>
+
           <div className="manage-stock-row">
             <div>
-              <p className="manage-stock-label">Total Stock</p>
+              <p className="manage-stock-label">Total Inventory</p>
               <p className="manage-stock-value manage-dark">
-                {product.totalStock}
+                {product.availableStock + product.backroomStock}
               </p>
             </div>
+
             <div>
               <p className="manage-stock-label">Available Stock</p>
               <p className="manage-stock-value manage-green">
                 {product.availableStock}
               </p>
             </div>
+
             <div>
-              <p className="manage-stock-label">Reserved Stock</p>
+              <p className="manage-stock-label">Backroom Stock</p>
               <p className="manage-stock-value manage-purple">
-                {product.reservedStock}
+                {product.backroomStock}
               </p>
             </div>
           </div>
@@ -125,14 +134,13 @@ const ManageStockModal = ({ inventoryId, product, onClose, onUpdate }) => {
 
         <form className="manage-form" onSubmit={handleSubmit}>
           <div className="manage-field">
-            <label>Action Type</label>
+            <label>Action Type (Optional)</label>
 
             <select
               value={actionType}
               onChange={(e) => setActionType(e.target.value)}
             >
               <option value="">Select Action Type</option>
-
               {actionTypes.map((type) => (
                 <option key={type} value={type}>
                   {type}
@@ -144,35 +152,30 @@ const ManageStockModal = ({ inventoryId, product, onClose, onUpdate }) => {
           <div className="manage-move-row">
             <div className="manage-field manage-field-half">
               <label>Move From</label>
-              <div className="manage-select-wrapper">
-                <select
-                  required
-                  value={moveFrom}
-                  onChange={(e) => setMoveFrom(e.target.value)}
-                >
-                  <option value=""></option>
-                  <option value="all stock">All Stock</option>
-                  <option value="reserved stock">Backroom Stock</option>
-                  <option value="available stock">Available Stock</option>
-                </select>
-              </div>
+              <select
+                required
+                value={moveFrom}
+                onChange={(e) => setMoveFrom(e.target.value)}
+              >
+                <option value=""></option>
+                <option value="available stock">Available Stock</option>
+                <option value="backroom stock">Backroom Stock</option>
+              </select>
             </div>
 
             <ArrowRight size={18} className="manage-arrow" />
 
             <div className="manage-field manage-field-half">
               <label>Move To</label>
-              <div className="manage-select-wrapper">
-                <select
-                  required
-                  value={moveTo}
-                  onChange={(e) => setMoveTo(e.target.value)}
-                >
-                  <option value=""></option>
-                  <option value="available stock">Available Stock</option>
-                  <option value="reserved stock">Backroom Stock</option>
-                </select>
-              </div>
+              <select
+                required
+                value={moveTo}
+                onChange={(e) => setMoveTo(e.target.value)}
+              >
+                <option value=""></option>
+                <option value="available stock">Available Stock</option>
+                <option value="backroom stock">Backroom Stock</option>
+              </select>
             </div>
           </div>
 
@@ -212,6 +215,7 @@ const ManageStockModal = ({ inventoryId, product, onClose, onUpdate }) => {
             >
               Cancel
             </button>
+
             <button
               type="submit"
               className="manage-confirm-btn"

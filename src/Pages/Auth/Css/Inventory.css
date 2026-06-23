@@ -244,6 +244,23 @@
   border: 1.5px solid #E5E7EB;
   border-radius: 12px;
   padding: 16px 20px;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+
+  transition: background 0.2s ease, transform 0.1s ease;
+}
+
+.stock-entry-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.stock-entry-card:hover {
+  background: #f9fafb;
 }
 
 .stock-entry-card-top {
@@ -277,6 +294,31 @@
   margin: 0 0 4px 0;
 }
 
+.stock-entry-batch {
+  font-size: 14px;
+  color: #475569;
+  margin: 0;
+}
+
+.stock-entry-details {
+  display: flex;
+  gap: 16px;
+  margin: 2px 0;
+}
+
+.stock-entry-detail-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: #64748B;
+}
+
+.detail-value {
+  font-weight: 600;
+  color: #1F2937;
+}
+
 .stock-entry-meta {
   font-size: 0.8rem;
   color: #64748B;
@@ -301,6 +343,16 @@
 
 .stock-entry-time p {
   margin: 0;
+}
+
+.stock-entry-expiry {
+  font-size: 13px;
+  color: #64748B;
+  margin: 0;
+}
+
+.stock-entry-card:hover {
+  background: #f9fafb;
 }
 
 .stock-history-note {

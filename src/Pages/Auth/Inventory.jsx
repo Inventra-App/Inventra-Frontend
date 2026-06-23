@@ -7,6 +7,10 @@ import {
   XCircle,
   Eye,
   Pencil,
+  Truck,
+  Contact,
+  User,
+  Building,
   ChevronDown,
   Clock,
   Folder,
@@ -104,8 +108,6 @@ const Inventory = () => {
         getAllProducts({ _t: Date.now() }),
         getInventoryItems({ _t: Date.now() }),
       ]);
-      console.log("productsRes", productsRes);
-      console.log("inventoryRes", inventoryRes);
 
       const products = Array.isArray(productsRes)
         ? productsRes
@@ -117,8 +119,6 @@ const Inventory = () => {
 
       const mapped = products.map((prod) => {
         const inv = inventory.find((i) => i.productId === prod._id) || {};
-        console.log("PRODUCT", prod.productName);
-        console.log("INVENTORY", inv);
         const total = Number(inv.totalStock) || 0;
         const reorderLevel = Number(prod.reorderLevel) || 10;
         const status =
@@ -265,7 +265,7 @@ const Inventory = () => {
       productList.find((p) => p._id === newBatch.productId)?.name || "Unknown";
 
     const newEntry = {
-      id: newBatch._id,
+      id: newBatch._id || Date.now(),
       productName,
       batch: newBatch.batchCode,
       quantity: newBatch.quantity,
@@ -286,7 +286,9 @@ const Inventory = () => {
               inventoryId: inventory._id,
               availableStock: inventory.availableStock ?? 0,
               backroomStock: inventory.backroomStock ?? 0,
-              totalStock: inventory.totalStock ?? 0,
+              totalStock:
+                (inventory.availableStock ?? 0) +
+                (inventory.backroomStock ?? 0),
             }
           : p,
       ),
@@ -442,7 +444,57 @@ const Inventory = () => {
             {stockEntries.length === 0
               ? renderEmptyState("No stock entries recorded yet.")
               : stockEntries.map((entry) => (
-                  <div key={entry.id} className="stock-entry-card" />
+                  <div key={entry.id} className="stock-entry-card">
+                    <div className="stock-entry-card-left">
+                      <div className="stock-entry-icon">
+                        <Truck size={20} />
+                      </div>
+
+                      <div className="stock-entry-content">
+                        <p className="stock-entry-name">{entry.productName}</p>
+
+                        <p className="stock-entry-batch">
+                          Batch: {entry.batch || "N/A"} • Qty: {entry.quantity}{" "}
+                          units
+                        </p>
+
+                        <div className="stock-entry-details">
+                          <div className="stock-entry-detail-item">
+                            <User size={14} />
+                            <span>
+                              Admin:{" "}
+                              <span className="detail-value">
+                                {entry.user || "Admin User"}
+                              </span>
+                            </span>
+                          </div>
+                          <div className="stock-entry-detail-item">
+                            <User size={14} />
+                            <span>
+                              Supplier:{" "}
+                              <span className="detail-value">
+                                {entry.supplier || "N/A"}
+                              </span>
+                            </span>
+                          </div>
+                        </div>
+
+                        <p className="stock-entry-expiry">
+                          Expiry: {entry.expiryDate}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="stock-entry-time">
+                      <p>{new Date(entry.timestamp).toLocaleDateString()}</p>
+                      <p>
+                        {new Date(entry.timestamp).toLocaleTimeString([], {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+                      </p>
+                    </div>
+                  </div>
                 ))}
           </div>
         ) : activeTab === "Stock History" ? (
