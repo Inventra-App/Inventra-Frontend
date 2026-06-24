@@ -116,6 +116,9 @@ const Inventory = () => {
   const [showToast, setShowToast] = useState(false);
   const [activeMenuProduct, setActiveMenuProduct] = useState(null);
   const [showAddCategory, setShowAddCategory] = useState(false);
+  const [hasCreatedCategory, setHasCreatedCategory] = useState(
+    localStorage.getItem("hasCreatedCategory") === "true",
+  );
   const [showNewUserGuide, setShowNewUserGuide] = useState(
     shouldShowInventoryGuide(),
   );
@@ -210,7 +213,12 @@ const Inventory = () => {
         categoryName: newCat.name,
         description: newCat.description,
       });
+
+      setHasCreatedCategory(true);
+      localStorage.setItem("hasCreatedCategory", "true");
+
       setShowAddCategory(false);
+
       if (openProductAfterCategory) {
         setShowAddProduct(true);
         setOpenProductAfterCategory(false);
@@ -388,6 +396,7 @@ const Inventory = () => {
           onClose={closeNewUserGuide}
           onCreateCategory={openCreateCategory}
           onAddProduct={openAddProduct}
+          hasCategories={hasCreatedCategory}
         />
       )}
 
