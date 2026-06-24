@@ -88,6 +88,11 @@
   border-color: #4f46e5;
 }
 
+.signup-field input::placeholder {
+  color: #6B7280;
+  opacity: 0.6;
+}
+
 .signup-agree-wrapper {
   display: flex;
   flex-direction: column;
