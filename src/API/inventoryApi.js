@@ -109,3 +109,8 @@ export const getActivityLogDescriptions = async () => {
   const res = await API.get('activity-logs/descriptions');
   return res.data;
 };
+
+export const bookDemo = async (payload) => {
+  const res = await API.post("/book-demo", payload);
+  return res.data;
+};
