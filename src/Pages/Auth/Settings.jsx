@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Bell, Check, Database, Eye, Save, Shield, User } from 'lucide-react'
+import { Bell, Check, Eye, Save, Shield, User } from 'lucide-react'
 import './Css/Settings.css'
 
 const isValidEmail = (value) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
@@ -98,8 +98,6 @@ const NotificationSettings = ({ onSave }) => {
   const [preferences, setPreferences] = useState({
     expiry: true,
     lowStock: true,
-    sales: false,
-    email: true,
   })
 
   const togglePreference = (name) => {
@@ -126,22 +124,6 @@ const NotificationSettings = ({ onSave }) => {
             <p>Get notified when inventory is running low</p>
           </div>
           <button className={preferences.lowStock ? 'settings-switch active' : 'settings-switch'} type='button' onClick={() => togglePreference('lowStock')}><span></span></button>
-        </div>
-
-        <div className='settings-notification-row'>
-          <div>
-            <h4>Sales Notifications</h4>
-            <p>Get notified about sales transactions</p>
-          </div>
-          <button className={preferences.sales ? 'settings-switch active' : 'settings-switch'} type='button' onClick={() => togglePreference('sales')}><span></span></button>
-        </div>
-
-        <div className='settings-notification-row'>
-          <div>
-            <h4>Email Notifications</h4>
-            <p>Receive notifications via email</p>
-          </div>
-          <button className={preferences.email ? 'settings-switch active' : 'settings-switch'} type='button' onClick={() => togglePreference('email')}><span></span></button>
         </div>
       </div>
 
@@ -221,71 +203,6 @@ const SecuritySettings = ({ onSave }) => {
   )
 }
 
-const SystemSettings = ({ onSave }) => {
-  const [form, setForm] = useState({
-    currency: '',
-    timezone: '',
-    dateFormat: '',
-    language: '',
-  })
-  const [errors, setErrors] = useState({})
-
-  const updateField = (field, value) => {
-    setForm((current) => ({ ...current, [field]: value }))
-    setErrors((current) => ({ ...current, [field]: '' }))
-  }
-
-  const handleSave = () => {
-    const nextErrors = {}
-
-    if (!form.currency.trim()) nextErrors.currency = 'Currency is required'
-    if (!form.timezone.trim()) nextErrors.timezone = 'Timezone is required'
-    if (!form.dateFormat.trim()) nextErrors.dateFormat = 'Date format is required'
-    if (!form.language.trim()) nextErrors.language = 'Language is required'
-
-    setErrors(nextErrors)
-    if (Object.keys(nextErrors).length === 0) onSave()
-  }
-
-  return (
-    <section className='settings-content-card settings-system-card'>
-      <h3>System Preferences</h3>
-      <p>Configure system-wide settings</p>
-
-      <div className='settings-form settings-system-form'>
-        <label className='settings-field'>
-          <span>Currency</span>
-          <input type='text' value={form.currency} onChange={(event) => updateField('currency', event.target.value)} />
-          <FieldError message={errors.currency} />
-        </label>
-
-        <label className='settings-field'>
-          <span>Timezone</span>
-          <input type='text' value={form.timezone} onChange={(event) => updateField('timezone', event.target.value)} />
-          <FieldError message={errors.timezone} />
-        </label>
-
-        <label className='settings-field'>
-          <span>Date Format</span>
-          <input type='text' value={form.dateFormat} onChange={(event) => updateField('dateFormat', event.target.value)} />
-          <FieldError message={errors.dateFormat} />
-        </label>
-
-        <label className='settings-field'>
-          <span>Language</span>
-          <input type='text' value={form.language} onChange={(event) => updateField('language', event.target.value)} />
-          <FieldError message={errors.language} />
-        </label>
-      </div>
-
-      <button className='settings-save-btn' type='button' onClick={handleSave}>
-        <Save size={16} />
-        <span>Save Changes</span>
-      </button>
-    </section>
-  )
-}
-
 const Settings = () => {
   const [activeSection, setActiveSection] = useState('notifications')
   const [showSavePopup, setShowSavePopup] = useState(false)
@@ -342,21 +259,11 @@ const Settings = () => {
             <span>Security</span>
           </button>
 
-          <button
-            type='button'
-            className={activeSection === 'system' ? 'settings-menu-item active' : 'settings-menu-item'}
-            onClick={() => setActiveSection('system')}
-          >
-            <Database size={19} />
-            <span>System</span>
-          </button>
-
         </aside>
 
         {activeSection === 'profile' && <ProfileSettings onSave={handleSaveSuccess} />}
         {activeSection === 'notifications' && <NotificationSettings onSave={handleSaveSuccess} />}
         {activeSection === 'security' && <SecuritySettings onSave={handleSaveSuccess} />}
-        {activeSection === 'system' && <SystemSettings onSave={handleSaveSuccess} />}
       </div>
 
       {showSavePopup && <SaveSuccessPopup message={savePopupMessage} />}

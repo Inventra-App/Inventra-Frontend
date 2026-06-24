@@ -19,6 +19,11 @@
     display: block;
     width: 100%;
   }
+
+  .signup-mobile-header .header-hamburger,
+  .signup-mobile-header .mobile-menu {
+    display: none;
+  }
 }
 
 @media (max-width: 468px) {
@@ -30,5 +35,10 @@
   .signup-mobile-header {
     display: block;
     width: 100%;
+  }
+
+  .signup-mobile-header .header-hamburger,
+  .signup-mobile-header .mobile-menu {
+    display: none;
   }
 }
