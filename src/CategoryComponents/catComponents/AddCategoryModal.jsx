@@ -74,7 +74,7 @@ const AddCategoryModal = ({ isOpen, onClose, onSave }) => {
               name="description"
               value={formData.description}
               onChange={handleChange}
-              placeholder="Briefly describe this category (optional)"
+              placeholder="Briefly describe this category"
               rows={4}
               disabled={isSubmitting}
             />
