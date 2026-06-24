@@ -230,7 +230,7 @@ const Inventory = () => {
   };
 
   const closeNewUserGuide = () => {
-    markInventoryGuideSeen();
+    markReturningSessionUser();
     setShowNewUserGuide(false);
   };
 

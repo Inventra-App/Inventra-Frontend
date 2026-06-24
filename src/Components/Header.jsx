@@ -9,11 +9,11 @@ const Header = () => {
 
   return (
     <header className="header">
-      <div className="header-logo">
+      <button className="header-logo" type="button" onClick={() => nav("/")}>
         <img src="/Inventra Logo.png" alt="Logo" />
         {/* <img src={logo} className="logo-icon" alt="" /> */}
         <h2>Inventra</h2>
-      </div>
+      </button>
 
       <nav className="header-nav">
         <NavLink to="/" className={({ isActive }) => isActive ? "active" : ""}>Home</NavLink>
@@ -43,7 +43,7 @@ const Header = () => {
           <NavLink to="/contact" onClick={() => setMenuOpen(false)}>Contact Us</NavLink>
           <div className="mobile-menu-actions">
             <button className="login-btn" onClick={() => nav("/login")}>Login</button>
-            <button className="start-btn" onClick={() => nav("/signup")}>Get Started</button>
+            {/* <button className="start-btn" onClick={() => nav("/signup")}>Get Started</button> */}
           </div>
         </div>
       )}

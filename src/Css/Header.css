@@ -14,9 +14,13 @@
 }
 
 .header-logo {
+  padding: 0;
+  border: 0;
+  background: transparent;
   display: flex;
   align-items: center;
   gap: 9px;
+  cursor: pointer;
 }
 
 .logo-icon {

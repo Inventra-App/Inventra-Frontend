@@ -82,16 +82,12 @@
   padding: 23px 25px 96px;
 }
 
-.settings-system-card {
-  padding: 23px 25px 92px;
-}
-
 .settings-permissions-card {
   padding: 23px 25px 32px;
 }
 
 .settings-notification-card {
-  min-height: 665px;
+  min-height: 425px;
 }
 
 .settings-content-card h3 {
@@ -171,10 +167,6 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 26px 24px;
-}
-
-.settings-system-form {
-  gap: 25px 24px;
 }
 
 .settings-field {
@@ -272,18 +264,6 @@
 
 .settings-security-card .settings-password-field input {
   border: none;
-}
-
-.settings-system-card .settings-field {
-  gap: 8px;
-  color: #334155;
-  font-size: 14px;
-  font-weight: 500;
-}
-
-.settings-system-card .settings-field input {
-  border: 2px solid #d1d5db;
-  background-color: #ffffff;
 }
 
 .settings-save-btn {
@@ -499,7 +479,7 @@
   }
 
   .settings-notification-card {
-    min-height: 560px;
+    min-height: 425px;
   }
 
   .settings-permission-grid {

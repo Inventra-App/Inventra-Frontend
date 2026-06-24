@@ -5,7 +5,6 @@ import {
   CheckCircle2,
   Clock3,
   LockKeyhole,
-  Menu,
   Shield,
   UsersRound,
   Eye,
@@ -296,9 +295,6 @@ const Login = () => {
             </span>
             <strong>Inventra</strong>
           </a>
-          <button type="button" aria-label="Open menu">
-            <Menu size={20} />
-          </button>
         </div>
 
         <div className="loginSignupPrompt">

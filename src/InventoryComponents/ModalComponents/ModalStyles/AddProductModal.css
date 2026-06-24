@@ -522,6 +522,29 @@
   .btn-cancel { height: 40px; font-size: 13px; border-radius: 8px; order: 2; }
   .step-progress { padding: 10px 16px 0; }
   .error-banner { margin: 10px 16px 0; }
+  .clean-form .form-row {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+  .clean-form .form-group {
+    margin-bottom: 12px;
+  }
+  .clean-form .input {
+    height: 42px;
+    border-radius: 8px;
+  }
+  .clean-form .form-actions {
+    flex-direction: column;
+    padding: 6px 0 0;
+    border-top: 0;
+    gap: 10px;
+  }
+  .clean-form .btn-submit,
+  .clean-form .btn-cancel {
+    width: 100%;
+    min-height: 44px;
+    height: 44px;
+  }
 }
 
 @media (max-width: 468px) {
@@ -536,4 +559,30 @@
   .btn-submit, .btn-cancel { height: 38px; font-size: 12px; }
   .step-progress { padding: 8px 14px 0; }
   .error-banner { margin: 8px 14px 0; }
+  .clean-form .form-row {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+  .clean-form .form-group {
+    margin-bottom: 12px;
+  }
+  .clean-form .input {
+    height: 32px;
+    font-size: 13px;
+    border-radius: 6px;
+  }
+  .clean-form .form-actions {
+    flex-direction: column;
+    padding: 6px 0 0;
+    border-top: 0;
+    gap: 10px;
+  }
+  .clean-form .btn-submit,
+  .clean-form .btn-cancel {
+    width: 100%;
+    min-height: 44px;
+    height: 44px;
+    border-radius: 6px;
+    font-size: 13px;
+  }
 }
