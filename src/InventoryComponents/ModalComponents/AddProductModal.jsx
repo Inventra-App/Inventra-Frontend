@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { X, Plus, Loader2, ArrowLeft, FolderOpen } from "lucide-react";
+import { X, Plus, Loader2, ArrowLeft, FolderOpen, Info } from "lucide-react";
 import { addInventoryItem, getAllCategories } from "../../API/inventoryApi";
 import "./ModalStyles/AddProductModal.css";
 
@@ -102,11 +102,34 @@ const AddProductModal = ({
 
     if (numericFields.includes(name)) {
       const cleaned = value.replace(/[^0-9]/g, "");
-      setFormData((prev) => ({ ...prev, [name]: cleaned }));
+
+      setFormData((prev) => {
+        const updated = {
+          ...prev,
+          [name]: cleaned,
+        };
+
+        const totalStock =
+          Number(updated.packageQuantity || 0) *
+          Number(updated.unitPerPackage || 0);
+
+        if (name === "availableStock") {
+          const available = Number(cleaned || 0);
+
+          updated.reservedStock =
+            available > totalStock ? "0" : String(totalStock - available);
+        }
+
+        return updated;
+      });
+
       return;
     }
 
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
   const handleSubmit = async (e) => {
@@ -150,7 +173,6 @@ const AddProductModal = ({
       console.log("ADD PRODUCT RESPONSE", response);
       onAddProduct(response.data);
       onClose();
-
     } catch (err) {
       const errorMsg =
         err?.response?.data?.message || "Failed to save product.";
@@ -373,7 +395,16 @@ const AddProductModal = ({
 
               <div className="form-row">
                 <div className="form-group">
-                  <label>Package Qty *</label>
+                  <label className="tooltip-label">
+                    Package Qty *
+                    <span className="tooltip-wrapper">
+                      <Info size={14} />
+                      <span className="tooltip-text">
+                        Number of cartons, boxes, bottles, bags, or packages you
+                        are adding.
+                      </span>
+                    </span>
+                  </label>
                   <input
                     className="input"
                     type="text"
@@ -404,7 +435,16 @@ const AddProductModal = ({
                 </div>
 
                 <div className="form-group">
-                  <label>Units Per Package *</label>
+                  <label className="tooltip2-label">
+                    Units Per Package *
+                    <span className="tooltip2-wrapper">
+                      <Info size={14} />
+                      <span className="tooltip2-text">
+                        Number of individual items inside one package. Example:
+                        1 carton = 24 bottles.
+                      </span>
+                    </span>
+                  </label>
                   <input
                     className="input"
                     type="text"
@@ -477,31 +517,26 @@ const AddProductModal = ({
                 <div className="form-group">
                   <label>Backroom Stock *</label>
                   <input
-                    className="input"
+                    className="input auto-stock-input"
                     type="text"
                     name="reservedStock"
                     value={formData.reservedStock}
-                    onChange={handleChange}
-                    onKeyDown={(e) => {
-                      if (
-                        !/[0-9]/.test(e.key) &&
-                        e.key !== "Backspace" &&
-                        e.key !== "Tab"
-                      ) {
-                        e.preventDefault();
-                      }
-                    }}
-                    onPaste={(e) => {
-                      const pasted = e.clipboardData.getData("text");
-                      if (!/^\d+$/.test(pasted)) {
-                        e.preventDefault();
-                      }
-                    }}
-                    min="0"
+                    readOnly
                     disabled={isSubmitting}
                   />
                 </div>
               </div>
+              <p
+                style={{
+                  fontSize: "12px",
+                  color: "#6b7280",
+                  marginTop: "-8px",
+                  marginBottom: "12px",
+                }}
+              >
+                Backroom Stock is automatically calculated from Total Stock
+                minus Available Stock.
+              </p>
 
               {totalStock > 0 && (
                 <p
