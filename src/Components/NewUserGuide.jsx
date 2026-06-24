@@ -23,7 +23,7 @@ const steps = [
   },
 ];
 
-const NewUserGuide = ({ onClose, onCreateCategory, onAddProduct }) => {
+const NewUserGuide = ({ onClose, onCreateCategory, onAddProduct,  hasCategories, }) => {
   return (
     <section className="new-user-guide">
       <button
@@ -65,7 +65,7 @@ const NewUserGuide = ({ onClose, onCreateCategory, onAddProduct }) => {
           onClick={onCreateCategory}
         >
           <Tags size={18} />
-          Create First Category
+          {hasCategories ? "Create Category" : "Create First Category"}
         </button>
 
         <button
