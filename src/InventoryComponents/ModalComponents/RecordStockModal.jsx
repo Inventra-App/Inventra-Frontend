@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { X, CheckCircle } from "lucide-react";
+import { X, CheckCircle, Info } from "lucide-react";
 import "./ModalStyles/RecordStockModal.css";
 import Logo from "../../Components/Logo";
 import { recordStockEntry } from "../../API/inventoryApi";
@@ -170,7 +170,16 @@ const RecordStockModal = ({ onClose, visible, onAddProduct, product }) => {
           <div className="record-card">
             <div className="record-row">
               <div className="record-field">
-                <label>Package Qty *</label>
+                <label className="tooltip-label">
+                  Package Qty *
+                  <span className="tooltip-wrapper">
+                    <Info size={14} />
+                    <span className="tooltip-text">
+                      Number of cartons, boxes, bottles, bags, or packages you
+                      are adding.
+                    </span>
+                  </span>
+                </label>
                 <input
                   type="number"
                   min="1"
@@ -189,7 +198,16 @@ const RecordStockModal = ({ onClose, visible, onAddProduct, product }) => {
               </div>
 
               <div className="record-field">
-                <label>Units Per Package *</label>
+                <label className="tooltip2-label">
+                  Units Per Package *
+                  <span className="tooltip2-wrapper">
+                    <Info size={14} />
+                    <span className="tooltip2-text">
+                      Number of individual items inside one package. Example: 1
+                      carton = 24 bottles.
+                    </span>
+                  </span>
+                </label>
                 <input
                   type="number"
                   min="1"

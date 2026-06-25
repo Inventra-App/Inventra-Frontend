@@ -74,18 +74,12 @@ const getDaysRemaining = (dateValue) => {
   return Math.ceil((expiryDate - today) / (1000 * 60 * 60 * 24));
 };
 
-const normalizeLowStockItem = (item) => {
-  return {
-    id: item?._id ?? item?.productId,
-    name: item?.productName ?? "Unknown",
-    category: item?.categoryName ?? "-",
-    units: Number(
-      item?.totalStock ?? item?.availableStock ?? item?.quantity ?? 0,
-    ),
-    batch: item?.SKU ?? item?.batchCode ?? "Batch no",
-    expiryDate: "No date",
-  };
-};
+const normalizeLowStockItem = (item) => ({
+  id: item.productId,
+  name: item.productName,
+  category: item.categoryName || "Uncategorized",
+  units: Number(item.totalStock || 0),
+});
 
 const getValue = (...values) =>
   values.find((value) => value !== undefined && value !== null && value !== "");
@@ -102,8 +96,12 @@ const findMatchingProduct = (item, products) => {
   ).toLowerCase();
 
   return products.find((product) => {
-    const currentId = String(product?._id ?? product?.id ?? product?.productId ?? "");
-    const currentName = String(product?.productName ?? product?.name ?? "").toLowerCase();
+    const currentId = String(
+      product?._id ?? product?.id ?? product?.productId ?? "",
+    );
+    const currentName = String(
+      product?.productName ?? product?.name ?? "",
+    ).toLowerCase();
 
     return (
       (productId && currentId === productId) ||
@@ -253,14 +251,43 @@ const Dashboard = () => {
           : null;
       setTotalSalesAmount(tsa);
 
-      let lowStock = [];
-      if (lowStockRes.status === "fulfilled" && lowStockRes.value) {
-        const apiLowStock = getArrayPayload(lowStockRes.value);
+      const inventoryItems =
+        invRes.status === "fulfilled" ? getArrayPayload(invRes.value) : [];
 
-        if (apiLowStock.length > 0) {
-          lowStock = apiLowStock.map(normalizeLowStockItem);
-        }
-      }
+      const products =
+        productsRes.status === "fulfilled"
+          ? getArrayPayload(productsRes.value)
+          : [];
+
+      const productLookup = Object.fromEntries(
+        products.map((p) => [
+          p._id,
+          {
+            productName: p.productName,
+            categoryName: p.categoryName,
+            reorderLevel: Number(p.reorderLevel || 10),
+          },
+        ]),
+      );
+
+      let lowStock = inventoryItems
+        .filter((item) => {
+          const product = productLookup[item.productId];
+          const reorderLevel = product?.reorderLevel || 10;
+
+          return (
+            Number(item.totalStock || 0) > 0 &&
+            Number(item.totalStock || 0) <= reorderLevel
+          );
+        })
+        .map((item) => ({
+          id: item.productId,
+          productId: item.productId,
+          name: productLookup[item.productId]?.productName || "Unknown",
+          category:
+            productLookup[item.productId]?.categoryName || "Uncategorized",
+          units: Number(item.totalStock || 0),
+        }));
 
       if (lowStock.length === 0) {
         const items =
@@ -302,10 +329,7 @@ const Dashboard = () => {
         expiryRes.status === "fulfilled"
           ? getArrayPayload(expiryRes.value)
           : [];
-      const products =
-        productsRes.status === "fulfilled"
-          ? getArrayPayload(productsRes.value)
-          : [];
+
       const normalizedExpiry = expiry.map((item) =>
         normalizeExpiryAlert(item, products),
       );
@@ -404,9 +428,8 @@ const Dashboard = () => {
   };
 
   const handleRestock = (item) => {
-    console.log("Restock item:", item);
     setShowModal(false);
-    navigate("/inventory");
+    navigate(`/super/inventory?restockProductId=${item.productId || item.id}`);
   };
 
   const criticalAlerts = expiryItems.filter(
@@ -523,7 +546,6 @@ const Dashboard = () => {
       </div>
     );
   }
-
   return (
     <div className="dashboard-content">
       <div className="dashboard-welcome">

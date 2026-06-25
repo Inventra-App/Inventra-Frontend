@@ -29,7 +29,7 @@ import {
   getAllProducts,
   getLowStockAlerts,
 } from "../../API/inventoryApi";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import InventoryStats from "../../InventoryComponents/ModalComponents/InventoryStats";
 import InventoryTabs from "../../InventoryComponents/ModalComponents/InventoryTabs";
 import InventoryTable from "../../InventoryComponents/ModalComponents/InventoryTable";
@@ -65,7 +65,7 @@ const normalizeLowStockItem = (item, products = []) => {
   const totalStock = Number(item?.totalStock ?? 0);
   const reservedStock = Number(item?.reservedStock ?? 0);
 
-  const matchedProduct = products.find((p) => p._id === item?.productId);
+  const matchedProduct = products[item?.productId];
 
   return {
     id: item?.productId || item?.id || item?.product,
@@ -87,8 +87,10 @@ const normalizeLowStockItem = (item, products = []) => {
 
 const Inventory = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [productList, setProductList] = useState([]);
   const [lowStockAlertItems, setLowStockAlertItems] = useState([]);
+  const [productLookup, setProductLookup] = useState({});
   const [loading, setLoading] = useState(true);
   const [stockEntries, setStockEntries] = useState([]);
 
@@ -137,9 +139,21 @@ const Inventory = () => {
       const products = Array.isArray(productsRes)
         ? productsRes
         : productsRes?.data || [];
+
+      const productLookup = Object.fromEntries(
+        products.map((p) => [
+          p._id,
+          {
+            category: p.categoryName || "Uncategorized",
+            productName: p.productName,
+          },
+        ]),
+      );
+
       const inventory = Array.isArray(inventoryRes)
         ? inventoryRes
         : inventoryRes?.data || [];
+
       const stored = JSON.parse(localStorage.getItem("stockReceived") || "{}");
 
       const mapped = products.map((prod) => {
@@ -159,11 +173,9 @@ const Inventory = () => {
           id: prod._id,
           name: prod.productName || "Unnamed Product",
           category: prod.categoryName || "Uncategorized",
-
           packageType: prod.packageType,
           packageQuantity: prod.packageQuantity,
           unitPerPackage: prod.unitPerPackage,
-
           batch: prod.SKU || "N/A",
           price: Number(prod.unitPrice || 0),
           createdAt: prod.createdAt,
@@ -175,6 +187,7 @@ const Inventory = () => {
         };
       });
       mapped.reverse();
+      setProductLookup(productLookup);
       setProductList(mapped);
     } catch (err) {
       console.error("Error fetching data:", err);
@@ -186,19 +199,46 @@ const Inventory = () => {
   const fetchLowStockAlerts = useCallback(async () => {
     try {
       const response = await getLowStockAlerts();
-      setLowStockAlertItems(
-        getArrayPayload(response).map((item) => normalizeLowStockItem(item)),
+
+      const normalized = getArrayPayload(response).map((item) =>
+        normalizeLowStockItem(item, productLookup),
       );
+
+      setLowStockAlertItems(normalized);
     } catch (err) {
       console.error("Low stock alerts fetch error:", err);
       setLowStockAlertItems([]);
     }
-  }, []);
+  }, [productLookup]);
 
   useEffect(() => {
     fetchProducts();
-    fetchLowStockAlerts();
-  }, [fetchProducts, fetchLowStockAlerts]);
+  }, [fetchProducts]);
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const productId = params.get("restockProductId");
+
+    if (!productId || productList.length === 0) return;
+
+    const product = productList.find(
+      (p) => p._id === productId || p.id === productId,
+    );
+
+    if (product) {
+      setShowRecordStock(product);
+
+      navigate("/super/inventory", {
+        replace: true,
+      });
+    }
+  }, [location.search, productList, navigate]);
+
+  useEffect(() => {
+    if (Object.keys(productLookup).length > 0) {
+      fetchLowStockAlerts();
+    }
+  }, [productLookup, fetchLowStockAlerts]);
 
   const handleSaveNewProduct = async () => {
     await fetchProducts(true);
@@ -246,7 +286,9 @@ const Inventory = () => {
   };
 
   const getTabFiltered = useCallback(() => {
-    if (activeTab === "Low Stock") return lowStockAlertItems;
+    if (activeTab === "Low Stock") {
+      return productList.filter((p) => p.status === "Low Stock");
+    }
     if (activeTab === "Out of Stock")
       return productList.filter((p) => p.status === "Out of Stock");
     return productList;
@@ -261,7 +303,10 @@ const Inventory = () => {
   );
 
   const totalProducts = productList.length;
-  const lowStockItems = lowStockAlertItems.length;
+  const lowStockItems = productList.filter(
+    (p) => p.status === "Low Stock",
+  ).length;
+
   const stockEntry = stockEntries.length;
   const outOfStock = productList.filter(
     (p) => p.status === "Out of Stock",
@@ -433,11 +478,10 @@ const Inventory = () => {
 
       <InventoryStats
         stats={{
-          total: productList.length,
-          lowStock: lowStockAlertItems.length,
-          entries: stockEntries.length,
-          outOfStock: productList.filter((p) => p.status === "Out of Stock")
-            .length,
+          total: totalProducts,
+          lowStock: lowStockItems,
+          entries: stockEntry,
+          outOfStock,
         }}
       />
 
@@ -445,10 +489,7 @@ const Inventory = () => {
         <InventoryTabs
           tabs={tabs}
           activeTab={activeTab}
-          setActiveTab={(tab) => {
-            setActiveTab(tab);
-            setCurrentPage(1);
-          }}
+          setActiveTab={setActiveTab}
           lowStockCount={lowStockItems}
         />
 
