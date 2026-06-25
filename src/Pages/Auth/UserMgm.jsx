@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react'
+import { useSelector } from 'react-redux'
 import {
   AlertCircle,
   Calendar,
@@ -64,7 +65,8 @@ const normalizeStaff = (staff) => {
 }
 
 const UserMgm = () => {
-  const currentUser = getSessionUser()
+  const reduxUser = useSelector((state) => state.apiInfo?.user)
+  const currentUser = reduxUser ?? getSessionUser()
   const currentUsername = `${currentUser.firstName} ${currentUser.lastName}`.trim() || currentUser.fullName
   const currentAdminUser = useMemo(() => ({
     id: 'current-admin',

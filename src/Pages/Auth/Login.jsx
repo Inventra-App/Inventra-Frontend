@@ -12,11 +12,15 @@ import {
 } from "lucide-react";
 import "./Css/Login.css";
 import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
 import { toast } from "react-hot-toast";
 import { loginAdmin } from "../../API/authApi";
 import { loginStaff } from "../../API/userManagementAPI";
+import { getUserProfile } from "../../API/userProfileApi";
+import { setAccessToken, setUser } from "../../redux/apiSlice";
 import { getAccountPath, saveSessionUser } from "../../Utils/sessionUser";
 import { consumeSessionExpiredMessage } from "../../Utils/authSession";
+import { persistUserProfile } from "../../Utils/userProfileState";
 
 const getAuthToken = (response) =>
   response?.token ||
@@ -59,6 +63,7 @@ const loginWithAdminOrStaff = async (payload) => {
 
 const Login = () => {
   const nav = useNavigate();
+  const dispatch = useDispatch();
   const [showPassword, setShowPassword] = useState(false);
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -140,11 +145,20 @@ const Login = () => {
       const token = getAuthToken(res);
       if (token) {
         localStorage.setItem("inventra_token", token);
+        dispatch(setAccessToken(token));
       }
-      const sessionUser = saveSessionUser(res, {
+      let sessionUser = saveSessionUser(res, {
         email: payload.email,
         role: loginRole,
       });
+      dispatch(setUser(sessionUser));
+
+      try {
+        const profileResponse = await getUserProfile();
+        sessionUser = persistUserProfile(profileResponse, dispatch).sessionUser;
+      } catch (profileError) {
+        console.error("Profile fetch after login failed:", profileError);
+      }
 
       toast.success(res.message || "Login Successful");
 

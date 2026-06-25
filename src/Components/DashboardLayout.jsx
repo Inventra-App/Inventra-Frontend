@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Outlet, useNavigate } from 'react-router-dom'
+import { useDispatch } from 'react-redux'
 import { LogOut, Package } from 'lucide-react'
 import toast from 'react-hot-toast'
 import '../Pages/Auth/Css/Dashboard.css'
@@ -9,6 +10,9 @@ import { logoutUser } from '../API/logoutUser'
 import NoInternet from '../Pages/Auth/NoInternet'
 import { getLoginPathForRole } from '../Utils/authRoles'
 import { getSessionUser } from '../Utils/sessionUser'
+import { getUserProfile } from '../API/userProfileApi'
+import { setAccessToken } from '../redux/apiSlice'
+import { persistUserProfile } from '../Utils/userProfileState'
 
 const DashboardLayout = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
@@ -16,6 +20,7 @@ const DashboardLayout = () => {
   const [isLoggingOut, setIsLoggingOut] = useState(false)
   const [isOffline, setIsOffline] = useState(!navigator.onLine)
   const navigate = useNavigate()
+  const dispatch = useDispatch()
 
   useEffect(() => {
     const showOfflinePage = () => setIsOffline(true)
@@ -29,6 +34,32 @@ const DashboardLayout = () => {
       window.removeEventListener('online', hideOfflinePage)
     }
   }, [])
+
+  useEffect(() => {
+    let isMounted = true
+
+    const loadAuthenticatedProfile = async () => {
+      const token = localStorage.getItem('inventra_token')
+      if (!token) return
+
+      dispatch(setAccessToken(token))
+
+      try {
+        const profile = await getUserProfile()
+        if (isMounted) {
+          persistUserProfile(profile, dispatch)
+        }
+      } catch (error) {
+        console.error('Profile refresh failed:', error)
+      }
+    }
+
+    loadAuthenticatedProfile()
+
+    return () => {
+      isMounted = false
+    }
+  }, [dispatch])
 
   const closeMobileMenu = () => setIsMobileMenuOpen(false)
   const openLogoutModal = () => {
