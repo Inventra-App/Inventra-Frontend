@@ -10,6 +10,7 @@ import {
   Eye,
   EyeOff,
 } from "lucide-react";
+import logo from "../../assets/Logo 2.png"
 import "./Css/Login.css";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
@@ -231,7 +232,7 @@ const Login = () => {
         <div className="leftContent">
           <div className="loginLogo" onClick={() => nav("/")}>
             <div className="loginLogoBox">
-              <Box size={24} />
+             <img src={logo} alt="logo" />
             </div>
             <h2>Inventra</h2>
           </div>

@@ -1,12 +1,11 @@
 import React from 'react'
-// import logoImg from '../assets/Inventra Logo.png'
+import logo from '../assets/Logo 2.png'
 import '../Css/Logo.css'
 
 const Logo = ({ variant = 'white' }) => {
   return (
     <div className={`inventra-logo-component ${variant}`}>
-      <img src="/Inventra Logo.png" alt="Logo" />
-      {/* <img src={logoImg} alt="Inventra" className="inventra-logo-img" /> */}
+      <img src={logo} alt="Logo" />
       <span>Inventra</span>
     </div>
   )
