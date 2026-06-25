@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 import {
   Package,
   Activity,
@@ -186,7 +187,8 @@ const Dashboard = () => {
   const [modalType, setModalType] = useState(null);
   const [modalItems, setModalItems] = useState([]);
   const [modalQueue, setModalQueue] = useState([]);
-  const [sessionUser] = useState(() => getSessionUser());
+  const reduxUser = useSelector((state) => state.apiInfo?.user);
+  const sessionUser = reduxUser ?? getSessionUser();
   const [isFirstLogin] = useState(() => isNewSessionUser());
 
   const fetchData = useCallback(async () => {
