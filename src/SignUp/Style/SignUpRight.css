@@ -89,8 +89,8 @@
 }
 
 .signup-field input::placeholder {
-  color: #6B7280;
-  opacity: 0.6;
+  color: #9CA3AF;
+  font-weight: 300;
 }
 
 .signup-agree-wrapper {

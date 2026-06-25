@@ -34,21 +34,21 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 1px solid #E5E7EB;
+  border-bottom: 1px solid #e5e7eb;
   padding-bottom: 16px;
 }
 
 .inv-modal-header h3 {
   font-size: 16px;
   font-weight: 700;
-  color: #0F172A;
+  color: #0f172a;
   margin: 0;
 }
 
 .inv-modal-close {
   background: none;
   border: none;
-  color: #0A0A0A;
+  color: #0a0a0a;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -64,8 +64,8 @@
   width: 75px;
   height: 75px;
   border-radius: 11px;
-  background-color: #F3F4F6;
-  color: #64748B;
+  background-color: #f3f4f6;
+  color: #64748b;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -75,7 +75,7 @@
 .inv-modal-product h4 {
   font-size: 19px;
   font-weight: 700;
-  color: #0F172A;
+  color: #0f172a;
   margin: 0 0 8px 0;
 }
 
@@ -88,24 +88,50 @@
 .inv-modal-batch-tag {
   font-size: 11px;
   font-weight: 500;
-  color: #0F172A;
-  background-color: #F3F4F6;
+  color: #0f172a;
+  background-color: #f3f4f6;
   padding: 3px 10px;
   border-radius: 8px;
+}
+
+.inv-modal-batch-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.inv-modal-batch-info {
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 12px;
+  background: #fafafa;
+}
+
+.inv-modal-batch-id {
+  font-size: 13px;
+  font-weight: 700;
+  color: #432dd7;
+  margin-bottom: 6px;
+}
+
+.inv-modal-batch-meta {
+  font-size: 12px;
+  color: #64748b;
+  margin: 2px 0;
 }
 
 .inv-modal-category-tag {
   font-size: 11px;
   font-weight: 400;
-  color: #64748B;
-  background-color: #F3F4F6;
+  color: #64748b;
+  background-color: #f3f4f6;
   padding: 3px 10px;
   border-radius: 6px;
 }
 
 .inv-modal-section {
-  border: 1px solid #E5E7EB;
-  background-color: #F9FAFB;
+  border: 1px solid #e5e7eb;
+  background-color: #f9fafb;
   border-radius: 12px;
   padding: 16px;
   display: flex;
@@ -116,7 +142,7 @@
 .inv-modal-section h5 {
   font-size: 13px;
   font-weight: 600;
-  color: #0F172A;
+  color: #0f172a;
   margin: 0;
 }
 
@@ -128,7 +154,7 @@
 
 .inv-modal-label {
   font-size: 12px;
-  color: #64748B;
+  color: #64748b;
   font-weight: 400;
   margin: 0 0 4px 0;
 }
@@ -136,23 +162,29 @@
 .inv-modal-value {
   font-size: 19px;
   font-weight: 700;
-  color: #0F172A;
+  color: #0f172a;
   margin: 0;
 }
 
-.inv-modal-values{
+.inv-modal-values {
   font-size: 12px;
   font-weight: 400;
-  color: #0F172A;
+  color: #0f172a;
   margin: 0;
 }
 
-.inv-modal-blue { color: #155DFC; }
-.inv-modal-green { color: #00A63E; }
-
+.inv-modal-blue {
+  color: #155dfc;
+}
+.inv-modal-green {
+  color: #00a63e;
+}
+.inv-modal-red {
+  color: #e7000b;
+}
 
 .inv-modal-batch-info {
-  background-color: #F9FAFB;
+  background-color: #f9fafb;
   border-radius: 8px;
   padding: 14px;
 }
@@ -160,22 +192,63 @@
 .inv-modal-batch-id {
   font-size: 12px;
   font-weight: 500;
-  color: #0F172A;
+  color: #0f172a;
   margin: 0 0 4px 0;
 }
 
 .inv-modal-batch-meta {
   font-size: 12px;
   font-weight: 400;
-  color: #64748B;
+  color: #64748b;
   margin: 0;
 }
 
 .inv-modal-empty {
   font-size: 12px;
   font-weight: 400;
-  color: #9CA3AF;
+  color: #9ca3af;
   margin: 0;
+}
+
+.inv-modal-history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.inv-modal-history-item {
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 12px;
+  background: #f8fafc;
+}
+
+.inv-history-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.inv-history-badge {
+  background: rgba(67, 45, 215, 0.08);
+  color: #432dd7;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 8px;
+  border-radius: 999px;
+}
+
+.inv-history-date {
+  font-size: 11px;
+  color: #64748b;
+}
+
+.inv-history-description {
+  margin: 0;
+  font-size: 13px;
+  color: #0f172a;
+  line-height: 1.5;
 }
 
 .inv-modal-manage-btn {
@@ -185,7 +258,7 @@
   gap: 9px;
   width: 100%;
   height: 40px;
-  background-color: #432DD7;
+  background-color: #432dd7;
   color: #ffffff;
   border: none;
   border-radius: 12px;
@@ -253,7 +326,7 @@
     top: 0 !important;
     background-color: #ffffff !important;
     z-index: 10 !important;
-    border-bottom: 1px solid #E5E7EB !important;
+    border-bottom: 1px solid #e5e7eb !important;
     margin-bottom: 16px !important;
   }
 
@@ -261,7 +334,7 @@
     display: block !important;
     font-size: 16px !important;
     font-weight: 700 !important;
-    color: #0F172A !important;
+    color: #0f172a !important;
     margin: 0 !important;
   }
 
@@ -274,7 +347,7 @@
     padding: 4px !important;
     width: 32px !important;
     height: 32px !important;
-    color: #0A0A0A !important;
+    color: #0a0a0a !important;
   }
 
   .inv-modal-product {

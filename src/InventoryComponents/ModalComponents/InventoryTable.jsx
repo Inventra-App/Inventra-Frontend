@@ -44,6 +44,11 @@ const InventoryTable = ({
             <th>CATEGORY</th>
             <th>AVAILABLE STOCK</th>
             <th>BACKROOM STOCK</th>
+            <th className="writeoff-header">
+              WRITE-OFF
+              <br />
+              STOCK
+            </th>
             <th>TOTAL INVENTORY</th>
             <th>STATUS</th>
             <th>ACTIONS</th>
@@ -52,7 +57,9 @@ const InventoryTable = ({
 
         <tbody>
           {data.map((product) => (
-            <tr key={product._id || product.id || product.batch || Math.random()}>
+            <tr
+              key={product._id || product.id || product.batch || Math.random()}
+            >
               <td>
                 <div className="inv-product-cell">
                   <div className="inv-product-icon">
@@ -83,6 +90,13 @@ const InventoryTable = ({
                   {product.backroomStock}{" "}
                 </span>{" "}
               </td>
+
+              <td>
+                <span className="inv-quantity-writeoff">
+                  {product.writeOffStock || 0}
+                </span>
+              </td>
+
               <td>
                 {" "}
                 <span className="inv-quantity">{product.totalStock}</span>{" "}
@@ -154,8 +168,10 @@ const InventoryTable = ({
 
       <div className="inv-mobile-cards">
         {data.map((product) => (
-          <div key={product._id || product.id || product.batch || Math.random()} className="inv-mobile-card">
-
+          <div
+            key={product._id || product.id || product.batch || Math.random()}
+            className="inv-mobile-card"
+          >
             <div className="inv-mobile-card-top">
               <div className="inv-mobile-card-product">
                 <div className="inv-product-icon">
@@ -181,6 +197,15 @@ const InventoryTable = ({
                 <label>BACKROOM STOCK</label>
                 <span className="inv-quantity-reserved">
                   {product.backroomStock}
+                </span>
+              </div>
+
+              <div className="inv-mobile-card-item">
+                <label>
+                  WRITE-OFF STOCK
+                </label>
+                <span className="inv-quantity-writeoff">
+                  {product.writeOffStock || 0}
                 </span>
               </div>
 

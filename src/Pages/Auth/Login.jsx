@@ -372,7 +372,7 @@ const Login = () => {
           </div>
 
           <div className="loginOptions">
-            <label className="rememberLogin">
+            {/* <label className="rememberLogin">
               <input
                 type="checkbox"
                 name="rememberMe"
@@ -381,7 +381,7 @@ const Login = () => {
                 disabled={isSubmitting}
               />
               <span>Remember Me</span>
-            </label>
+            </label> */}
             <a href="/resetpassword">Forgot Password?</a>
           </div>
 

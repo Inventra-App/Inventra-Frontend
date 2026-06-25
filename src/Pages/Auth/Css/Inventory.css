@@ -374,7 +374,7 @@
 
 .inventory-table {
   width: 100%;
-  min-width: 1050px;
+  min-width: 980px;
   border-collapse: collapse;
 }
 
@@ -383,7 +383,7 @@
 }
 
 .inventory-table th {
-  padding: 14px 20px;
+  padding: 14px 16px;
   text-align: left;
   font-size: 11px;
   font-weight: 500;
@@ -406,9 +406,21 @@
 }
 
 .inventory-table td {
-  padding: 16px 20px;
+  padding: 16px 16px;
   vertical-align: middle;
   background-color: #ffffff;
+}
+
+.inv-quantity-writeoff {
+  color: #E7000B;
+  font-weight: 600;
+}
+
+.writeoff-header {
+  width: 99px;
+  min-width: 90px;
+  text-align: center;
+  line-height: 1.2;
 }
 
 .inv-product-cell {
@@ -812,6 +824,11 @@
     justify-content: space-between;
     align-items: flex-start;
   }
+  
+  .inv-mobile-card-item .inv-quantity-writeoff {
+  color: #E7000B !important;
+  font-weight: 700;
+}
 
   .inv-mobile-card-product {
     display: flex;
