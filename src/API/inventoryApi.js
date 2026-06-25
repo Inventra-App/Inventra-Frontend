@@ -114,3 +114,8 @@ export const bookDemo = async (payload) => {
   const res = await API.post("/book-demo", payload);
   return res.data;
 };
+
+export const getStockMovementHistory = async (inventoryId) => {
+  const res = await API.get(`stock/log/${inventoryId}`);
+  return res.data;
+};

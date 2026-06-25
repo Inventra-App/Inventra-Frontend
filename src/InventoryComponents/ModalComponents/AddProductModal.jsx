@@ -15,6 +15,8 @@ const AddProductModal = ({
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [categories, setCategories] = useState([]);
   const [loadingCategories, setLoadingCategories] = useState(false);
+  const [isClosing, setIsClosing] = useState(false);
+  const [hasExpiry, setHasExpiry] = useState(true);
 
   const [formData, setFormData] = useState({
     productName: "",
@@ -26,6 +28,7 @@ const AddProductModal = ({
     packageType: "",
     expiryDate: "",
     customPackageType: "",
+    stockRatio: 0,
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -37,6 +40,15 @@ const AddProductModal = ({
       fetchCategories();
     }
   }, [isOpen]);
+
+  useEffect(() => {
+    if (!hasExpiry) {
+      setFormData((prev) => ({
+        ...prev,
+        expiryDate: "",
+      }));
+    }
+  }, [hasExpiry]);
 
   const resetAll = () => {
     setStep(STEPS.CATEGORY);
@@ -118,6 +130,20 @@ const AddProductModal = ({
 
           updated.reservedStock =
             available > totalStock ? "0" : String(totalStock - available);
+
+          updated.stockRatio = totalStock > 0 ? available / totalStock : 0;
+        }
+
+        if (
+          (name === "packageQuantity" || name === "unitPerPackage") &&
+          updated.stockRatio !== undefined
+        ) {
+          const newAvailable = Math.round(
+            totalStock * Number(updated.stockRatio),
+          );
+
+          updated.availableStock = String(newAvailable);
+          updated.reservedStock = String(totalStock - newAvailable);
         }
 
         return updated;
@@ -164,7 +190,7 @@ const AddProductModal = ({
           formData.packageType === "Other"
             ? formData.customPackageType
             : formData.packageType,
-        expiryDate: formData.expiryDate,
+        expiryDate: hasExpiry ? formData.expiryDate : null,
         availableStock: Number(formData.availableStock || 0),
         backroomStock: Number(formData.reservedStock || 0),
       };
@@ -184,14 +210,31 @@ const AddProductModal = ({
 
   if (!isOpen) return null;
 
+  const handleClose = () => {
+    setIsClosing(true);
+
+    setTimeout(() => {
+      onClose();
+      setIsClosing(false);
+    }, 450);
+  };
+
   return (
-    <div className="modal-overlay">
-      <div className="form-container">
+    <div
+      className={`modal-overlay ${
+        step === STEPS.FORM ? "add-product-overlay" : ""
+      }`}
+    >
+      <div
+        className={`form-container ${
+          step === STEPS.FORM ? "add-product-container" : ""
+        } ${isClosing ? "closing" : ""}`}
+      >
         {step === STEPS.CATEGORY && (
           <>
             <div className="form-header">
               <h2>Select a category</h2>
-              <button className="close-btn" onClick={onClose}>
+              <button className="close-btn" onClick={handleClose}>
                 <X size={18} />
               </button>
             </div>
@@ -292,7 +335,7 @@ const AddProductModal = ({
               </div>
               <button
                 className="close-btn"
-                onClick={onClose}
+                onClick={handleClose}
                 disabled={isSubmitting}
               >
                 <X size={18} />
@@ -309,6 +352,33 @@ const AddProductModal = ({
             )}
 
             <form onSubmit={handleSubmit} className="product-form clean-form">
+              <div className="expiry-toggle-section">
+                <label className="expiry-toggle-title">{hasExpiry ? "Add Expiry Product" : "Add Non-Expiry Product"}</label>
+
+                <div className="expiry-toggle-container">
+                  <div
+                    className={`expiry-option ${hasExpiry ? "active" : ""}`}
+                    onClick={() => setHasExpiry(true)}
+                  >
+                    <div className="expiry-radio">
+                      {hasExpiry && <div className="expiry-radio-inner" />}
+                    </div>
+
+                    <span>Expiry</span>
+                  </div>
+
+                  <div
+                    className={`expiry-option ${!hasExpiry ? "active" : ""}`}
+                    onClick={() => setHasExpiry(false)}
+                  >
+                    <div className="expiry-radio">
+                      {!hasExpiry && <div className="expiry-radio-inner" />}
+                    </div>
+
+                    <span>Non-expiry</span>
+                  </div>
+                </div>
+              </div>
               <div className="form-group full">
                 <label>Product Name *</label>
                 <input
@@ -553,26 +623,31 @@ const AddProductModal = ({
                 </p>
               )}
 
-              <div className="form-group full">
-                <label>Expiry Date</label>
-                <input
-                  className="input"
-                  type="date"
-                  name="expiryDate"
-                  value={formData.expiryDate}
-                  onChange={handleChange}
-                  min={
-                    new Date(Date.now() + 86400000).toISOString().split("T")[0]
-                  }
-                  disabled={isSubmitting}
-                />
-              </div>
+              {hasExpiry && (
+                <div className="form-group full">
+                  <label>Expiry Date</label>
+                  <input
+                    className="input"
+                    type="date"
+                    name="expiryDate"
+                    value={formData.expiryDate}
+                    onChange={handleChange}
+                    min={
+                      new Date(Date.now() + 86400000)
+                        .toISOString()
+                        .split("T")[0]
+                    }
+                    required={hasExpiry}
+                    disabled={isSubmitting}
+                  />
+                </div>
+              )}
 
               <div className="form-actions">
                 <button
                   type="button"
                   className="btn-cancel"
-                  onClick={onClose}
+                  onClick={handleClose}
                   disabled={isSubmitting}
                 >
                   Cancel

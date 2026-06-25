@@ -239,6 +239,29 @@
   gap: 12px;
 }
 
+.manage-red {
+  color: #E7000B;
+}
+
+.writeoff-label {
+  color: #E7000B;
+  font-weight: 600;
+}
+
+.writeoff-select {
+  color: #E7000B !important;
+  font-weight: 600;
+}
+
+.writeoff-select option[value="write-off stock"] {
+  color: #E7000B;
+}
+
+option[value="write-off stock"] {
+  color: #E7000B;
+  font-weight: 600;
+}
+
 .manage-field-half {
   display: flex;
   flex-direction: column;

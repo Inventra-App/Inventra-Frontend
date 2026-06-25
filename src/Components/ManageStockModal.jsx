@@ -14,7 +14,11 @@ const ManageStockModal = ({ inventoryId, product, onClose, onUpdate }) => {
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState(null);
 
-  const actionTypes = ["RESTOCK", "ADJUSTMENT"];
+  const actionTypes = [
+    "TRANSFER_TO_AVAILABLE",
+    "RETURN_TO_BACKROOM",
+    "TRANSFER_TO_WRITEOFF",
+  ];
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -47,7 +51,7 @@ const ManageStockModal = ({ inventoryId, product, onClose, onUpdate }) => {
       console.error("Move stock error:", err);
       setError(
         err?.response?.data?.message ||
-          "Failed to move stock. Please try again."
+          "Failed to move stock. Please try again.",
       );
     } finally {
       setLoading(false);
@@ -129,25 +133,71 @@ const ManageStockModal = ({ inventoryId, product, onClose, onUpdate }) => {
                 {product.backroomStock}
               </p>
             </div>
+
+            <div>
+              <p className="manage-stock-label">Write-off Stock</p>
+              <p className="manage-stock-value" style={{ color: "#E7000B" }}>
+                {product.writeOffStock || 0}
+              </p>
+            </div>
           </div>
         </div>
 
         <form className="manage-form" onSubmit={handleSubmit}>
           <div className="manage-field">
-            <label>Action Type (Optional)</label>
+            <label>Action Type </label>
 
             <select
               value={actionType}
-              onChange={(e) => setActionType(e.target.value)}
+              onChange={(e) => {
+                const value = e.target.value;
+
+                setActionType(value);
+
+                if (value === "TRANSFER_TO_AVAILABLE") {
+                  setMoveFrom("backroom stock");
+                  setMoveTo("available stock");
+                }
+
+                if (value === "RETURN_TO_BACKROOM") {
+                  setMoveFrom("available stock");
+                  setMoveTo("backroom stock");
+                }
+
+                if (value === "TRANSFER_TO_WRITEOFF") {
+                  setMoveFrom("");
+                  setMoveTo("write-off stock");
+                }
+              }}
             >
               <option value="">Select Action Type</option>
-              {actionTypes.map((type) => (
-                <option key={type} value={type}>
-                  {type}
-                </option>
-              ))}
+
+              <option value="TRANSFER_TO_AVAILABLE">
+                Transfer to Available
+              </option>
+
+              <option value="RETURN_TO_BACKROOM">
+                Return to Backroom (Excess Product)
+              </option>
+
+              <option value="TRANSFER_TO_WRITEOFF" style={{ color: "#E7000B" }}>
+                Transfer to Write-off Stock
+              </option>
             </select>
           </div>
+
+          {actionType === "TRANSFER_TO_WRITEOFF" && (
+            <p
+              style={{
+                fontSize: "12px",
+                color: "#E7000B",
+                marginTop: "6px",
+              }}
+            >
+              Select whether the stock should be written off from Available
+              Stock or Backroom Stock.
+            </p>
+          )}
 
           <div className="manage-move-row">
             <div className="manage-field manage-field-half">
@@ -175,6 +225,7 @@ const ManageStockModal = ({ inventoryId, product, onClose, onUpdate }) => {
                 <option value=""></option>
                 <option value="available stock">Available Stock</option>
                 <option value="backroom stock">Backroom Stock</option>
+                <option value="write-off stock">Write-off Stock</option>
               </select>
             </div>
           </div>
