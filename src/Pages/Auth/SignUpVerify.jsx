@@ -6,6 +6,7 @@ import { resendOtp, verifySignupEmail } from '../../API/authApi'
 import './Css/SignUpVerify.css'
 import Header from '../../Components/Header' 
 import toast from 'react-hot-toast'
+import logo from '../../assets/Logo 2.png'
 
 const SignUpVerify = () => {
   const completeState = useSelector((state) => state);
@@ -158,7 +159,7 @@ const SignUpVerify = () => {
 
       <div className="verify-left">
         <div className="verify-left-logo">
-          <img src="/Inventra Logo.png" alt="Logo" />
+          <img src={logo} alt="Logo" />
           <span>Inventra</span>
         </div>
 

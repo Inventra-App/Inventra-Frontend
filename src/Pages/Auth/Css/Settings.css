@@ -245,8 +245,33 @@
   box-shadow: none;
 }
 
-.settings-password-field svg {
+.settings-password-toggle {
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: none;
+  border-radius: 8px;
+  background-color: transparent;
   color: #98a2b3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+.settings-password-toggle:hover {
+  color: #432DD7;
+  background-color: #f3f4f6;
+}
+
+.settings-password-toggle:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.settings-password-toggle svg {
+  color: currentColor;
   flex-shrink: 0;
 }
 

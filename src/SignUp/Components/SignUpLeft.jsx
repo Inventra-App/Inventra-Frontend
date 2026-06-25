@@ -3,7 +3,7 @@ import { Package, Calendar, TrendingUp, Shield, Users, Clock } from 'lucide-reac
 import bg1 from '../../assets/SignUp bdg.jpg'
 import bg2 from '../../assets/Pricing bdg.jpg'
 import bg3 from '../../assets/Warehouse.jpg'
-// import logo from '../../assets/Inventra Logo.png'
+import logo from '../../assets/Logo 2.png'
 import '../Style/SignUpLeft.css'
 
 const backgrounds = [bg1, bg2, bg3]
@@ -38,8 +38,7 @@ const SignUpLeft = ({ nav }) => {
       <div className="signup-overlay" />
 
       <div className="signup-left-logo" onClick={() => nav('/')}>
-        {/* <img src={logo} alt="Inventra" className="signup-logo-img" /> */}
-        <img src="/Inventra Logo.png" alt="Logo" />
+        <img src={logo} alt="Logo" />
         <span>Inventra</span>
       </div>
 

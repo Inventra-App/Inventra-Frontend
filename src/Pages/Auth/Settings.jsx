@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { Bell, Check, Eye, Save, Shield, User } from 'lucide-react'
+import { Bell, Check, Eye, EyeOff, Save, Shield, User } from 'lucide-react'
 import { getUserProfile } from '../../API/userProfileApi'
 import { changePassword, changeProfile } from '../../API/settingsApi'
 import { persistUserProfile } from '../../Utils/userProfileState'
@@ -167,11 +167,20 @@ const SecuritySettings = ({ isSaving, onSave }) => {
     newPassword: '',
     confirmPassword: '',
   })
+  const [visibleFields, setVisibleFields] = useState({
+    currentPassword: false,
+    newPassword: false,
+    confirmPassword: false,
+  })
   const [errors, setErrors] = useState({})
 
   const updateField = (field, value) => {
     setForm((current) => ({ ...current, [field]: value }))
     setErrors((current) => ({ ...current, [field]: '' }))
+  }
+
+  const togglePasswordVisibility = (field) => {
+    setVisibleFields((current) => ({ ...current, [field]: !current[field] }))
   }
 
   const handleSave = async () => {
@@ -205,8 +214,10 @@ const SecuritySettings = ({ isSaving, onSave }) => {
         <label className='settings-field'>
           <span>Current Password</span>
           <div className='settings-password-field'>
-            <input type='password' value={form.currentPassword} onChange={(event) => updateField('currentPassword', event.target.value)} disabled={isSaving} />
-            <Eye size={18} />
+            <input type={visibleFields.currentPassword ? 'text' : 'password'} value={form.currentPassword} onChange={(event) => updateField('currentPassword', event.target.value)} disabled={isSaving} />
+            <button type='button' className='settings-password-toggle' onClick={() => togglePasswordVisibility('currentPassword')} aria-label={visibleFields.currentPassword ? 'Hide current password' : 'Show current password'} disabled={isSaving}>
+              {visibleFields.currentPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
           </div>
           <FieldError message={errors.currentPassword} />
         </label>
@@ -214,15 +225,22 @@ const SecuritySettings = ({ isSaving, onSave }) => {
         <label className='settings-field'>
           <span>New Password</span>
           <div className='settings-password-field'>
-            <input type='password' value={form.newPassword} onChange={(event) => updateField('newPassword', event.target.value)} disabled={isSaving} />
-            <Eye size={18} />
+            <input type={visibleFields.newPassword ? 'text' : 'password'} value={form.newPassword} onChange={(event) => updateField('newPassword', event.target.value)} disabled={isSaving} />
+            <button type='button' className='settings-password-toggle' onClick={() => togglePasswordVisibility('newPassword')} aria-label={visibleFields.newPassword ? 'Hide new password' : 'Show new password'} disabled={isSaving}>
+              {visibleFields.newPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
           </div>
           <FieldError message={errors.newPassword} />
         </label>
 
         <label className='settings-field'>
           <span>Confirm New Password</span>
-          <input type='password' value={form.confirmPassword} onChange={(event) => updateField('confirmPassword', event.target.value)} disabled={isSaving} />
+          <div className='settings-password-field'>
+            <input type={visibleFields.confirmPassword ? 'text' : 'password'} value={form.confirmPassword} onChange={(event) => updateField('confirmPassword', event.target.value)} disabled={isSaving} />
+            <button type='button' className='settings-password-toggle' onClick={() => togglePasswordVisibility('confirmPassword')} aria-label={visibleFields.confirmPassword ? 'Hide confirm password' : 'Show confirm password'} disabled={isSaving}>
+              {visibleFields.confirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
+          </div>
           <FieldError message={errors.confirmPassword} />
         </label>
       </div>

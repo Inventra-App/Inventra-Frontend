@@ -1,5 +1,5 @@
 import React from 'react'
-// import logo from '../assets/Inventra Logo.png'
+import logo from '../assets/Logo 2.png'
 import '../Css/Footer.css'
 
 const Footer = () => {
@@ -9,8 +9,7 @@ const Footer = () => {
       <div className="footer-top">
         <div className="footer-brand">
           <div className="footer-logo">
-            <img src="/Inventra Logo.png" alt="Logo" />
-            {/* <img src={logo} alt="Inventra" className="footer-logo-img" /> */}
+            <img src={logo} alt="Logo" />
             <span className="footer-logo-text">Inventra</span>
           </div>
           <p className="footer-brand-desc">
