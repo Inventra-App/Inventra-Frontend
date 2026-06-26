@@ -179,6 +179,12 @@ const AddProductModal = ({
       return;
     }
 
+      if (hasExpiry && !formData.expiryDate) {
+    setServerError("Expiry date is required for expiry products.");
+    setIsSubmitting(false);
+    return;
+  }
+
     try {
       const payload = {
         productName: formData.productName,

@@ -115,6 +115,58 @@ const normalizeExpiryItem = (item, products = []) => {
   }
 }
 
+const ExpirySkeleton = () => (
+  <>
+    <div className="expiry-stats">
+      {Array.from({ length: 4 }).map((_, index) => (
+        <div key={index} className="expiry-stat-card">
+          <div className="expiry-skeleton expiry-skeleton-icon"></div>
+          <div>
+            <div className="expiry-skeleton expiry-skeleton-label"></div>
+            <div className="expiry-skeleton expiry-skeleton-value"></div>
+          </div>
+        </div>
+      ))}
+    </div>
+
+    <div className="expiry-skeleton expiry-skeleton-btn"></div>
+
+    {Array.from({ length: 3 }).map((_, section) => (
+      <div key={section} className="expiry-section">
+        <div className="expiry-section-header">
+          <div className="expiry-skeleton expiry-skeleton-heading"></div>
+          <div className="expiry-skeleton expiry-skeleton-count"></div>
+        </div>
+
+        <div className="expiry-list">
+          {Array.from({ length: 3 }).map((_, item) => (
+            <div key={item} className="expiry-item">
+              <div className="expiry-item-left">
+                <div className="expiry-skeleton expiry-skeleton-circle"></div>
+
+                <div className="expiry-item-body">
+                  <div className="expiry-skeleton expiry-skeleton-title"></div>
+                  <div className="expiry-skeleton expiry-skeleton-batch"></div>
+
+                  <div className="expiry-item-meta">
+                    <div className="expiry-skeleton expiry-skeleton-meta"></div>
+                    <div className="expiry-skeleton expiry-skeleton-meta"></div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="expiry-item-right">
+                <div className="expiry-skeleton expiry-skeleton-tag"></div>
+                <div className="expiry-skeleton expiry-skeleton-view"></div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    ))}
+  </>
+)
+
 const ExpiryMgm = () => {
   const [expiryItems, setExpiryItems] = useState([])
   const [loading, setLoading] = useState(true)
@@ -227,6 +279,25 @@ const ExpiryMgm = () => {
     setShowRemovePopup(true)
   }
 
+  if (loading) {
+  return (
+    <div className="expiry-page">
+      <div className="expiry-top">
+        <h2 className="expiry-title">Expiry Updates</h2>
+        <p className="expiry-sub expiry-sub-desktop">
+          Monitor products approaching expiry dates
+        </p>
+        <p className="expiry-sub expiry-sub-mobile">
+          Here's what's happening in your supermarket today.
+          <span className="expiry-admin"> (Admin)</span>
+        </p>
+      </div>
+
+      <ExpirySkeleton />
+    </div>
+  )
+}
+
   return (
     <div className="expiry-page">
 
@@ -253,8 +324,6 @@ const ExpiryMgm = () => {
       </div>
 
       <button className="expiry-manage-btn">+ Manage Expiry</button>
-
-      {loading && <p className="expiry-api-message">Loading expiry alerts...</p>}
       {error && <p className="expiry-api-message expiry-api-error">{error}</p>}
 
       <div className="expiry-section">

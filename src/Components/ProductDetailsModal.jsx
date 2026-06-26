@@ -178,7 +178,7 @@ const ProductDetailsModal = ({ product, onClose, onManage }) => {
                           month: "short",
                           year: "numeric",
                         })
-                      : "N/A"}
+                      : "No expiry date"}
                   </p>
                 </div>
               ))}

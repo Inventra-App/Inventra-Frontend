@@ -22,11 +22,28 @@ const filterOptions = [
   { label: "Stock Update", value: "stock" },
 ];
 
-const getModuleType = (module = "") => {
-  const m = module.toUpperCase();
-  if (m.includes("SALE") || m.includes("POS")) return "sale";
-  if (m.includes("STOCK") || m.includes("BATCH") || m.includes("RECEIV"))
+const getModuleType = (item) => {
+  const module = item.module?.toUpperCase() || "";
+  const action = item.action?.toUpperCase() || "";
+  const description = item.description?.toUpperCase() || "";
+
+  if (module.includes("SALE") || module.includes("POS")) {
+    return "sale";
+  }
+
+  if (
+    action.includes("RECORDED DELIVERY") ||
+    description.includes("RECEIVED") ||
+    description.includes("SUPPLIER") ||
+    description.includes("DELIVERY")
+  ) {
     return "receiving";
+  }
+
+  if (action.includes("UPDATED STOCK")) {
+    return "stock";
+  }
+
   return "inventory";
 };
 
@@ -66,6 +83,50 @@ const formatDate = (dateStr) => {
   });
 };
 
+const ActivitySkeleton = () => (
+  <>
+    <div className="activity-stats">
+      {Array.from({ length: 5 }).map((_, i) => (
+        <div key={i} className="activity-stat-card">
+          <div className="activity-skeleton activity-skeleton-icon"></div>
+          <div>
+            <div className="activity-skeleton activity-skeleton-label"></div>
+            <div className="activity-skeleton activity-skeleton-value"></div>
+          </div>
+        </div>
+      ))}
+    </div>
+
+    <div className="activity-filter-bar">
+      <div className="activity-skeleton activity-skeleton-filter"></div>
+    </div>
+
+    <div className="activity-timeline-card">
+      <h3 className="activity-timeline-title">Activity Timeline</h3>
+
+      {Array.from({ length: 8 }).map((_, i) => (
+        <div key={i} className="activity-item">
+          <div className="activity-skeleton activity-skeleton-avatar"></div>
+
+          <div className="activity-item-body">
+            <div className="activity-item-top">
+              <div className="activity-skeleton activity-skeleton-title"></div>
+              <div className="activity-skeleton activity-skeleton-tag"></div>
+            </div>
+
+            <div className="activity-skeleton activity-skeleton-desc"></div>
+
+            <div className="activity-item-meta">
+              <div className="activity-skeleton activity-skeleton-meta"></div>
+              <div className="activity-skeleton activity-skeleton-meta"></div>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  </>
+);
+
 const ActivityLog = () => {
   const [activities, setActivities] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -79,15 +140,16 @@ const ActivityLog = () => {
       try {
         const res = await getActivityLogs();
         const list = Array.isArray(res?.data) ? res.data : [];
+        console.log("Activity Logs:", list)
         setActivities(
           [...list]
             .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
             .map((item) => ({
               id: item._id,
-              type: getModuleType(item.module),
+              type: getModuleType(item),
               label: item.action || item.title || "Activity",
               desc: item.description || "-",
-              user: item.user || "System",
+              user: item.staffName || "System",
               date: formatDate(item.createdAt),
               amount:
                 item.amount > 0
@@ -123,6 +185,12 @@ const ActivityLog = () => {
     (a) => a.type === "inventory",
   ).length;
 
+  const inventoryUpdatesCount = activities.filter((a) =>
+    ["updated stock", "adjusted stock", "moved stock"].includes(
+      a.label?.toLowerCase(),
+    ),
+  ).length;
+
   const statCards = [
     {
       label: "Total Activities",
@@ -150,7 +218,7 @@ const ActivityLog = () => {
     },
     {
       label: "Inventory Updates",
-      value: 0,
+      value: inventoryUpdatesCount,
       icon: <Package size={20} />,
       color: "orange",
     },
@@ -160,6 +228,21 @@ const ActivityLog = () => {
     const option = filterOptions.find((o) => o.value === filter);
     return `${option?.label} (${filter === "all" ? activities.length : filtered.length})`;
   };
+
+  if (loading) {
+    return (
+      <div className="activity-page">
+        <div className="activity-top">
+          <h2 className="activity-title">Activity</h2>
+          <p className="activity-sub">
+            Track all actions and maintain accountability
+          </p>
+        </div>
+
+        <ActivitySkeleton />
+      </div>
+    );
+  }
 
   return (
     <div className="activity-page">
@@ -225,9 +308,7 @@ const ActivityLog = () => {
       <div className="activity-timeline-card">
         <h3 className="activity-timeline-title">Activity Timeline</h3>
 
-        {loading ? (
-          <p className="activity-loading">Loading activity logs...</p>
-        ) : filtered.length === 0 ? (
+        {filtered.length === 0 ? (
           <p className="activity-loading">No activities found.</p>
         ) : (
           <div className="activity-list">

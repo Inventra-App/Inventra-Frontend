@@ -19,6 +19,7 @@ import {
   getActivityLogs,
   getAllProducts,
 } from "../../API/inventoryApi";
+import { getDailySalesTotal } from "../../API/salesPosApi";
 import AlertModal from "../../Components/AlertModal";
 import {
   getSessionUser,
@@ -199,7 +200,7 @@ const Dashboard = () => {
       const results = await Promise.allSettled([
         getTotalStockUnits().catch(() => null),
         getTotalProductsCount().catch(() => null),
-        getTotalSalesAmount().catch(() => null),
+        getDailySalesTotal().catch(() => null),
         getInventoryItems().catch(() => []),
         getExpiryAlerts().catch(() => []),
         getLowStockAlerts().catch(() => []),
@@ -240,15 +241,13 @@ const Dashboard = () => {
           : null;
       setTotalProducts(tpc);
 
-      const tsa =
-        tsaRes.status === "fulfilled" && tsaRes.value
-          ? typeof tsaRes.value === "number"
-            ? tsaRes.value
-            : (tsaRes.value?.totalSalesAmount ??
-              tsaRes.value?.data ??
-              tsaRes.value?.amount ??
-              null)
+      const dailySales =
+        tsaRes.status === "fulfilled"
+          ? (tsaRes.value?.data?.[0] ?? null)
           : null;
+
+      const tsa = Number(dailySales?.totalSales ?? 0);
+
       setTotalSalesAmount(tsa);
 
       const inventoryItems =

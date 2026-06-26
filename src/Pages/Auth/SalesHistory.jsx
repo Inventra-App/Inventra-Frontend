@@ -200,7 +200,6 @@ const SalesHistory = () => {
         </>
       )}
 
-      {/* Sale Detail Modal */}
       {selectedSale && (
         <div
           className="sh-modal-backdrop"
@@ -226,9 +225,41 @@ const SalesHistory = () => {
               </button>
             </div>
 
+            <div className="sh-modal-content">
+
             <div className="sh-modal-amount">
               <span>TOTAL AMOUNT</span>
               <strong>{formatNaira(selectedSale.totalAmount)}</strong>
+            </div>
+
+            <div className="sh-modal-section">
+              <h4>ITEMS PURCHASED</h4>
+
+              <div className="sh-items-list">
+                {(selectedSale.items || []).map((item, index) => (
+                  <div key={index} className="sh-item-row">
+                    <div className="sh-item-left">
+                      <div className="sh-item-icon">
+                        <Package size={16} />
+                      </div>
+
+                      <div>
+                        <p className="sh-item-name">{item.productName}</p>
+
+                        <span className="sh-item-price">
+                          {formatNaira(item.unitPrice)} each
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="sh-item-right">
+                      <span className="sh-item-qty">×{item.quantity}</span>
+
+                      <strong>{formatNaira(item.subtotal)}</strong>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
 
             <div className="sh-modal-section">
@@ -262,6 +293,7 @@ const SalesHistory = () => {
                   <strong>{formatDate(selectedSale.createdAt)}</strong>
                 </div>
               </div>
+            </div>
             </div>
           </div>
         </div>

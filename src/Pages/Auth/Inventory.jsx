@@ -667,7 +667,14 @@ const Inventory = () => {
       <RecordStockModal
         onClose={() => setShowRecordStock(null)}
         visible={!!showRecordStock}
-        product={showRecordStock}
+        product={
+          showRecordStock
+            ? {
+                ...showRecordStock,
+                hasExpiry: !!showRecordStock.expiryDate,
+              }
+            : null
+        }
         onAddProduct={handleAddProduct}
       />
 

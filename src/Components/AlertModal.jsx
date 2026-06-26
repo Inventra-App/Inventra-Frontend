@@ -107,7 +107,7 @@ const AlertModal = ({
         <div className="alert-modal-items">
           {items.map((item, index) => (
             <div
-              key={item.id ?? `${item.name}-${index}`}
+              key={`${item.id}-${item.batch}-${item.expiryDate}`}
               className={`alert-modal-item alert-modal-item-${config.tone}`}
             >
               <div

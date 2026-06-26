@@ -44,11 +44,6 @@ const InventoryTable = ({
             <th>CATEGORY</th>
             <th>AVAILABLE STOCK</th>
             <th>BACKROOM STOCK</th>
-            <th className="writeoff-header">
-              WRITE-OFF
-              <br />
-              STOCK
-            </th>
             <th>TOTAL INVENTORY</th>
             <th>STATUS</th>
             <th>ACTIONS</th>
@@ -90,13 +85,7 @@ const InventoryTable = ({
                   {product.backroomStock}{" "}
                 </span>{" "}
               </td>
-
-              <td>
-                <span className="inv-quantity-writeoff">
-                  {product.writeOffStock || 0}
-                </span>
-              </td>
-
+              
               <td>
                 {" "}
                 <span className="inv-quantity">{product.totalStock}</span>{" "}
@@ -197,15 +186,6 @@ const InventoryTable = ({
                 <label>BACKROOM STOCK</label>
                 <span className="inv-quantity-reserved">
                   {product.backroomStock}
-                </span>
-              </div>
-
-              <div className="inv-mobile-card-item">
-                <label>
-                  WRITE-OFF STOCK
-                </label>
-                <span className="inv-quantity-writeoff">
-                  {product.writeOffStock || 0}
                 </span>
               </div>
 

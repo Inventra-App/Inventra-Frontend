@@ -1,4 +1,3 @@
-/* Container */
 .sh-container {
   background: #ffffff;
   border-radius: 14px;
@@ -9,7 +8,6 @@
   gap: 0;
 }
 
-/* Header */
 .sh-header {
   display: flex;
   justify-content: space-between;
@@ -102,7 +100,6 @@
   margin: 0;
 }
 
-/* Spinner */
 .sh-spinner {
   width: 32px;
   height: 32px;
@@ -116,7 +113,6 @@
   to { transform: rotate(360deg); }
 }
 
-/* List */
 .sh-list {
   display: flex;
   flex-direction: column;
@@ -219,7 +215,6 @@
   font-weight: 500;
 }
 
-/* Payment tag */
 .sh-payment-tag {
   font-size: 11px;
   font-weight: 600;
@@ -243,7 +238,6 @@
   color: #9333ea;
 }
 
-/* Footer / Pagination */
 .sh-footer {
   display: flex;
   justify-content: space-between;
@@ -302,15 +296,14 @@
   color: #ffffff !important;
 }
 
-/* Modal */
 .sh-modal-backdrop {
   position: fixed;
   inset: 0;
   z-index: 1000;
-  background: rgba(15, 23, 42, 0.45);
+  background: rgba(15,23,42,.45);
   display: flex;
-  align-items: center;
   justify-content: center;
+  align-items: center;
   padding: 20px;
 }
 
@@ -318,8 +311,29 @@
   background: #ffffff;
   border-radius: 16px;
   width: min(100%, 480px);
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.18);
+  max-height: calc(100vh - 40px);
+  display: flex;
+  flex-direction: column;
   overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0,0,0,.18);
+}
+
+.sh-modal-content {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.sh-modal-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.sh-modal-content::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 999px;
+}
+
+.sh-modal-content::-webkit-scrollbar-track {
+  background: transparent;
 }
 
 .sh-modal-header {
@@ -399,6 +413,67 @@
 
 .sh-modal-section {
   padding: 20px 24px 24px;
+}
+
+.sh-items-list{
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+
+.sh-item-row{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:12px 0;
+  border-bottom:1px solid #edf2f7;
+}
+
+.sh-item-row:last-child{
+  border-bottom:none;
+}
+
+.sh-item-left{
+  display:flex;
+  gap:12px;
+  align-items:center;
+}
+
+.sh-item-icon{
+  width:36px;
+  height:36px;
+  border-radius:10px;
+  background:#eef2ff;
+  color:#4f46e5;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.sh-item-name{
+  margin:0;
+  font-weight:600;
+  color:#111827;
+}
+
+.sh-item-price{
+  font-size:13px;
+  color:#6b7280;
+}
+
+.sh-item-right{
+  text-align:right;
+}
+
+.sh-item-qty{
+  display:block;
+  font-size:13px;
+  color:#6b7280;
+  margin-bottom:4px;
+}
+
+.sh-item-right strong{
+  color:#111827;
 }
 
 .sh-modal-section h4 {

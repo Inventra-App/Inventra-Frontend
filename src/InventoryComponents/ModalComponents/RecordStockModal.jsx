@@ -13,11 +13,14 @@ const RecordStockModal = ({ onClose, visible, onAddProduct, product }) => {
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
   const [expiryError, setExpiryError] = useState("");
+  const [hasExpiry, setHasExpiry] = useState(true);
 
   useEffect(() => {
     if (product) {
       setPackageQuantity(product.packageQuantity || "");
       setUnitPerPackage(product.unitPerPackage || "");
+
+      setHasExpiry(product.hasExpiry ?? !!product.expiryDate);
     }
   }, [product]);
 
@@ -36,20 +39,25 @@ const RecordStockModal = ({ onClose, visible, onAddProduct, product }) => {
     e.preventDefault();
     setError(null);
 
-    const tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    tomorrow.setHours(0, 0, 0, 0);
+    if (expiryDate) {
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      tomorrow.setHours(0, 0, 0, 0);
 
-    if (new Date(expiryDate) < tomorrow) {
-      setExpiryError("Expiry date must be a future date.");
-      return;
+      if (new Date(expiryDate) < tomorrow) {
+        setExpiryError("Expiry date must be a future date.");
+        return;
+      }
     }
+
+    setExpiryError("");
+
     setExpiryError("");
 
     const payload = {
       inventoryId: product?.inventoryId,
       supplier: supplierName,
-      expiryDate,
+      expiryDate: expiryDate || null,
       packageType: product?.packageType,
       packageQuantity: parseInt(packageQuantity),
       unitPerPackage: parseInt(unitPerPackage),
@@ -243,7 +251,7 @@ const RecordStockModal = ({ onClose, visible, onAddProduct, product }) => {
               </div>
 
               <div className="record-field">
-                <label>Expiry Date *</label>
+                <label>Expiry Date </label>
                 <input
                   type="date"
                   value={expiryDate}
@@ -254,7 +262,7 @@ const RecordStockModal = ({ onClose, visible, onAddProduct, product }) => {
                     setExpiryDate(e.target.value);
                     setExpiryError("");
                   }}
-                  required
+              
                 />
                 {expiryError && (
                   <div className="record-field-error">{expiryError}</div>
