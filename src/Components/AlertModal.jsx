@@ -15,7 +15,7 @@ const configs = {
     tone: "expired",
     title: "Expired Products Alert",
     subtitle: (count) =>
-      `${count} product${count === 1 ? "" : "s"} ${count === 1 ? "has" : "have"} expired`,
+      `${count} product${count === 1 ? "" : "s"} require immediate attention`,
     headerIcon: <AlertTriangle size={20} />,
     actionText:
       "The following products have passed their expiry date. Please remove them from shelves immediately to prevent sale and potential health risks.",
@@ -29,7 +29,7 @@ const configs = {
     tone: "expiring",
     title: "Products Expiring Soon",
     subtitle: (count) =>
-      `${count} product${count === 1 ? " is" : "s are"} expiring in the next 7 days`,
+      `${count} product${count === 1 ? " is" : "s are"} expiring in 4-7 days`,
     headerIcon: <Clock size={20} />,
     actionText: "",
     statusText: "",
