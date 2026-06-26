@@ -55,7 +55,40 @@
   border-radius: 999px;
 }
 
-/* States */
+.sh-search-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 20px 0;
+  padding: 0 16px;
+  height: 48px;
+  background: #fff;
+  border: 2px solid #d1d5db;
+  border-radius: 6px;
+}
+
+.sh-search-bar:focus-within {
+  border-color: #432dd7;
+}
+
+.sh-search-bar svg {
+  color: #9ca3af;
+  flex-shrink: 0;
+}
+
+.sh-search-bar input {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 14px;
+  color: #111827;
+}
+
+.sh-search-bar input::placeholder {
+  color: #9ca3af;
+}
+
 .sh-state-box {
   display: flex;
   flex-direction: column;
