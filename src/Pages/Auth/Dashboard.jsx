@@ -25,6 +25,7 @@ import {
   isNewSessionUser,
   markReturningSessionUser,
 } from "../../Utils/sessionUser";
+import { normalizeRole } from "../../Utils/authRoles";
 import "./Css/Dashboard.css";
 
 const getArrayPayload = (payload) => {
@@ -264,6 +265,9 @@ const Dashboard = () => {
   const [modalQueue, setModalQueue] = useState([]);
   const reduxUser = useSelector((state) => state.apiInfo?.user);
   const sessionUser = reduxUser ?? getSessionUser();
+  const currentRole = normalizeRole(sessionUser.role) || "Admin";
+  const isAdmin = currentRole === "Admin";
+  const isManager = currentRole === "Manager";
   const [isFirstLogin] = useState(() => isNewSessionUser());
 
   const fetchData = useCallback(async () => {
@@ -513,18 +517,21 @@ const Dashboard = () => {
 
   const statCards = [
     {
+      roles: ["Admin", "Manager"],
       label: "Total Products",
       value: totalProducts !== null ? String(totalProducts) : "0",
       icon: <Package size={22} />,
       color: "blue",
     },
     {
+      roles: ["Admin", "Manager"],
       label: "Total Stock Units",
       value: totalStockUnits !== null ? String(totalStockUnits) : "0",
       icon: <Activity size={22} />,
       color: "green",
     },
     {
+      roles: ["Admin", "Cashier"],
       label: "Sales Today",
       value:
         totalSalesAmount !== null
@@ -538,13 +545,14 @@ const Dashboard = () => {
       color: "purple",
     },
     {
+      roles: ["Admin", "Manager"],
       label: "Critical Alerts",
       value: String(criticalAlerts),
       sub: "Products needing attention",
       icon: <TrendingDown size={22} />,
       color: "red",
     },
-  ];
+  ].filter((card) => card.roles.includes(currentRole));
 
   if (loading) {
     return (
@@ -631,7 +639,7 @@ const Dashboard = () => {
         </h2>
         <p>
           Here's what's happening in your supermarket today.{" "}
-          <span className="expiry-admin">({sessionUser.role})</span>
+          <span className="expiry-admin">({currentRole})</span>
         </p>
       </div>
 
@@ -650,6 +658,7 @@ const Dashboard = () => {
         ))}
       </div>
 
+      {(isAdmin || isManager) && (
       <div className="dashboard-alerts">
         <div className="alert-card">
           <div className="alert-card-header">
@@ -731,6 +740,7 @@ const Dashboard = () => {
           </div>
         </div>
       </div>
+      )}
 
       <div className="activity-card">
         <div className="alert-card-header">

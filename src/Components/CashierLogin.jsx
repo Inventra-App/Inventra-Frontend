@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
-import { Box, Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import { loginStaff } from "../API/userManagementAPI";
 import { getAccountPath, saveSessionUser } from "../Utils/sessionUser";
 import { getRoleFromToken, getStaffLoginDestination, normalizeRole } from "../Utils/authRoles";
 import { consumeSessionExpiredMessage } from "../Utils/authSession";
+import Logo from "./Logo";
 import loginBg from "../assets/LoginBg.png";
 import "./CashierLogin.css";
 
@@ -99,10 +100,7 @@ const CashierLogin = () => {
       >
         <div className="staff-auth-shade" />
         <div className="staff-auth-brand" onClick={() => navigate("/")}>
-          <span>
-            <Box size={22} />
-          </span>
-          <strong>Inventra</strong>
+          <Logo variant="white" />
         </div>
 
         <div className="staff-auth-copy">
@@ -124,7 +122,7 @@ const CashierLogin = () => {
           </div>
 
           <div className="staff-auth-switch" aria-label="Login type">
-            <button type="button" disabled>
+            <button type="button" onClick={() => navigate("/staff-login")}>
               Manager
             </button>
             <button type="button" className="active" aria-current="page">

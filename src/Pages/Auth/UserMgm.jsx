@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { useSelector } from 'react-redux'
 import {
   AlertCircle,
@@ -99,6 +99,25 @@ const UserMgm = () => {
   const [newRole, setNewRole] = useState('')
   const [copied, setCopied] = useState(false)
 
+  const loadStaffs = useCallback(async (silent = false) => {
+    if (!silent) {
+      setLoadingUsers(true)
+    }
+
+    try {
+      const response = await getStaffs()
+      const staffs = getArrayPayload(response).map(normalizeStaff)
+      setUsers([currentAdminUser, ...staffs])
+    } catch (error) {
+      console.error('Staff fetch error:', error)
+      setUsers([currentAdminUser])
+    } finally {
+      if (!silent) {
+        setLoadingUsers(false)
+      }
+    }
+  }, [currentAdminUser])
+
   const permissions = [
     'Dashboard',
     'Inventory',
@@ -111,40 +130,9 @@ const UserMgm = () => {
   const roles = ['manager', 'cashier']
 
   useEffect(() => {
-    let isMounted = true
-
-    const loadStaffs = async (silent = false) => {
-      if (!silent) {
-        setLoadingUsers(true)
-      }
-
-      try {
-        const response = await getStaffs()
-        const staffs = getArrayPayload(response).map(normalizeStaff)
-        if (!isMounted) return
-        setUsers([currentAdminUser, ...staffs])
-      } catch (error) {
-        console.error('Staff fetch error:', error)
-        if (!isMounted) return
-        setUsers([currentAdminUser])
-      } finally {
-        if (isMounted && !silent) {
-          setLoadingUsers(false)
-        }
-      }
-    }
-
-    loadStaffs()
-    const intervalId = window.setInterval(() => loadStaffs(true), 30000)
-    const refreshOnFocus = () => loadStaffs(true)
-    window.addEventListener('focus', refreshOnFocus)
-
-    return () => {
-      isMounted = false
-      window.clearInterval(intervalId)
-      window.removeEventListener('focus', refreshOnFocus)
-    }
-  }, [currentAdminUser])
+    const timerId = window.setTimeout(loadStaffs, 0)
+    return () => window.clearTimeout(timerId)
+  }, [loadStaffs])
 
   // Default permission state per role (used when no custom config exists yet)
   const defaultRolePermissions = {
@@ -305,6 +293,7 @@ const UserMgm = () => {
         status: 'Inactive',
       }
       setUsers((currentUsers) => [...currentUsers, newStaff])
+      loadStaffs(true)
       setFirstName('')
       setLastName('')
       setEmail('')

@@ -85,7 +85,6 @@ const getProductPrice = (item, matchedProduct) =>
     ),
   );
 
-<<<<<<< HEAD
 const getProductId = (item) => String(getValue(
   item?.productId?._id,
   item?.productId,
@@ -94,12 +93,6 @@ const getProductId = (item) => String(getValue(
   item?.inventory?.productId,
   '',
 ))
-=======
-const getProductId = (item) =>
-  String(
-    getValue(item?.productId?._id, item?.productId, item?.product?._id, ""),
-  );
->>>>>>> 7f21ce645640d8814dd64cb2b5038f178c0aa078
 
 const getProductName = (item) => getValue(
   item?.productName,
@@ -112,15 +105,8 @@ const getProductName = (item) => getValue(
 )
 
 const findMatchingProduct = (item, products) => {
-<<<<<<< HEAD
   const productId = getProductId(item)
   const productName = String(getProductName(item)).toLowerCase()
-=======
-  const productId = getProductId(item);
-  const productName = String(
-    item?.productName ?? item?.product?.productName ?? "",
-  ).toLowerCase();
->>>>>>> 7f21ce645640d8814dd64cb2b5038f178c0aa078
 
   return products.find((product) => {
     const currentId = String(
@@ -146,7 +132,6 @@ const findMatchingProduct = (item, products) => {
 };
 
 const normalizeExpiryItem = (item, products = []) => {
-<<<<<<< HEAD
   const matchedProduct = findMatchingProduct(item, products)
   const expiryValue = getValue(
     item?.expiryDate,
@@ -177,24 +162,7 @@ const normalizeExpiryItem = (item, products = []) => {
       0,
     )),
     expires: formatDate(expiryValue),
-=======
-  const matchedProduct = findMatchingProduct(item, products);
-  const days = Number(item?.daysLeft ?? getDaysRemaining(item?.expiryDate));
-  const expiredDays = Math.abs(days);
-
-  return {
-    id: `${item?.productId ?? item?._id}-${item?.batchCode ?? ""}`,
-    name: item?.productName ?? "Unnamed Product",
-    productId: getProductId(item) || "N/A",
-    category: getCategoryName(item, matchedProduct),
-    price: getProductPrice(item, matchedProduct),
-    batch: item?.batchCode ?? "N/A",
-    quantity: Number(
-      item?.quantityRemaining ?? item?.inventory?.totalStock ?? 0,
-    ),
-    expires: formatDate(item?.expiryDate),
     urgency: item?.urgencyLevel || "",
->>>>>>> 7f21ce645640d8814dd64cb2b5038f178c0aa078
     daysNumber: days,
     status: days <= 0 ? "EXPIRED" : "EXPIRING SOON",
     daysLeft:

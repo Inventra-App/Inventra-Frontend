@@ -4,7 +4,7 @@
   width: 100%;
   padding: 28px 24px;
   border-radius: 14px;
-  background: #6366F1;
+  background: #0F172A;
   color: #ffffff;
   box-sizing: border-box;
 }
@@ -102,8 +102,7 @@
   margin-bottom: 12px;
 }
 
-.new-user-number,
-.new-user-icon {
+.new-user-number {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -117,14 +116,6 @@
   background: rgba(255, 255, 255, 0.18);
   font-size: 12px;
   font-weight: 700;
-}
-
-.new-user-icon {
-  width: 32px;
-  height: 32px;
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.16);
-  color: #2f21bd;
 }
 
 .new-user-step h4 {
