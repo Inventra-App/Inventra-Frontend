@@ -65,8 +65,8 @@
   background-color: #ffffff;
   width: 100%;
   max-width: 380px;
-  height: 100%;
-  max-height: none;
+  /* height: 100%; */
+  max-height: calc(100vh - 24px);
   border-radius: 12px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
   display: flex;

@@ -250,7 +250,9 @@ const ExpiryMgm = () => {
     (item) => item.daysNumber >= 4 && item.daysNumber <= 7,
   );
 
-  const infoItems = expiryItems.filter((item) => item.daysNumber >= 8);
+  const infoItems = expiryItems.filter(
+    (item) => item.daysNumber >= 8 && item.daysNumber <= 14,
+  );
 
   const statCards = [
     {

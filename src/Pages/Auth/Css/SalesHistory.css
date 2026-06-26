@@ -395,6 +395,15 @@
   flex-shrink: 0;
 }
 
+.sh-modal .sh-payment-tag {
+  background: #ffffff !important;
+  color: #16a34a !important;
+  border: none !important;
+  padding: 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
 .sh-modal-title h3 {
   font-size: 17px;
   font-weight: 700;

@@ -10,7 +10,7 @@ import {
   Eye,
   EyeOff,
 } from "lucide-react";
-import logo from "../../assets/Logo 2.png"
+import logo from "../../assets/Logo 2.png";
 import "./Css/Login.css";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
@@ -83,36 +83,55 @@ const Login = () => {
     if (message) toast.error(message);
   }, []);
 
-  const validateField = (name, value) => {
-    let error = "";
-    if (name === "email") {
-      if (!value.trim()) {
-        error = "Email address is required";
-      } else if (!/\S+@\S+\.\S+/.test(value)) {
-        error = "Please enter a valid email address";
-      }
-    }
-    if (name === "password" && !value) {
-      error = "Password is required";
-    }
-    setErrors((prev) => ({ ...prev, [name]: error }));
-  };
+  // const validateField = (name, value) => {
+  //   let error = "";
+  //   if (name === "email") {
+  //     if (!value.trim()) {
+  //       error = "Email address is required";
+  //     } else if (!/\S+@\S+\.\S+/.test(value)) {
+  //       error = "Please enter a valid email address";
+  //     }
+  //   }
+  //   if (name === "password" && !value) {
+  //     error = "Password is required";
+  //   }
+  //   setErrors((prev) => ({ ...prev, [name]: error }));
+  // };
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     const fieldValue = type === "checkbox" ? checked : value;
 
-    setFormData((prev) => ({ ...prev, [name]: fieldValue }));
+    setFormData((prev) => ({
+      ...prev,
+      [name]: fieldValue,
+    }));
 
-    if (touched[name]) {
-      validateField(name, fieldValue);
+    if (errors[name]) {
+      setErrors((prev) => ({
+        ...prev,
+        [name]: "",
+      }));
     }
   };
 
   const handleBlur = (e) => {
-    const { name, value } = e.target;
-    setTouched((prev) => ({ ...prev, [name]: true }));
-    validateField(name, value);
+    const { name } = e.target;
+
+    setTouched((prev) => ({
+      ...prev,
+      [name]: true,
+    }));
+
+    if (!formData[name]?.trim()) {
+      setErrors((prev) => ({
+        ...prev,
+        [name]:
+          name === "email"
+            ? "Email address is required"
+            : "Password is required",
+      }));
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -170,9 +189,6 @@ const Login = () => {
     } catch (error) {
       console.error("=== LOGIN ERROR ===", error);
 
-      const status = error.response?.status;
-      const serverMessage = error.response?.data?.message;
-
       if (
         !error.response &&
         (error.code === "ERR_NETWORK" || error.message === "Network Error")
@@ -183,34 +199,12 @@ const Login = () => {
         return;
       }
 
-      if (status === 403 && serverMessage?.toLowerCase().includes("locked")) {
-        try {
-          const timestamp = serverMessage.match(
-            /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z/g,
-          );
-          if (timestamp) {
-            const localTime = new Date(timestamp[0]).toLocaleTimeString([], {
-              hour: "2-digit",
-              minute: "2-digit",
-            });
-            toast.error(`Account locked. Please try again after ${localTime}`);
-            return;
-          }
-        } catch (e) {
-          console.error("Error parsing lock timestamp", e);
-        }
-      }
+      const serverMessage =
+        error.response?.data?.message ||
+        error.response?.data?.error ||
+        "Something went wrong. Please try again.";
 
-      if (
-        serverMessage?.toLowerCase().includes("not found") ||
-        serverMessage?.toLowerCase().includes("invalid credentials")
-      ) {
-        toast.error(
-          "No account found with these credentials. Please check your email and password.",
-        );
-      } else {
-        toast.error(serverMessage || "Something went wrong. Please try again.");
-      }
+      toast.error(serverMessage);
     } finally {
       setIsSubmitting(false);
     }
@@ -232,7 +226,7 @@ const Login = () => {
         <div className="leftContent">
           <div className="loginLogo" onClick={() => nav("/")}>
             <div className="loginLogoBox">
-             <img src={logo} alt="logo" />
+              <img src={logo} alt="logo" />
             </div>
             <h2>Inventra</h2>
           </div>
