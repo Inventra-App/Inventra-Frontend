@@ -593,6 +593,20 @@
   margin-bottom: 4px;
 }
 
+.expiry-risk-box-expired {
+  border-color: #ef4444;
+  background: #fef2f2;
+  color: #dc2626;
+}
+
+.expiry-risk-box-warning {
+  border-color: #fdba74;
+}
+
+.expiry-risk-box-info {
+  border-color: #fde047;
+}
+
 .expiry-risk-box strong {
   color: #9a3412;
   font-size: 15px;
@@ -700,6 +714,16 @@
 
 .expiry-remove-stock-btn-info {
   background: #ca8a04;
+}
+
+.expiry-remove-stock-btn-critical {
+  background: #dc2626;
+  color: #ffffff;
+  border: none;
+}
+
+.expiry-remove-stock-btn-critical:hover {
+  background: #b91c1c;
 }
 
 .expiry-remove-backdrop {

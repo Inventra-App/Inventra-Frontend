@@ -85,28 +85,32 @@ const getProductPrice = (item, matchedProduct) =>
     ),
   );
 
-const getProductId = (item) => String(getValue(
-  item?.productId?._id,
-  item?.productId,
-  item?.product?._id,
-  item?.inventory?.productId?._id,
-  item?.inventory?.productId,
-  '',
-))
+const getProductId = (item) =>
+  String(
+    getValue(
+      item?.productId?._id,
+      item?.productId,
+      item?.product?._id,
+      item?.inventory?.productId?._id,
+      item?.inventory?.productId,
+      "",
+    ),
+  );
 
-const getProductName = (item) => getValue(
-  item?.productName,
-  item?.name,
-  item?.product?.productName,
-  item?.product?.name,
-  item?.inventory?.productName,
-  item?.inventory?.product?.productName,
-  '',
-)
+const getProductName = (item) =>
+  getValue(
+    item?.productName,
+    item?.name,
+    item?.product?.productName,
+    item?.product?.name,
+    item?.inventory?.productName,
+    item?.inventory?.product?.productName,
+    "",
+  );
 
 const findMatchingProduct = (item, products) => {
-  const productId = getProductId(item)
-  const productName = String(getProductName(item)).toLowerCase()
+  const productId = getProductId(item);
+  const productName = String(getProductName(item)).toLowerCase();
 
   return products.find((product) => {
     const currentId = String(
@@ -132,35 +136,47 @@ const findMatchingProduct = (item, products) => {
 };
 
 const normalizeExpiryItem = (item, products = []) => {
-  const matchedProduct = findMatchingProduct(item, products)
+  const matchedProduct = findMatchingProduct(item, products);
   const expiryValue = getValue(
     item?.expiryDate,
     item?.expiresAt,
     item?.expires,
     item?.expirationDate,
-  )
-  const days = Number(getValue(
-    item?.daysLeft,
-    item?.daysRemaining,
-    item?.remainingDays,
-    getDaysRemaining(expiryValue),
-  ))
-  const expiredDays = Math.abs(days)
+  );
+  const days = Number(
+    getValue(
+      item?.daysLeft,
+      item?.daysRemaining,
+      item?.remainingDays,
+      getDaysRemaining(expiryValue),
+    ),
+  );
+  const expiredDays = Math.abs(days);
 
   return {
-    id: item?._id ?? getProductId(item) ?? `${getProductName(item)}-${expiryValue}`,
-    name: getValue(getProductName(item), matchedProduct?.productName, matchedProduct?.name, 'Unnamed Product'),
-    productId: getProductId(item) || 'N/A',
+    id:
+      item?._id ??
+      getProductId(item) ??
+      `${getProductName(item)}-${expiryValue}`,
+    name: getValue(
+      getProductName(item),
+      matchedProduct?.productName,
+      matchedProduct?.name,
+      "Unnamed Product",
+    ),
+    productId: getProductId(item) || "N/A",
     category: getCategoryName(item, matchedProduct),
     price: getProductPrice(item, matchedProduct),
-    batch: item?.batchCode ?? item?.batch ?? item?.batchNumber ?? 'N/A',
-    quantity: Number(getValue(
-      item?.quantityRemaining,
-      item?.inventory?.totalStock,
-      item?.totalStock,
-      item?.quantity,
-      0,
-    )),
+    batch: item?.batchCode ?? item?.batch ?? item?.batchNumber ?? "N/A",
+    quantity: Number(
+      getValue(
+        item?.quantityRemaining,
+        item?.inventory?.totalStock,
+        item?.totalStock,
+        item?.quantity,
+        0,
+      ),
+    ),
     expires: formatDate(expiryValue),
     urgency: item?.urgencyLevel || "",
     daysNumber: days,
@@ -312,37 +328,51 @@ const ExpiryMgm = () => {
   const batchValue = selectedProduct
     ? selectedProduct.quantity * selectedProduct.price
     : 0;
+
   const getProductTone = (product) => {
-    if (!product) return "warning";
-    if (product.daysNumber <= 0) return "expired";
-    if (product.daysNumber <= 7) return "warning";
+    if (!product) return "info";
+
+    if (product?.daysNumber <= 0) return "expired";
+    if (product?.daysNumber <= 3) return "critical";
+    if (product?.daysNumber <= 7) return "warning";
+
     return "info";
   };
+
   const selectedProductTone = getProductTone(selectedProduct);
   const removingProductTone = getProductTone(removingProduct);
+
   const selectedProductAlertTitle =
     selectedProductTone === "expired"
       ? "Product Expired"
       : selectedProductTone === "warning"
-        ? "Product Warning"
+        ? "Product Critical"
         : "Product Info";
+
   const selectedProductStatusText =
     selectedProductTone === "expired"
       ? "Expired"
       : selectedProductTone === "warning"
         ? "Warning"
         : "Info";
+
   const selectedProductSectionText =
     selectedProductTone === "expired"
       ? "Critical"
       : selectedProductTone === "warning"
         ? "Warning"
         : "Info";
+
   const selectedProductStatusBadge = selectedProductStatusText.toUpperCase();
+
   const selectedProductActions = {
     expired: [
       "Remove expired stock immediately to prevent sale",
       "Document disposal for inventory records",
+    ],
+    critical: [
+      "Prioritize this batch for immediate sale or use",
+      "Monitor closely as expiry is imminent",
     ],
     warning: [
       "Move warning stock forward for quick sale review",
@@ -353,7 +383,12 @@ const ExpiryMgm = () => {
       "Monitor this batch during routine inventory checks",
     ],
   }[selectedProductTone];
-  const selectedProductRemoveLabel = `Remove ${selectedProductSectionText} Stock`;
+
+  const selectedProductRemoveLabel =
+    selectedProduct && selectedProduct?.daysNumber <= 0
+      ? "Remove Expired Stock"
+      : "OK";
+
   const removingProductLabel =
     removingProductTone === "expired"
       ? "Critical"
@@ -626,7 +661,11 @@ const ExpiryMgm = () => {
               <div>
                 <strong>{selectedProductAlertTitle}</strong>
                 <span>
-                  {selectedProduct.expiredAgo || "Product is nearing expiry"}
+                  {selectedProduct?.daysNumber <= 0
+                    ? selectedProduct.daysLeft
+                    : `${selectedProduct?.daysNumber} day${
+                        selectedProduct?.daysNumber === 1 ? "" : "s"
+                      } until expiry`}
                 </span>
               </div>
             </div>
@@ -667,7 +706,11 @@ const ExpiryMgm = () => {
                   <strong
                     className={`expiry-status-text expiry-status-text-${selectedProductTone}`}
                   >
-                    {selectedProductStatusText}
+                    {selectedProduct?.daysNumber <= 0
+                      ? "Expired"
+                      : `${selectedProduct?.daysNumber} day${
+                          selectedProduct?.daysNumber === 1 ? "" : "s"
+                        }`}
                   </strong>
                 </div>
               </div>
@@ -688,7 +731,15 @@ const ExpiryMgm = () => {
               </div>
             </div>
 
-            <div className="expiry-risk-box">
+            <div
+              className={`expiry-risk-box ${
+                selectedProduct?.daysNumber <= 3
+                  ? "expiry-risk-box-expired"
+                  : selectedProductTone === "warning"
+                    ? "expiry-risk-box-warning"
+                    : "expiry-risk-box-info"
+              }`}
+            >
               <span>₦ Batch Value at Risk</span>
               <strong>{formatNaira(batchValue)}</strong>
               <small>
@@ -712,7 +763,13 @@ const ExpiryMgm = () => {
                 <b
                   className={`expiry-batch-status expiry-batch-status-${selectedProductTone}`}
                 >
-                  {selectedProductStatusBadge}
+                  {selectedProductTone === "expired"
+                    ? "EXPIRED"
+                    : selectedProductTone === "warning"
+                      ? "WARNING"
+                      : selectedProductTone === "critical"
+                        ? "CRITICAL"
+                        : ""}
                 </b>
               </div>
             </section>
@@ -727,7 +784,11 @@ const ExpiryMgm = () => {
             <button
               className={`expiry-remove-stock-btn expiry-remove-stock-btn-${selectedProductTone}`}
               type="button"
-              onClick={openRemovePopup}
+              onClick={
+                selectedProduct?.daysNumber <= 0
+                  ? openRemovePopup
+                  : () => setSelectedProduct(null)
+              }
             >
               <Trash2 size={16} /> {selectedProductRemoveLabel}
             </button>
