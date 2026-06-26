@@ -486,9 +486,8 @@
 
 .tooltip2-text {
   position: absolute;
-  top: 50%;
-  right: 120%;
-  transform: translateY(-50%);
+  bottom: 130%;
+  right: -10px;
   width: 220px;
   background: #111827;
   color: #fff;
@@ -684,6 +683,19 @@
   }
   .step-progress {
     padding: 10px 16px 0;
+  }
+   .tooltip2-text {
+    width: 230px;
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+    bottom: 140%;
+  }
+
+  .tooltip2-text::after {
+    right: auto;
+    left: 50%;
+    transform: translateX(-50%);
   }
   .error-banner {
     margin: 10px 16px 0;

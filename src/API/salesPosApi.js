@@ -33,3 +33,11 @@ export const getSalesHistory = async (
 
   return res.data;
 };
+
+export const getDailySalesTotal = async (date) => {
+  const res = await API.get("sales/daily-total", {
+    params: { date },
+  });
+
+  return res.data;
+};

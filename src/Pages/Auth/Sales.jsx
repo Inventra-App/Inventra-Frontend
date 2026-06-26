@@ -18,6 +18,7 @@ import {
   countSalesPos,
   makeSalesPos,
   getTotalSalesAmountPos,
+  getDailySalesTotal,
 } from "../../API/salesPosApi";
 import "./Css/Sales.css";
 import calendar from "../../assets/calendar.png";
@@ -84,33 +85,34 @@ const Sales = () => {
   const [salesError, setSalesError] = useState("");
   const [salesToday, setSalesToday] = useState(0);
   const [revenueToday, setRevenueToday] = useState(0);
+  const [totalRevenue, setTotalRevenue] = useState(0);
   const [showReceipt, setShowReceipt] = useState(false);
   const [receiptData, setReceiptData] = useState(null);
   const [showCategoryPanel, setShowCategoryPanel] = useState(false);
 
   const loadSales = async () => {
     try {
-      const [salesResponse, revenueResponse] = await Promise.all([
-        countSalesPos(),
+      const today = new Date().toISOString().split("T")[0];
+
+      const [dailyResponse, totalRevenueResponse] = await Promise.all([
+        getDailySalesTotal(today),
         getTotalSalesAmountPos(),
       ]);
 
-      console.log("SALES COUNT:", salesResponse);
-      console.log("SALES AMOUNT:", revenueResponse);
+      // console.log("DAILY SALES:", dailyResponse);
+      // console.log("TOTAL REVENUE:", totalRevenueResponse);
 
-      setSalesToday(
-        Number(
-          salesResponse?.data?.pagination?.totalSales ??
-            salesResponse?.pagination?.totalSales ??
-            0,
-        ),
-      );
+      setSalesToday(Number(dailyResponse?.data?.[0]?.totalSales ?? 0));
 
-      setRevenueToday(Number(revenueResponse?.data ?? 0));
+      setRevenueToday(Number(dailyResponse?.data?.[0]?.totalAmount ?? 0));
+
+      setTotalRevenue(Number(totalRevenueResponse?.data ?? 0));
     } catch (error) {
       console.error("Sales stats fetch error:", error);
+
       setSalesToday(0);
       setRevenueToday(0);
+      setTotalRevenue(0);
     }
   };
 
