@@ -6,6 +6,7 @@ import {
   ShoppingCart,
   CreditCard,
   Package,
+  Search,
   X,
 } from "lucide-react";
 import { getSalesHistory } from "../../API/salesPosApi";
@@ -37,6 +38,7 @@ const SalesHistory = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [pagination, setPagination] = useState(null);
   const [selectedSale, setSelectedSale] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
 
   const fetchSales = useCallback(async (page = 1) => {
     setLoading(true);
@@ -68,6 +70,21 @@ const SalesHistory = () => {
 
   const totalPages = pagination?.totalPages ?? 1;
   const totalSales = pagination?.totalSales ?? sales.length;
+
+  const filteredSales = sales.filter((sale) => {
+    const search = searchTerm.toLowerCase().trim();
+
+    if (!search) return true;
+
+    return (
+      sale.saleNumber?.toString().toLowerCase().includes(search) ||
+      sale.paymentMethod?.toLowerCase().includes(search) ||
+      sale.totalAmount?.toString().includes(search) ||
+      sale.items?.some((item) =>
+        item.productName?.toLowerCase().includes(search),
+      )
+    );
+  });
 
   const renderPagination = () => {
     if (totalPages <= 1) return null;
@@ -126,6 +143,17 @@ const SalesHistory = () => {
         <span className="sh-total-badge">{totalSales} total sales</span>
       </div>
 
+      <div className="sh-search-bar">
+        <Search size={18} />
+
+        <input
+          type="text"
+          placeholder="Search receipt number or product..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+      </div>
+
       {loading ? (
         <div className="sh-state-box">
           <div className="sh-spinner" />
@@ -141,16 +169,23 @@ const SalesHistory = () => {
             Retry
           </button>
         </div>
-      ) : sales.length === 0 ? (
+      ) : filteredSales.length === 0 ? (
         <div className="sh-state-box sh-empty">
           <ShoppingCart size={40} className="sh-empty-icon" />
-          <p className="sh-empty-title">No sales yet</p>
-          <p className="sh-empty-sub">Completed sales will appear here.</p>
+          <p className="sh-empty-title">
+            {searchTerm ? "No matching receipts found" : "No sales yet"}
+          </p>
+
+          <p className="sh-empty-sub">
+            {searchTerm
+              ? "Try another receipt number or product name."
+              : "Completed sales will appear here."}
+          </p>
         </div>
       ) : (
         <>
           <div className="sh-list">
-            {sales.map((sale) => (
+            {filteredSales.map((sale) => (
               <button
                 key={sale._id}
                 className="sh-item"
@@ -191,9 +226,7 @@ const SalesHistory = () => {
 
           <div className="sh-footer">
             <p className="sh-showing">
-              Showing {(currentPage - 1) * ITEMS_PER_PAGE + 1}–
-              {Math.min(currentPage * ITEMS_PER_PAGE, totalSales)} of{" "}
-              {totalSales} sales
+              Showing {filteredSales.length} of {totalSales} sales
             </p>
             {renderPagination()}
           </div>
@@ -226,74 +259,73 @@ const SalesHistory = () => {
             </div>
 
             <div className="sh-modal-content">
+              <div className="sh-modal-amount">
+                <span>TOTAL AMOUNT</span>
+                <strong>{formatNaira(selectedSale.totalAmount)}</strong>
+              </div>
 
-            <div className="sh-modal-amount">
-              <span>TOTAL AMOUNT</span>
-              <strong>{formatNaira(selectedSale.totalAmount)}</strong>
-            </div>
+              <div className="sh-modal-section">
+                <h4>ITEMS PURCHASED</h4>
 
-            <div className="sh-modal-section">
-              <h4>ITEMS PURCHASED</h4>
+                <div className="sh-items-list">
+                  {(selectedSale.items || []).map((item, index) => (
+                    <div key={index} className="sh-item-row">
+                      <div className="sh-item-left">
+                        <div className="sh-item-icon">
+                          <Package size={16} />
+                        </div>
 
-              <div className="sh-items-list">
-                {(selectedSale.items || []).map((item, index) => (
-                  <div key={index} className="sh-item-row">
-                    <div className="sh-item-left">
-                      <div className="sh-item-icon">
-                        <Package size={16} />
+                        <div>
+                          <p className="sh-item-name">{item.productName}</p>
+
+                          <span className="sh-item-price">
+                            {formatNaira(item.unitPrice)} each
+                          </span>
+                        </div>
                       </div>
 
-                      <div>
-                        <p className="sh-item-name">{item.productName}</p>
+                      <div className="sh-item-right">
+                        <span className="sh-item-qty">×{item.quantity}</span>
 
-                        <span className="sh-item-price">
-                          {formatNaira(item.unitPrice)} each
-                        </span>
+                        <strong>{formatNaira(item.subtotal)}</strong>
                       </div>
                     </div>
+                  ))}
+                </div>
+              </div>
 
-                    <div className="sh-item-right">
-                      <span className="sh-item-qty">×{item.quantity}</span>
-
-                      <strong>{formatNaira(item.subtotal)}</strong>
-                    </div>
+              <div className="sh-modal-section">
+                <h4>TRANSACTION DETAILS</h4>
+                <div className="sh-modal-grid">
+                  <div className="sh-modal-field">
+                    <span>Sale Number</span>
+                    <strong>#{selectedSale.saleNumber}</strong>
                   </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="sh-modal-section">
-              <h4>TRANSACTION DETAILS</h4>
-              <div className="sh-modal-grid">
-                <div className="sh-modal-field">
-                  <span>Sale Number</span>
-                  <strong>#{selectedSale.saleNumber}</strong>
-                </div>
-                <div className="sh-modal-field">
-                  <span>Payment Method</span>
-                  <strong
-                    className={`sh-payment-tag sh-payment-${selectedSale.paymentMethod}`}
-                  >
-                    {selectedSale.paymentMethod}
-                  </strong>
-                </div>
-                <div className="sh-modal-field">
-                  <span>Total Items</span>
-                  <strong>
-                    {selectedSale.totalItems} item
-                    {selectedSale.totalItems !== 1 ? "s" : ""}
-                  </strong>
-                </div>
-                <div className="sh-modal-field">
-                  <span>Total Amount</span>
-                  <strong>{formatNaira(selectedSale.totalAmount)}</strong>
-                </div>
-                <div className="sh-modal-field sh-modal-field-full">
-                  <span>Date & Time</span>
-                  <strong>{formatDate(selectedSale.createdAt)}</strong>
+                  <div className="sh-modal-field">
+                    <span>Payment Method</span>
+                    <strong
+                      className={`sh-payment-tag sh-payment-${selectedSale.paymentMethod}`}
+                    >
+                      {selectedSale.paymentMethod}
+                    </strong>
+                  </div>
+                  <div className="sh-modal-field">
+                    <span>Total Items</span>
+                    <strong>
+                      {selectedSale.totalItems} item
+                      {selectedSale.totalItems !== 1 ? "s" : ""}
+                    </strong>
+                  </div>
+                  <div className="sh-modal-field">
+                    <span>Total Amount</span>
+                    <strong>{formatNaira(selectedSale.totalAmount)}</strong>
+                  </div>
+                  <div className="sh-modal-field sh-modal-field-full">
+                    <span>Date & Time</span>
+                    <strong>{formatDate(selectedSale.createdAt)}</strong>
+                  </div>
                 </div>
               </div>
-            </div>
             </div>
           </div>
         </div>

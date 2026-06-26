@@ -7,6 +7,7 @@ import {
   Minus,
   Package,
   Plus,
+  DollarSign,
   Search,
   ShoppingCart,
   Trash2,
@@ -415,18 +416,26 @@ const Sales = () => {
             <img src={Container2} alt="" />
           </div>
           <div>
-            <p>Revenue Today</p>
+            <p>Today Revenue </p>
             <strong>{formatNaira(revenueToday)}</strong>
           </div>
         </article>
 
         <article className="sales-metric-card">
           <div className="sales-metric-icon sales-metric-purple">
-            <img src={Container3} alt="" />
+            {showOrderHistory ? (
+              <DollarSign size={26} strokeWidth={2.5} />
+            ) : (
+              <img src={Container3} alt="" />
+            )}
           </div>
+
           <div>
-            <p>Items in Cart</p>
-            <strong>{itemsInCart}</strong>
+            <p>{showOrderHistory ? "Total Revenue" : "Items in Cart"}</p>
+
+            <strong>
+              {showOrderHistory ? formatNaira(totalRevenue) : itemsInCart}
+            </strong>
           </div>
         </article>
       </section>
