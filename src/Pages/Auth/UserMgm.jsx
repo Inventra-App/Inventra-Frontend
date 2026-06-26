@@ -52,13 +52,18 @@ const normalizeStaff = (staff) => {
     rawStatus === 'online' ||
     rawStatus === 'logged in',
   )
+  const normalizedStatus = isActive
+    ? 'Active'
+    : rawStatus === 'suspended'
+      ? 'Suspended'
+      : 'Inactive'
 
   return {
     id: staff?._id ?? staff?.id ?? staff?.staffId ?? `${staff?.email}-${fullName}`,
     name: fullName || 'User',
     username: staff?.email ?? staff?.username ?? staff?.gmail ?? 'No email',
     role,
-    status: isActive ? 'Active' : (staff?.status ?? 'Inactive'),
+    status: normalizedStatus,
     joined: staff?.createdAt ? new Date(staff.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'Not available',
     lastLogin: staff?.lastLogin ? new Date(staff.lastLogin).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' }) : 'Not available',
   }
@@ -97,14 +102,10 @@ const UserMgm = () => {
   const permissions = [
     'Dashboard',
     'Inventory',
-    'Incoming Stock',
-    'Low Stock Management',
     'Sales (POS)',
     'Expiry Management',
-    'Reports',
-    'User Management',
-    'Settings',
     'Activity Logs',
+    'Settings',
   ]
 
   const roles = ['manager', 'cashier']
@@ -150,26 +151,18 @@ const UserMgm = () => {
     Manager: {
       'Dashboard': true,
       'Inventory': true,
-      'Incoming Stock': true,
-      'Low Stock Management': true,
-      'Sales (POS)': true,
+      'Sales (POS)': false,
       'Expiry Management': true,
-      'Reports': true,
-      'User Management': false,
-      'Settings': true,
       'Activity Logs': true,
+      'Settings': true,
     },
     Cashier: {
       'Dashboard': true,
-      'Inventory': true,
-      'Incoming Stock': false,
-      'Low Stock Management': true,
+      'Inventory': false,
       'Sales (POS)': true,
       'Expiry Management': false,
-      'Reports': true,
-      'User Management': false,
-      'Settings': false,
-      'Activity Logs': false,
+      'Activity Logs': true,
+      'Settings': true,
     },
   }
 
@@ -200,11 +193,34 @@ const UserMgm = () => {
     showToast(`${roleDisplayName[activePermissionRole]} permissions saved`)
   }
 
+  const nameCharacterLimit = 15
+  const warnNameLimit = () => {
+    showToast(`First and last name must not be more than ${nameCharacterLimit} characters`)
+  }
+
+  const handleLimitedNameChange = (value, setter) => {
+    if (value.length > nameCharacterLimit) {
+      setter(value.slice(0, nameCharacterLimit))
+      warnNameLimit()
+      return
+    }
+
+    setter(value)
+  }
+
+  const handleLimitedNameKeyDown = (event, value) => {
+    const hasSelection = event.currentTarget.selectionStart !== event.currentTarget.selectionEnd
+    const isCharacterKey = event.key.length === 1
+
+    if (isCharacterKey && !hasSelection && value.length >= nameCharacterLimit) {
+      event.preventDefault()
+      warnNameLimit()
+    }
+  }
+
   const roleText = {
-    Admin: 'Full system access. Can manage users, view all reports, and configure system settings.',
-    Manager: 'Can manage inventory, view reports, receive goods, and monitor expiry alerts.',
-    Cashier: 'Can process sales, view inventory, and access sales history.',
-    Staff: 'Can add products, receive goods, and update inventory levels.',
+    Manager: 'Can access dashboard, inventory, expiry management, activity log, and settings.',
+    Cashier: 'Can access dashboard, sales (POS), activity log, and settings.',
   }
 
   const totalUsers = users.length
@@ -226,6 +242,12 @@ const UserMgm = () => {
   }
 
   const isSuspended = (user) => Boolean(user) && user.status === 'Suspended'
+  const getStatusClass = (status) => {
+    const normalizedStatus = String(status || '').toLowerCase()
+    if (normalizedStatus === 'suspended') return 'status-text suspended'
+    if (normalizedStatus === 'inactive') return 'status-text inactive'
+    return 'status-text'
+  }
 
   const closeModal = () => {
     setModal('')
@@ -277,7 +299,11 @@ const UserMgm = () => {
     try {
       setIsCreatingStaff(true)
       const response = await onBoardStaff(payload)
-      const newStaff = normalizeStaff(response?.staff ?? response?.data ?? response?.user ?? { ...payload, status: 'Inactive' })
+      const createdStaff = response?.staff ?? response?.data ?? response?.user ?? payload
+      const newStaff = {
+        ...normalizeStaff(createdStaff),
+        status: 'Inactive',
+      }
       setUsers((currentUsers) => [...currentUsers, newStaff])
       setFirstName('')
       setLastName('')
@@ -531,7 +557,7 @@ const UserMgm = () => {
 
               <div className="table-field status-field">
                 <small className="mobile-field-label">Status</small>
-                <span className={user.status === 'Suspended' ? 'status-text suspended' : 'status-text'}>
+                <span className={getStatusClass(user.status)}>
                   <span></span>{user.status}
                 </span>
               </div>
@@ -556,14 +582,6 @@ const UserMgm = () => {
         <h3>Role Permissions</h3>
 
         <div className="permission-grid">
-          <div className="permission-box admin">
-            <div className="permission-title">
-              <img src={Vector} alt="" />
-              <h4>Admin</h4>
-            </div>
-            <p>{roleText.Admin}</p>
-          </div>
-
           <div className="permission-box manager">
             <div className="permission-title">
               <img src={Icon3} alt="" />
@@ -579,14 +597,6 @@ const UserMgm = () => {
             </div>
             <p>{roleText.Cashier}</p>
           </div>
-
-          <div className="permission-box staff">
-            <div className="permission-title">
-              <span className="permission-icon-text staff"><Users size={18} /></span>
-              <h4>Staff</h4>
-            </div>
-            <p>{roleText.Staff}</p>
-          </div>
         </div>
       </section>
 
@@ -601,12 +611,26 @@ const UserMgm = () => {
 
             <label>
               <span>First Name</span>
-              <input type="text" placeholder="John" value={firstName} onChange={(event) => setFirstName(event.target.value)} />
+              <input
+                type="text"
+                placeholder="John"
+                value={firstName}
+                maxLength={nameCharacterLimit}
+                onKeyDown={(event) => handleLimitedNameKeyDown(event, firstName)}
+                onChange={(event) => handleLimitedNameChange(event.target.value, setFirstName)}
+              />
             </label>
 
             <label>
               <span>Last Name</span>
-              <input type="text" placeholder="Doe" value={lastName} onChange={(event) => setLastName(event.target.value)} />
+              <input
+                type="text"
+                placeholder="Doe"
+                value={lastName}
+                maxLength={nameCharacterLimit}
+                onKeyDown={(event) => handleLimitedNameKeyDown(event, lastName)}
+                onChange={(event) => handleLimitedNameChange(event.target.value, setLastName)}
+              />
             </label>
 
             <label>
@@ -680,7 +704,7 @@ const UserMgm = () => {
               <div>
                 <span>Account Status</span>
                 <strong className={isSuspended(selectedUser) ? 'suspended-value' : 'active-value'}>
-                  {isSuspended(selectedUser) ? 'User is Suspended' : 'Active'}
+                  {isSuspended(selectedUser) ? 'User is Suspended' : selectedUser.status}
                 </strong>
               </div>
             </div>

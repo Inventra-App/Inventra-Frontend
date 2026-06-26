@@ -12,7 +12,6 @@ import {
 import {
   getTotalStockUnits,
   getTotalProductsCount,
-  getTotalSalesAmount,
   getInventoryItems,
   getExpiryAlerts,
   getLowStockAlerts,
@@ -75,26 +74,35 @@ const getDaysRemaining = (dateValue) => {
   return Math.ceil((expiryDate - today) / (1000 * 60 * 60 * 24));
 };
 
-const normalizeLowStockItem = (item) => ({
-  id: item.productId,
-  name: item.productName,
-  category: item.categoryName || "Uncategorized",
-  units: Number(item.totalStock || 0),
-});
-
 const getValue = (...values) =>
   values.find((value) => value !== undefined && value !== null && value !== "");
 
 const getProductId = (item) =>
   String(
-    getValue(item?.productId?._id, item?.productId, item?.product?._id, ""),
+    getValue(
+      item?.productId?._id,
+      item?.productId,
+      item?.product?._id,
+      item?.inventory?.productId?._id,
+      item?.inventory?.productId,
+      "",
+    ),
+  );
+
+const getProductName = (item) =>
+  getValue(
+    item?.productName,
+    item?.name,
+    item?.product?.productName,
+    item?.product?.name,
+    item?.inventory?.productName,
+    item?.inventory?.product?.productName,
+    "",
   );
 
 const findMatchingProduct = (item, products) => {
   const productId = getProductId(item);
-  const productName = String(
-    item?.productName ?? item?.product?.productName ?? "",
-  ).toLowerCase();
+  const productName = String(getProductName(item)).toLowerCase();
 
   return products.find((product) => {
     const currentId = String(
@@ -109,6 +117,72 @@ const findMatchingProduct = (item, products) => {
       (productName && currentName === productName)
     );
   });
+};
+
+const getInventoryUnits = (item) =>
+  Number(
+    getValue(
+      item?.inventory?.totalStock,
+      item?.totalInventory,
+      item?.totalInventoryStock,
+      item?.totalStock,
+      item?.availableStock,
+      item?.quantity,
+      item?.stock,
+      0,
+    ),
+  );
+
+const buildInventoryLookup = (inventoryItems = []) => {
+  const lookup = new Map();
+
+  inventoryItems.forEach((item) => {
+    const id = getProductId(item);
+    const name = String(getProductName(item)).toLowerCase();
+    const record = {
+      units: getInventoryUnits(item),
+      category: getCategoryName(item),
+      productId: id,
+    };
+
+    if (id) lookup.set(`id:${id}`, record);
+    if (name) lookup.set(`name:${name}`, record);
+  });
+
+  return lookup;
+};
+
+const findInventoryRecord = (item, inventoryLookup) => {
+  const id = getProductId(item);
+  const name = String(getProductName(item)).toLowerCase();
+  return (
+    (id && inventoryLookup.get(`id:${id}`)) ||
+    (name && inventoryLookup.get(`name:${name}`)) ||
+    null
+  );
+};
+
+const normalizeLowStockAlert = (item, inventoryLookup, products = []) => {
+  const matchedProduct = findMatchingProduct(item, products);
+  const inventoryRecord = findInventoryRecord(item, inventoryLookup);
+  const productId = getProductId(item) || matchedProduct?._id || item?._id;
+  const name = getValue(
+    getProductName(item),
+    matchedProduct?.productName,
+    matchedProduct?.name,
+    "Unnamed Product",
+  );
+
+  return {
+    id: productId || `${name}-${item?.batchCode ?? item?.batch ?? ""}`,
+    productId,
+    name,
+    category:
+      inventoryRecord?.category || getCategoryName(item, matchedProduct),
+    units: Number(inventoryRecord?.units ?? getInventoryUnits(item)),
+    batch: item?.batchCode ?? item?.batch ?? "",
+    expiryDate: item?.expiryDate ? formatAlertDate(item.expiryDate) : "",
+  };
 };
 
 const getCategoryName = (item, matchedProduct) =>
@@ -269,35 +343,36 @@ const Dashboard = () => {
         ]),
       );
 
-      let lowStock = inventoryItems
-        .filter((item) => {
-          const product = productLookup[item.productId];
+      const inventoryLookup = buildInventoryLookup(inventoryItems);
+      const lowStockPayload =
+        lowStockRes.status === "fulfilled"
+          ? getArrayPayload(lowStockRes.value)
+          : [];
+
+      let lowStock = lowStockPayload.map((item) =>
+        normalizeLowStockAlert(item, inventoryLookup, products),
+      );
+
+      if (lowStock.length === 0) {
+        lowStock = inventoryItems
+          .filter((item) => {
+          const product = productLookup[getProductId(item)];
           const reorderLevel = product?.reorderLevel || 10;
+          const totalStock = getInventoryUnits(item);
 
           return (
-            Number(item.totalStock || 0) > 0 &&
-            Number(item.totalStock || 0) <= reorderLevel
+            totalStock > 0 &&
+            totalStock <= reorderLevel
           );
         })
         .map((item) => ({
-          id: item.productId,
-          productId: item.productId,
-          name: productLookup[item.productId]?.productName || "Unknown",
+          id: getProductId(item),
+          productId: getProductId(item),
+          name: productLookup[getProductId(item)]?.productName || getProductName(item) || "Unknown",
           category:
-            productLookup[item.productId]?.categoryName || "Uncategorized",
-          units: Number(item.totalStock || 0),
+            productLookup[getProductId(item)]?.categoryName || getCategoryName(item),
+          units: getInventoryUnits(item),
         }));
-
-      if (lowStock.length === 0) {
-        const items =
-          invRes.status === "fulfilled" ? getArrayPayload(invRes.value) : [];
-
-        lowStock = items
-          .filter((p) => {
-            const qty = p.availableStock ?? p.quantity ?? p.stock ?? 0;
-            return qty > 0 && qty <= 10;
-          })
-          .map(normalizeLowStockItem);
       }
       setLowStockItems(lowStock);
 
@@ -431,9 +506,10 @@ const Dashboard = () => {
     navigate(`/super/inventory?restockProductId=${item.productId || item.id}`);
   };
 
-  const criticalAlerts = expiryItems.filter(
+  const expiredAlerts = expiryItems.filter(
     (item) => item.status === "EXPIRED",
   ).length;
+  const criticalAlerts = expiredAlerts + lowStockItems.length;
 
   const statCards = [
     {
@@ -464,7 +540,7 @@ const Dashboard = () => {
     {
       label: "Critical Alerts",
       value: String(criticalAlerts),
-      sub: "Products expiring soon",
+      sub: "Products needing attention",
       icon: <TrendingDown size={22} />,
       color: "red",
     },

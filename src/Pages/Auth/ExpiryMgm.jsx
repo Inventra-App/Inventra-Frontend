@@ -72,12 +72,24 @@ const getProductId = (item) => String(getValue(
   item?.productId?._id,
   item?.productId,
   item?.product?._id,
+  item?.inventory?.productId?._id,
+  item?.inventory?.productId,
   '',
 ))
 
+const getProductName = (item) => getValue(
+  item?.productName,
+  item?.name,
+  item?.product?.productName,
+  item?.product?.name,
+  item?.inventory?.productName,
+  item?.inventory?.product?.productName,
+  '',
+)
+
 const findMatchingProduct = (item, products) => {
   const productId = getProductId(item)
-  const productName = String(item?.productName ?? item?.product?.productName ?? '').toLowerCase()
+  const productName = String(getProductName(item)).toLowerCase()
 
   return products.find((product) => {
     const currentId = String(product?._id ?? product?.id ?? product?.productId ?? '')
@@ -94,18 +106,35 @@ const findMatchingProduct = (item, products) => {
 
 const normalizeExpiryItem = (item, products = []) => {
   const matchedProduct = findMatchingProduct(item, products)
-  const days = Number(item?.daysLeft ?? getDaysRemaining(item?.expiryDate))
+  const expiryValue = getValue(
+    item?.expiryDate,
+    item?.expiresAt,
+    item?.expires,
+    item?.expirationDate,
+  )
+  const days = Number(getValue(
+    item?.daysLeft,
+    item?.daysRemaining,
+    item?.remainingDays,
+    getDaysRemaining(expiryValue),
+  ))
   const expiredDays = Math.abs(days)
 
   return {
-    id: item?._id ?? item?.productId ?? `${item?.productName}-${item?.expiryDate}`,
-    name: item?.productName ?? 'Unnamed Product',
+    id: item?._id ?? getProductId(item) ?? `${getProductName(item)}-${expiryValue}`,
+    name: getValue(getProductName(item), matchedProduct?.productName, matchedProduct?.name, 'Unnamed Product'),
     productId: getProductId(item) || 'N/A',
     category: getCategoryName(item, matchedProduct),
     price: getProductPrice(item, matchedProduct),
-    batch: item?.batchCode ?? 'N/A',
-    quantity: Number(item?.quantityRemaining ?? item?.inventory?.totalStock ?? 0),
-    expires: formatDate(item?.expiryDate),
+    batch: item?.batchCode ?? item?.batch ?? item?.batchNumber ?? 'N/A',
+    quantity: Number(getValue(
+      item?.quantityRemaining,
+      item?.inventory?.totalStock,
+      item?.totalStock,
+      item?.quantity,
+      0,
+    )),
+    expires: formatDate(expiryValue),
     daysNumber: days,
     status: days <= 0 ? 'EXPIRED' : 'EXPIRING SOON',
     daysLeft: days <= 0 ? '0d left' : `${days} day${days === 1 ? '' : 's'} left`,
