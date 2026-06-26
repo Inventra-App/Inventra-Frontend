@@ -752,24 +752,6 @@
   .mobile-brand-emblem {
     display: flex;
     align-items: center;
-    gap: 10px;
-  }
-
-  .brand-logo-square {
-    width: 36px;
-    height: 36px;
-    background-color: #432dd7;
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .brand-logo-text {
-    font-size: 1.3rem;
-    font-weight: 700;
-    color: #101828;
-    letter-spacing: -0.5px;
   }
 
   .mobile-hamburger-trigger {
@@ -885,6 +867,20 @@
 
   .stat-value {
     font-size: 1.6rem;
+  }
+
+  .mobile-brand-emblem .inventra-logo-component {
+    gap: 8px;
+  }
+
+  .mobile-brand-emblem .inventra-logo-img {
+    width: 34px;
+    height: 34px;
+  }
+
+  .mobile-brand-emblem .inventra-logo-component span {
+    font-size: 20px;
+    font-weight: 700;
   }
 }
 

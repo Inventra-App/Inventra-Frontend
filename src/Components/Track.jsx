@@ -1,5 +1,6 @@
 import React from 'react'
 import { Clock, UserCircle, CalendarCheck, Lock, Shield } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
 import BadgeItem from './BadgeItem'
 import '../Css/Track.css'
 
@@ -34,9 +35,10 @@ const details = [
 ]
 
 const Track = () => {
+  const navigate = useNavigate()
+
   return (
     <div className="track-section">
-
       <div className="track-left">
         <h2 className="track-title">Track Every Staff Action</h2>
         <p className="track-subtitle">With Full Transparency</p>
@@ -53,8 +55,8 @@ const Track = () => {
             <BadgeItem key={index} icon={badge.icon} label={badge.label} />
           ))}
         </div>
-        <button className="track-btn">
-          Learn more about user management →
+        <button className="track-btn" type="button" onClick={() => navigate('/user-management-info')}>
+          Learn more about user management -&gt;
         </button>
       </div>
 
@@ -69,7 +71,6 @@ const Track = () => {
           </div>
         ))}
       </div>
-
     </div>
   )
 }

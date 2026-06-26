@@ -5,7 +5,7 @@ import '../Css/Logo.css'
 const Logo = ({ variant = 'white' }) => {
   return (
     <div className={`inventra-logo-component ${variant}`}>
-      <img src={logo} alt="Logo" />
+      <img className="inventra-logo-img" src={logo} alt="Logo" />
       <span>Inventra</span>
     </div>
   )
