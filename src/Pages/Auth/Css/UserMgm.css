@@ -346,6 +346,10 @@
   background: #ef4444;
 }
 
+.status-text.inactive span {
+  background: #94a3b8;
+}
+
 .you-text {
   color: #371cff;
   font-size: 14px;

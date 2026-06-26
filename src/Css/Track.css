@@ -73,6 +73,18 @@
   outline: none;
 }
 
+.track-staff-login-btn {
+  display: block;
+  margin-top: 14px;
+  background-color: #432DD7;
+  color: #ffffff;
+}
+
+.track-staff-login-btn:hover,
+.track-staff-login-btn:focus-visible {
+  background-color: #3825bd;
+}
+
 .track-right {
   width: 50%;
   display: flex;

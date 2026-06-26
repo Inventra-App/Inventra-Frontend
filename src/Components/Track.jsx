@@ -58,6 +58,10 @@ const Track = () => {
         <button className="track-btn" type="button" onClick={() => navigate('/user-management-info')}>
           Learn more about user management -&gt;
         </button>
+
+        <button className="track-btn track-staff-login-btn" type="button" onClick={() => navigate('/staff-login')}>
+          Staff Login
+        </button>
       </div>
 
       <div className="track-right">
