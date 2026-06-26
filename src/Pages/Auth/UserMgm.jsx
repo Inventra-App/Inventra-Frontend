@@ -201,14 +201,17 @@ const UserMgm = () => {
   }
 
   const roleText = {
+    Admin: 'Full system access. Can manage users, view all reports, and configure system settings.',
     Manager: 'Can manage inventory, view reports, receive goods, and monitor expiry alerts.',
     Cashier: 'Can process sales, view inventory, and access sales history.',
+    Staff: 'Can add products, receive goods, and update inventory levels.',
   }
 
   const totalUsers = users.length
   const adminCount = users.filter((user) => user.role === 'Admin').length
   const managerCount = users.filter((user) => user.role === 'Manager').length
   const cashierCount = users.filter((user) => user.role === 'Cashier').length
+  const staffCount = Math.max(totalUsers - adminCount, 0)
 
   const showToast = (message) => {
     setToast(message)
@@ -244,23 +247,23 @@ const UserMgm = () => {
     const cleanEmail = email.trim()
 
     if (cleanFirstName === '' || cleanLastName === '') {
-      alert('First and last name is required')
+      showToast('First and last name is required')
       return
     }
 
     if (cleanEmail === '') {
-      alert('Email is required')
+      showToast('Email is required')
       return
     } else if (!/\S+@\S+\.\S+/.test(cleanEmail)) {
-      alert('Enter a valid email address')
+      showToast('Enter a valid email address')
       return
     } else if (users.find((user) => user.username.toLowerCase() === cleanEmail.toLowerCase())) {
-      alert('Email already exists')
+      showToast('Email already exists')
       return
     }
 
     if (role === '') {
-      alert('Role is required')
+      showToast('Role is required')
       return
     }
 
@@ -284,7 +287,7 @@ const UserMgm = () => {
       showToast('New staff member has been created')
     } catch (error) {
       console.error('Create staff error:', error)
-      alert(error?.response?.data?.message || 'Failed to create staff. Please try again.')
+      showToast(error?.response?.data?.message || 'Failed to create staff. Please try again.')
     } finally {
       setIsCreatingStaff(false)
     }
@@ -420,7 +423,7 @@ const UserMgm = () => {
         <div className="user-top-actions">
           <button className="manage-roles-btn" type="button" onClick={() => setPage('roles')}>
             <img src={manage} alt="" className="manage-roles-icon" />
-            <span>Manage Roles</span>
+            <span>Manage roles</span>
           </button>
 
           <button className="onboard-btn" type="button" onClick={() => setModal('onboard')}>
@@ -478,14 +481,14 @@ const UserMgm = () => {
             <img src={Icon5} alt="" />
           </div>
           <div>
-            <p>Cashiers</p>
-            <h3>{cashierCount}</h3>
+            <p>Staff</p>
+            <h3>{staffCount || cashierCount}</h3>
           </div>
         </div>
       </section>
 
       <section className="staff-card">
-        <h3>User Directory</h3>
+        <h3>Staff Directory</h3>
 
         <div className="staff-table">
           <div className="table-head">
@@ -553,20 +556,36 @@ const UserMgm = () => {
         <h3>Role Permissions</h3>
 
         <div className="permission-grid">
+          <div className="permission-box admin">
+            <div className="permission-title">
+              <img src={Vector} alt="" />
+              <h4>Admin</h4>
+            </div>
+            <p>{roleText.Admin}</p>
+          </div>
+
           <div className="permission-box manager">
             <div className="permission-title">
               <img src={Icon3} alt="" />
-              <h4>manager</h4>
+              <h4>Manager</h4>
             </div>
-            <p>{roleText.manager}</p>
+            <p>{roleText.Manager}</p>
           </div>
 
           <div className="permission-box cashier">
             <div className="permission-title">
               <img src={green} alt="" className="icon4" />
-              <h4>cashier</h4>
+              <h4>Cashier</h4>
             </div>
-            <p>{roleText.cashier}</p>
+            <p>{roleText.Cashier}</p>
+          </div>
+
+          <div className="permission-box staff">
+            <div className="permission-title">
+              <span className="permission-icon-text staff"><Users size={18} /></span>
+              <h4>Staff</h4>
+            </div>
+            <p>{roleText.Staff}</p>
           </div>
         </div>
       </section>

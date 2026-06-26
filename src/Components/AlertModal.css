@@ -291,21 +291,82 @@
 }
 
 @media (max-width: 640px) {
+  .alert-modal-overlay {
+    align-items: flex-end;
+    padding: 12px;
+  }
+
   .alert-modal-container {
-    width: 96vw;
+    width: 100%;
+    max-height: calc(100vh - 24px);
+    border-radius: 14px;
+  }
+
+  .alert-modal-header {
+    min-height: 64px;
+    padding: 14px 14px;
+    gap: 10px;
+  }
+
+  .alert-modal-title {
+    font-size: 15px;
+    line-height: 1.2;
+  }
+
+  .alert-modal-subtitle {
+    font-size: 11px;
+    line-height: 1.25;
+  }
+
+  .alert-modal-action-box {
+    margin: 14px 12px 2px;
+    padding: 11px 12px;
+  }
+
+  .alert-modal-items {
+    padding: 10px 12px 14px;
   }
 
   .alert-modal-item {
     grid-template-columns: 36px minmax(0, 1fr);
+    align-items: start;
+    gap: 10px;
+    padding: 12px;
+  }
+
+  .alert-modal-item-name {
+    font-size: 13px;
+    line-height: 1.25;
+    overflow-wrap: anywhere;
+  }
+
+  .alert-modal-item-meta {
+    gap: 6px;
+    font-size: 10px;
   }
 
   .alert-modal-item-right {
     grid-column: 2;
     align-items: flex-start;
+    min-width: 0;
+    width: 100%;
   }
 
   .alert-modal-footer,
   .alert-modal-item-actions {
     grid-template-columns: 1fr;
+  }
+
+  .alert-modal-footer {
+    padding: 12px 12px 8px;
+  }
+
+  .alert-modal-btn {
+    min-height: 42px;
+  }
+
+  .alert-modal-footer-text {
+    padding: 0 12px 12px;
+    line-height: 1.35;
   }
 }

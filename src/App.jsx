@@ -23,6 +23,7 @@ import ActivityLog from "./Pages/Auth/ActivityLog";
 import UserMgm from "./Pages/Auth/UserMgm";
 import Settings from "./Pages/Auth/Settings";
 import Demo from "./Pages/Auth/Demo";
+import UserManagementInfo from "./Pages/Auth/UserManagementInfo";
 import PlanSetup from "./Pages/Auth/PlanSetup";
 import PaymentSuccess from "./Pages/Auth/PaymentSuccess";
 import CategoriesList from "./Pages/Auth/CategoriesList";
@@ -64,6 +65,7 @@ function App() {
           <Route path="/resetpassword" element={<ForgetPassUi />} />
           <Route path="/forgot-password" element={<ForgetPassUi />} />
           <Route path="/demo" element={<Demo />} />
+          <Route path="/user-management-info" element={<UserManagementInfo />} />
           <Route path="/plan-setup/:plan" element={<PlanSetup />} />
           <Route path="/payment-success" element={<PaymentSuccess />} />
         </Route>

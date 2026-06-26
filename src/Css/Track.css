@@ -53,7 +53,7 @@
 }
 
 .track-btn {
-  width: 506px;
+  width: min(100%, 506px);
   padding: 18px;
   background-color: transparent;
   border: 1px solid #432DD7;
@@ -62,6 +62,15 @@
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
+  transition: background-color 0.18s ease, color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.track-btn:hover,
+.track-btn:focus-visible {
+  background-color: #432DD7;
+  color: #ffffff;
+  box-shadow: 0 12px 24px rgba(67, 45, 215, 0.24);
+  outline: none;
 }
 
 .track-right {

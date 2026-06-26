@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react'
 import { Outlet, useNavigate } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
-import { LogOut, Package } from 'lucide-react'
+import { LogOut } from 'lucide-react'
 import toast from 'react-hot-toast'
 import '../Pages/Auth/Css/Dashboard.css'
 import SideBar from './SideBar'
 import DashboardHeader from './DashboardHeader'
+import Logo from './Logo'
 import { logoutUser } from '../API/logoutUser'
 import NoInternet from '../Pages/Auth/NoInternet'
 import { getLoginPathForRole } from '../Utils/authRoles'
@@ -94,10 +95,7 @@ const DashboardLayout = () => {
 
       <div className={`mobile-navigation-bar ${isMobileMenuOpen ? 'nav-hidden-state' : ''}`}>
         <div className="mobile-brand-emblem">
-          <div className="brand-logo-square">
-            <Package size={20} color="white" />
-          </div>
-          <span className="brand-logo-text">Inventra</span>
+          <Logo variant="dark" />
         </div>
         <button
           className="mobile-hamburger-trigger"

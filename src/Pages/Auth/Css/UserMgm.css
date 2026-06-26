@@ -395,6 +395,15 @@
   flex-shrink: 0;
 }
 
+.permission-icon-text {
+  width: 24px;
+  height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
 .permission-title h4 {
   font-size: 16px;
   font-weight: 600;
@@ -1142,12 +1151,12 @@
 @media (max-width: 768px) {
   .user-page {
     margin-top: 70px;
-    padding: 18px 4px 24px;
+    padding: 18px 12px 30px;
   }
 
   .user-top {
     flex-direction: column;
-    gap: 20px;
+    gap: 18px;
     margin-bottom: 20px;
   }
 
@@ -1163,22 +1172,26 @@
 
   .user-top-actions {
     width: 100%;
-    flex-direction: column;
+    flex-direction: row;
     gap: 12px;
   }
 
   .manage-roles-btn,
   .onboard-btn {
-    width: 100%;
+    flex: 1 1 0;
+    min-width: 0;
     height: 48px;
     justify-content: center;
-    border-radius: 6px;
+    border-radius: 8px;
+    padding: 0 10px;
+    font-size: 14px;
+    box-shadow: 0 7px 16px rgba(15, 23, 42, 0.12);
   }
 
   .logged-card {
     align-items: flex-start;
     border-radius: 8px;
-    padding: 15px 14px;
+    padding: 16px 14px;
     gap: 12px;
     margin-bottom: 18px;
   }
@@ -1214,14 +1227,14 @@
   }
 
   .user-stat-card {
-    min-height: 138px;
+    min-height: 118px;
     border-color: #d1d5db;
     border-radius: 8px;
-    padding: 20px 18px 16px;
+    padding: 18px 16px 15px;
     flex-direction: column;
     align-items: flex-start;
     justify-content: space-between;
-    box-shadow: 0 2px 7px rgba(15, 23, 42, 0.2);
+    box-shadow: 0 2px 7px rgba(15, 23, 42, 0.13);
   }
 
   .user-stat-icon {
@@ -1250,15 +1263,15 @@
 
   .staff-card h3,
   .permission-card h3 {
-    color: #0f2345;
-    font-size: 13px;
-    font-weight: 700;
+    color: #101828;
+    font-size: 18px;
+    font-weight: 800;
   }
 
   .staff-card h3 {
-    padding: 0 12px 17px;
-    border-bottom: 2px solid #d1d5db;
-    margin-bottom: 24px;
+    padding: 0;
+    border-bottom: none;
+    margin-bottom: 14px;
   }
 
   .staff-table {
@@ -1274,19 +1287,18 @@
 
   .table-row {
     min-width: 0;
-    min-height: 154px;
-    grid-template-columns: 1.4fr 1fr;
+    min-height: 148px;
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.95fr) minmax(86px, 0.75fr);
     grid-template-areas:
-      "user username"
-      "role status"
-      "actions actions";
+      "user user username"
+      "role status actions";
     align-items: start;
-    gap: 14px 12px;
-    padding: 25px 17px 16px;
+    gap: 18px 8px;
+    padding: 24px 12px 15px;
     border: 1px solid #d1d5db;
     border-radius: 8px;
     background: #ffffff;
-    box-shadow: 0 2px 7px rgba(15, 23, 42, 0.2);
+    box-shadow: 0 2px 7px rgba(15, 23, 42, 0.13);
   }
 
   .staff-user {
@@ -1298,7 +1310,7 @@
   .staff-user::before,
   .mobile-field-label {
     display: block;
-    color: #667085;
+    color: #98a2b3;
     font-size: 10px;
     font-weight: 800;
     line-height: 1;
@@ -1316,6 +1328,7 @@
   .staff-user {
     position: relative;
     margin-top: 18px;
+    min-width: 0;
   }
 
   .table-field {
@@ -1331,6 +1344,7 @@
   .staff-user strong {
     font-size: 15px;
     margin-bottom: 3px;
+    overflow-wrap: anywhere;
   }
 
   .staff-user p,
@@ -1345,6 +1359,7 @@
 
   .username-field {
     grid-area: username;
+    min-width: 0;
   }
 
   .role-field {
@@ -1374,23 +1389,28 @@
 
   .action-field {
     grid-area: actions;
-    align-self: end;
-    justify-self: end;
+    align-self: start;
+    justify-self: stretch;
     align-items: flex-end;
   }
 
   .details-btn {
-    padding: 8px 12px;
+    width: 100%;
+    min-height: 32px;
+    padding: 7px 8px;
     border-radius: 10px;
-    font-size: 13px;
+    font-size: 12px;
+    white-space: nowrap;
   }
 
   .you-text {
+    width: 100%;
+    text-align: center;
     border: 1px solid #9ee7c0;
     border-radius: 8px;
     background: #eef2ff;
-    padding: 8px 12px;
-    font-size: 13px;
+    padding: 8px;
+    font-size: 12px;
   }
 
   .permission-card {
@@ -1402,9 +1422,9 @@
   }
 
   .permission-card h3 {
-    padding: 0 12px 17px;
-    border-bottom: 2px solid #d1d5db;
-    margin-bottom: 20px;
+    padding: 0;
+    border-bottom: none;
+    margin-bottom: 14px;
   }
 
   .permission-grid {
@@ -1416,7 +1436,7 @@
   .permission-box {
     border-radius: 6px;
     padding: 14px 14px 16px;
-    border-width: 2px;
+    border-width: 1px;
   }
 
   .permission-title {
@@ -1428,8 +1448,54 @@
   }
 
   .permission-box p {
-    font-size: 12px;
+    font-size: 11px;
     line-height: 1.35;
+  }
+
+  .user-toast {
+    top: 14px;
+    left: 12px;
+    right: 12px;
+    min-width: 0;
+    min-height: 52px;
+    border-radius: 10px;
+    padding: 14px 16px;
+    text-align: center;
+  }
+
+  .user-modal-backdrop {
+    align-items: flex-end;
+    padding: 14px;
+  }
+
+  .user-modal,
+  .confirm-modal {
+    width: 100%;
+    max-height: calc(100vh - 28px);
+    overflow-y: auto;
+    border-radius: 14px;
+  }
+
+  .onboard-modal,
+  .reset-modal,
+  .change-role-modal,
+  .confirm-modal {
+    padding: 24px 18px 18px;
+  }
+
+  .details-modal {
+    width: 100%;
+    padding: 22px 16px 16px;
+  }
+
+  .modal-actions,
+  .confirm-actions,
+  .details-actions {
+    gap: 10px;
+  }
+
+  .temp-password-box div {
+    grid-template-columns: 1fr;
   }
 
   .role-page {
@@ -1562,18 +1628,23 @@
   }
 
   .user-page {
-    padding-left: 3px;
-    padding-right: 3px;
+    padding-left: 12px;
+    padding-right: 12px;
   }
 
   .table-row {
-    gap: 14px 8px;
-    padding-left: 16px;
-    padding-right: 16px;
+    gap: 18px 8px;
+    padding-left: 12px;
+    padding-right: 12px;
   }
 
   .staff-user strong {
     font-size: 14px;
+  }
+
+  .manage-roles-btn,
+  .onboard-btn {
+    font-size: 13px;
   }
 
   .role-select-card {
