@@ -207,27 +207,30 @@ const normalizeExpiryAlert = (item, products = []) => {
     item?.expiresAt ??
     item?.expires ??
     item?.expirationDate;
-  const daysRemaining = Number(
-    item?.daysLeft ?? item?.daysRemaining ?? getDaysRemaining(expiryValue),
-  );
-  const expiredDays = Math.abs(daysRemaining);
 
-  return {
-    id: item?._id ?? item?.productId ?? `${item?.productName}-${expiryValue}`,
-    name: item?.productName ?? "Unnamed Product",
-    batch: item?.batchCode ?? item?.batch ?? "N/A",
-    quantity: Number(
-      item?.quantityRemaining ?? item?.inventory?.totalStock ?? 0,
-    ),
-    category: getCategoryName(item, matchedProduct),
-    expiryDate: formatAlertDate(expiryValue),
-    daysRemaining,
-    daysLeft:
-      daysRemaining <= 0
-        ? `${expiredDays} day${expiredDays === 1 ? "" : "s"} ago`
-        : `${daysRemaining} day${daysRemaining === 1 ? "" : "s"} left`,
-    status: daysRemaining <= 0 ? "EXPIRED" : "EXPIRING SOON",
-  };
+  const daysRemaining = Number(
+  item?.daysLeft ?? item?.daysRemaining ?? getDaysRemaining(expiryValue),
+);
+
+const expiredDays = Math.abs(daysRemaining);
+
+return {
+  id: `${getProductId(item)}-${item?.batchCode ?? item?.batch ?? "NA"}`,
+  productId: getProductId(item),
+  name: item?.productName ?? "Unnamed Product",
+  batch: item?.batchCode ?? item?.batch ?? "N/A",
+  quantity: Number(
+    item?.quantityRemaining ?? item?.inventory?.totalStock ?? 0,
+  ),
+  category: getCategoryName(item, matchedProduct),
+  expiryDate: formatAlertDate(expiryValue),
+  daysRemaining,
+  urgency: item?.urgencyLevel,
+  daysLeft:
+    daysRemaining <= 0
+      ? `${expiredDays} day${expiredDays === 1 ? "" : "s"} ago`
+      : `${daysRemaining} day${daysRemaining === 1 ? "" : "s"} left`,
+};
 };
 
 const dashboardCache = {
@@ -414,11 +417,12 @@ const Dashboard = () => {
       setExpiryItems(normalizedExpiry);
 
       const expiredItems = normalizedExpiry.filter(
-        (item) => item.status === "EXPIRED",
-      );
-      const expiringItems = normalizedExpiry.filter(
-        (item) => item.daysRemaining >= 1 && item.daysRemaining <= 7,
-      );
+  (item) => item.daysRemaining <= 3,
+);
+
+const expiringItems = normalizedExpiry.filter(
+  (item) => item.daysRemaining >= 4 && item.daysRemaining <= 7,
+);
 
       const queue = [];
       if (expiredItems.length > 0) {
