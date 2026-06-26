@@ -179,11 +179,11 @@ const AddProductModal = ({
       return;
     }
 
-      if (hasExpiry && !formData.expiryDate) {
-    setServerError("Expiry date is required for expiry products.");
-    setIsSubmitting(false);
-    return;
-  }
+    if (hasExpiry && !formData.expiryDate) {
+      setServerError("Expiry date is required for expiry products.");
+      setIsSubmitting(false);
+      return;
+    }
 
     try {
       const payload = {
@@ -230,11 +230,13 @@ const AddProductModal = ({
       className={`modal-overlay ${
         step === STEPS.FORM ? "add-product-overlay" : ""
       }`}
+      onClick={step === STEPS.FORM ? handleClose : undefined}
     >
       <div
         className={`form-container ${
           step === STEPS.FORM ? "add-product-container" : ""
         } ${isClosing ? "closing" : ""}`}
+        onClick={step === STEPS.FORM ? (e) => e.stopPropagation() : undefined}
       >
         {step === STEPS.CATEGORY && (
           <>
@@ -359,7 +361,9 @@ const AddProductModal = ({
 
             <form onSubmit={handleSubmit} className="product-form clean-form">
               <div className="expiry-toggle-section">
-                <label className="expiry-toggle-title">{hasExpiry ? "Add Expiry Product" : "Add Non-Expiry Product"}</label>
+                <label className="expiry-toggle-title">
+                  {hasExpiry ? "Add Expiry Product" : "Add Non-Expiry Product"}
+                </label>
 
                 <div className="expiry-toggle-container">
                   <div

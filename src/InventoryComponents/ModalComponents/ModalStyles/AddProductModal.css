@@ -17,15 +17,16 @@
   justify-content: flex-end;
   align-items: stretch;
   background: rgba(0, 0, 0, 0.1);
+  padding: 0 !important;
 }
 
 .add-product-container {
-  width: min(420px, 95vw) !important;
-  max-width: min(500px, 95vw) !important;
-  height: 100vh;
-  max-height: 100vh;
-  border-radius: 0;
+  width: min(420px, 95vw);
+  max-width: min(500px, 95vw);
+  height: 100%;
+  max-height: 100%;
   margin: 0;
+  border-radius: 0;
   background: #fff;
   border-left: 1px solid #e5e7eb;
   box-shadow:
@@ -64,17 +65,19 @@
   background-color: #ffffff;
   width: 100%;
   max-width: 380px;
-  max-height: calc(100vh - 24px);
+  height: 100%;
+  max-height: none;
   border-radius: 12px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  font-family:
-    Inter,
-    system-ui,
-    -apple-system,
-    sans-serif;
+}
+
+.form-container.add-product-container {
+  max-height: 100vh !important;
+  height: 100vh !important;
+  border-radius: 0;
 }
 
 .form-header {
@@ -684,7 +687,7 @@
   .step-progress {
     padding: 10px 16px 0;
   }
-   .tooltip2-text {
+  .tooltip2-text {
     width: 230px;
     left: 50%;
     right: auto;
