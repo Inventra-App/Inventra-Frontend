@@ -200,8 +200,10 @@ const getCategoryName = (item, matchedProduct) =>
     "Uncategorized",
   );
 
-const normalizeExpiryAlert = (item, products = []) => {
+const normalizeExpiryAlert = (item, products = [], inventoryLookup = new Map()) => {
   const matchedProduct = findMatchingProduct(item, products);
+  const inventoryRecord = findInventoryRecord(item, inventoryLookup);
+  const productId = getProductId(item) || matchedProduct?._id || item?._id;
   const expiryValue =
     item?.expiryDate ??
     item?.expiresAt ??
@@ -215,14 +217,26 @@ const normalizeExpiryAlert = (item, products = []) => {
 const expiredDays = Math.abs(daysRemaining);
 
 return {
-  id: `${getProductId(item)}-${item?.batchCode ?? item?.batch ?? "NA"}`,
-  productId: getProductId(item),
-  name: item?.productName ?? "Unnamed Product",
+  id: `${productId}-${item?.batchCode ?? item?.batch ?? "NA"}`,
+  productId,
+  name: getValue(
+    getProductName(item),
+    matchedProduct?.productName,
+    matchedProduct?.name,
+    "Unnamed Product",
+  ),
   batch: item?.batchCode ?? item?.batch ?? "N/A",
   quantity: Number(
-    item?.quantityRemaining ?? item?.inventory?.totalStock ?? 0,
+    getValue(
+      inventoryRecord?.units,
+      item?.quantityRemaining,
+      item?.inventory?.totalStock,
+      item?.totalStock,
+      item?.quantity,
+      0,
+    ),
   ),
-  category: getCategoryName(item, matchedProduct),
+  category: inventoryRecord?.category || getCategoryName(item, matchedProduct),
   expiryDate: formatAlertDate(expiryValue),
   daysRemaining,
   urgency: item?.urgencyLevel,
@@ -412,7 +426,7 @@ const Dashboard = () => {
           : [];
 
       const normalizedExpiry = expiry.map((item) =>
-        normalizeExpiryAlert(item, products),
+        normalizeExpiryAlert(item, products, inventoryLookup),
       );
       setExpiryItems(normalizedExpiry);
 
@@ -667,10 +681,10 @@ const expiringItems = normalizedExpiry.filter(
         <div className="alert-card">
           <div className="alert-card-header">
             <div className="alert-card-title">
-              <AlertTriangle size={18} className="alert-icon-orange" />
+              <AlertTriangle size={18} className="alert-icon-red" />
               <h4>Expiry Alerts</h4>
             </div>
-            <span className="alert-badge alert-badge-orange">
+            <span className="alert-badge alert-badge-red">
               {expiryItems.length}
             </span>
           </div>
@@ -684,7 +698,7 @@ const expiringItems = normalizedExpiry.filter(
                 <div
                   key={`${item.id}-${index}`}
                   className={`dashboard-expiry-item dashboard-expiry-${
-                    item.daysRemaining <= 0 ? "expired" : "expiring"
+                    item.daysRemaining <= 3 ? "critical" : "expiring"
                   }`}
                 >
                   <div className="dashboard-expiry-content">
@@ -697,7 +711,7 @@ const expiringItems = normalizedExpiry.filter(
                   <div className="dashboard-expiry-badge">
                     <span
                       className={`dashboard-days-badge dashboard-days-${
-                        item.daysRemaining <= 0 ? "red" : "orange"
+                        item.daysRemaining <= 3 ? "red" : "orange"
                       }`}
                     >
                       {item.daysLeft}
