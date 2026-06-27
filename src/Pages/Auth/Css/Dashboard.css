@@ -420,6 +420,11 @@
   border-color: #fecaca;
 }
 
+.dashboard-expiry-critical {
+  background-color: #fef2f2;
+  border-color: #fecaca;
+}
+
 .dashboard-expiry-expiring {
   background-color: #fff7ed;
   border-color: #fed7aa;
