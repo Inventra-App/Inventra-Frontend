@@ -18,7 +18,7 @@ const configs = {
       `${count} product${count === 1 ? "" : "s"} require immediate attention`,
     headerIcon: <AlertTriangle size={20} />,
     actionText:
-      "The following products have passed their expiry date. Please remove them from shelves immediately to prevent sale and potential health risks.",
+      "The following products are at the verge of expiry/has passed expiry or has expired. Please remove them from shelves immediately to prevent sale and potential health risks.",
     statusText: "EXPIRED",
     secondaryButton: "Go to Expiry Management",
     secondaryTarget: "Expiry Management",
@@ -64,6 +64,18 @@ const AlertModal = ({
   const isLowStock = type === "lowstock";
   const isExpired = type === "expired";
   const isExpiring = type === "expiring";
+
+  const getExpiryStatus = (item) => {
+    return item.daysRemaining <= 0
+      ? {
+          text: "EXPIRED",
+          className: "expired",
+        }
+      : {
+          text: "CRITICAL",
+          className: "critical",
+        };
+  };
 
   const handleRestock = (item) => {
     if (onRestock) onRestock(item);
@@ -189,11 +201,17 @@ const AlertModal = ({
                   </>
                 ) : (
                   <>
-                    <span
-                      className={`alert-modal-status-badge alert-modal-status-${config.tone}`}
-                    >
-                      {config.statusText}
-                    </span>
+                    {(() => {
+                      const status = getExpiryStatus(item);
+
+                      return (
+                        <span
+                          className={`alert-modal-status-badge alert-modal-status-${status.className}`}
+                        >
+                          {status.text}
+                        </span>
+                      );
+                    })()}
                     <span
                       className={`alert-modal-date alert-modal-date-${config.tone}`}
                     >

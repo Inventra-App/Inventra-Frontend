@@ -171,14 +171,21 @@ const ProductDetailsModal = ({ product, onClose, onManage }) => {
                   </p>
 
                   <p className="inv-modal-batch-meta">
-                    Expires:{" "}
-                    {batch.expiryDate
-                      ? new Date(batch.expiryDate).toLocaleDateString("en-GB", {
-                          day: "2-digit",
-                          month: "short",
-                          year: "numeric",
-                        })
-                      : "No expiry date"}
+                    {batch.expiryDate ? (
+                      <>
+                        Expires:{" "}
+                        {new Date(batch.expiryDate).toLocaleDateString(
+                          "en-GB",
+                          {
+                            day: "2-digit",
+                            month: "short",
+                            year: "numeric",
+                          },
+                        )}
+                      </>
+                    ) : (
+                      "No expiry date"
+                    )}
                   </p>
                 </div>
               ))}

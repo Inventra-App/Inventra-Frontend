@@ -121,9 +121,13 @@ const Inventory = () => {
   const [hasCreatedCategory, setHasCreatedCategory] = useState(
     localStorage.getItem("hasCreatedCategory") === "true",
   );
-  const [showNewUserGuide, setShowNewUserGuide] = useState(
-    shouldShowInventoryGuide(),
-  );
+
+  const [showNewUserGuide, setShowNewUserGuide] = useState(() => {
+    const dismissed =
+      localStorage.getItem("inventoryGuideDismissed") === "true";
+
+    return shouldShowInventoryGuide() && !dismissed;
+  });
 
   const [openProductAfterCategory, setOpenProductAfterCategory] =
     useState(false);
@@ -172,6 +176,7 @@ const Inventory = () => {
           inventoryId: inv._id,
           id: prod._id,
           name: prod.productName || "Unnamed Product",
+          isExpiring: prod.isExpiring,
           category: prod.categoryName || "Uncategorized",
           packageType: prod.packageType,
           packageQuantity: prod.packageQuantity,
@@ -271,7 +276,7 @@ const Inventory = () => {
   };
 
   const closeNewUserGuide = () => {
-    markReturningSessionUser();
+    localStorage.setItem("inventoryGuideDismissed", "true");
     setShowNewUserGuide(false);
   };
 
