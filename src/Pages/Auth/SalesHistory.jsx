@@ -8,9 +8,11 @@ import {
   Package,
   Search,
   X,
+  Printer,
 } from "lucide-react";
 import { getSalesHistory } from "../../API/salesPosApi";
 import "./Css/SalesHistory.css";
+import ReceiptModal from "../../InventoryComponents/ModalComponents/ReceiptModal";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -39,6 +41,7 @@ const SalesHistory = () => {
   const [pagination, setPagination] = useState(null);
   const [selectedSale, setSelectedSale] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const [receiptData, setReceiptData] = useState(null);
 
   const fetchSales = useCallback(async (page = 1) => {
     setLoading(true);
@@ -327,9 +330,29 @@ const SalesHistory = () => {
                 </div>
               </div>
             </div>
+            <div className="sh-modal-actions">
+              <button
+                type="button"
+                className="sh-print-btn"
+                onClick={() => {
+                  setReceiptData({
+                    sale: selectedSale,
+                    items: selectedSale.items || [],
+                  });
+                }}
+              >
+                <Printer size={16} />
+                Print Receipt
+              </button>
+            </div>
           </div>
         </div>
       )}
+
+      <ReceiptModal
+        receipt={receiptData}
+        onClose={() => setReceiptData(null)}
+      />
     </section>
   );
 };

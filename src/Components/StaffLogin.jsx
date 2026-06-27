@@ -145,9 +145,6 @@ const StaffLogin = () => {
           <label className="staff-auth-field">
             <span className="staff-auth-password-label">
               Password
-              <button type="button" onClick={() => navigate("/resetpassword")}>
-                Forgot password?
-              </button>
             </span>
             <div className="staff-auth-password">
               <input

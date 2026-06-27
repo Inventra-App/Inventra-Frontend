@@ -345,9 +345,11 @@ const ExpiryMgm = () => {
   const selectedProductAlertTitle =
     selectedProductTone === "expired"
       ? "Product Expired"
-      : selectedProductTone === "warning"
+      : selectedProductTone === "critical"
         ? "Product Critical"
-        : "Product Info";
+        : selectedProductTone === "warning"
+          ? "Product Warning"
+          : "Product Info";
 
   const selectedProductStatusText =
     selectedProductTone === "expired"
@@ -358,10 +360,12 @@ const ExpiryMgm = () => {
 
   const selectedProductSectionText =
     selectedProductTone === "expired"
-      ? "Critical"
-      : selectedProductTone === "warning"
-        ? "Warning"
-        : "Info";
+      ? "Expired"
+      : selectedProductTone === "critical"
+        ? "Critical"
+        : selectedProductTone === "warning"
+          ? "Warning"
+          : "Info";
 
   const selectedProductStatusBadge = selectedProductStatusText.toUpperCase();
 
@@ -385,16 +389,22 @@ const ExpiryMgm = () => {
   }[selectedProductTone];
 
   const selectedProductRemoveLabel =
-    selectedProduct && selectedProduct?.daysNumber <= 0
+    selectedProductTone === "expired"
       ? "Remove Expired Stock"
-      : "OK";
+      : selectedProductTone === "critical"
+        ? "Remove Critical Stock"
+        : selectedProductTone === "warning"
+          ? "Remove Warning Stock"
+          : "Remove Info Stock";
 
   const removingProductLabel =
     removingProductTone === "expired"
-      ? "Critical"
-      : removingProductTone === "warning"
-        ? "Warning"
-        : "Info";
+      ? "Expired"
+      : removingProductTone === "critical"
+        ? "Critical"
+        : removingProductTone === "warning"
+          ? "Warning"
+          : "Info";
 
   const confirmRemoval = () => {
     setExpiryItems((items) =>
@@ -784,11 +794,7 @@ const ExpiryMgm = () => {
             <button
               className={`expiry-remove-stock-btn expiry-remove-stock-btn-${selectedProductTone}`}
               type="button"
-              onClick={
-                selectedProduct?.daysNumber <= 0
-                  ? openRemovePopup
-                  : () => setSelectedProduct(null)
-              }
+              onClick={openRemovePopup}
             >
               <Trash2 size={16} /> {selectedProductRemoveLabel}
             </button>

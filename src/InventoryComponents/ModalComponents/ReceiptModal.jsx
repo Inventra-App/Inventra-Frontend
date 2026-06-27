@@ -10,6 +10,7 @@ const ReceiptModal = ({ receipt, onClose }) => {
 
   const handlePrint = () => {
     window.print();
+    onClose?.();
   };
 
   return (
@@ -20,16 +21,11 @@ const ReceiptModal = ({ receipt, onClose }) => {
 
           <h2>Sale Complete!</h2>
 
-          <p>
-            Receipt #
-            {sale?.saleNumber || "000000"}
-          </p>
+          <p>Receipt #{sale?.saleNumber || "000000"}</p>
         </div>
 
         <div className="receipt-body">
-          <h3 className="receipt-store-name">
-            INVENTRA
-          </h3>
+          <h3 className="receipt-store-name">INVENTRA</h3>
 
           <p className="receipt-date">
             {new Date(sale?.createdAt).toLocaleDateString("en-NG", {
@@ -37,38 +33,28 @@ const ReceiptModal = ({ receipt, onClose }) => {
               day: "2-digit",
               month: "short",
               year: "numeric",
-            })}
-            {" "}
+            })}{" "}
             {new Date(sale?.createdAt).toLocaleTimeString("en-NG", {
               hour: "2-digit",
               minute: "2-digit",
             })}
           </p>
 
-          <p className="receipt-number">
-            Receipt: {sale?.saleNumber}
-          </p>
+          <p className="receipt-number">Receipt: {sale?.saleNumber}</p>
 
           <div className="receipt-divider" />
 
           <div className="receipt-items">
             {items.map((item, index) => (
-              <div
-                key={index}
-                className="receipt-item"
-              >
+              <div key={index} className="receipt-item">
                 <div className="receipt-item-top">
                   <span>{item.productName}</span>
 
-                  <span>
-                    ₦
-                    {Number(item.subtotal).toLocaleString("en-NG")}
-                  </span>
+                  <span>₦{Number(item.subtotal).toLocaleString("en-NG")}</span>
                 </div>
 
                 <div className="receipt-item-bottom">
-                  ₦
-                  {Number(item.unitPrice || 0).toLocaleString("en-NG")}
+                  ₦{Number(item.unitPrice || 0).toLocaleString("en-NG")}
                   {" × "}
                   {item.quantity}
                 </div>
@@ -81,19 +67,13 @@ const ReceiptModal = ({ receipt, onClose }) => {
           <div className="receipt-summary-row">
             <span>Subtotal</span>
 
-            <span>
-              ₦
-              {Number(sale?.totalAmount).toLocaleString("en-NG")}
-            </span>
+            <span>₦{Number(sale?.totalAmount).toLocaleString("en-NG")}</span>
           </div>
 
           <div className="receipt-total-row">
             <span>Total</span>
 
-            <span>
-              ₦
-              {Number(sale?.totalAmount).toLocaleString("en-NG")}
-            </span>
+            <span>₦{Number(sale?.totalAmount).toLocaleString("en-NG")}</span>
           </div>
 
           <div className="receipt-divider" />
@@ -101,26 +81,18 @@ const ReceiptModal = ({ receipt, onClose }) => {
           <div className="receipt-footer">
             <p>Thank you for your purchase!</p>
 
-            <p>
-              Powered by INVENTRA POS
-            </p>
+            <p>Powered by INVENTRA POS</p>
           </div>
         </div>
 
         <div className="receipt-actions">
-          <button
-            className="receipt-print-btn"
-            onClick={handlePrint}
-          >
+          <button className="receipt-print-btn" onClick={handlePrint}>
             <Printer size={16} />
             Print Receipt
           </button>
 
-          <button
-            className="receipt-close-btn"
-            onClick={onClose}
-          >
-            New Sale
+          <button className="receipt-close-btn" onClick={onClose}>
+            Cancel
           </button>
         </div>
       </div>
