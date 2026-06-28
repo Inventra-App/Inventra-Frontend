@@ -4,8 +4,15 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import { loginStaff } from "../API/userManagementAPI";
 import { getAccountPath, saveSessionUser } from "../Utils/sessionUser";
-import { getRoleFromToken, getStaffLoginDestination, normalizeRole } from "../Utils/authRoles";
-import { consumeSessionExpiredMessage } from "../Utils/authSession";
+import {
+  getRoleFromToken,
+  getStaffLoginDestination,
+  normalizeRole,
+} from "../Utils/authRoles";
+import {
+  clearAuthStorage,
+  consumeSessionExpiredMessage,
+} from "../Utils/authSession";
 import Logo from "./Logo";
 import loginBg from "../assets/LoginBg.png";
 import "./StaffLogin.css";
@@ -64,12 +71,19 @@ const StaffLogin = () => {
       };
       const response = await loginStaff(payload);
       const token = getAuthToken(response);
-      const tokenRole = getRoleFromToken(token) || normalizeRole(getResponseRole(response));
+      const tokenRole =
+        getRoleFromToken(token) || normalizeRole(getResponseRole(response));
+
+      console.log("LOGIN RESPONSE", response);
+      console.log("TOKEN", token);
+      console.log("TOKEN ROLE", tokenRole);
 
       if (tokenRole !== "Manager") {
         toast.error("Only manager staff accounts can sign in here.");
         return;
       }
+
+      clearAuthStorage();
 
       if (token) {
         localStorage.setItem("inventra_token", token);
@@ -81,7 +95,9 @@ const StaffLogin = () => {
       });
 
       toast.success(response?.message || "Staff login successful");
-      navigate(getAccountPath(getStaffLoginDestination(tokenRole), sessionUser));
+      navigate(
+        getAccountPath(getStaffLoginDestination(tokenRole), sessionUser),
+      );
     } catch (error) {
       toast.error(
         error?.response?.data?.message ||
@@ -111,7 +127,9 @@ const StaffLogin = () => {
           </p>
         </div>
 
-        <p className="staff-auth-footer">(c) 2026 INVENTRA. All rights reserved.</p>
+        <p className="staff-auth-footer">
+          (c) 2026 INVENTRA. All rights reserved.
+        </p>
       </section>
 
       <section className="staff-auth-form-section">
@@ -143,9 +161,7 @@ const StaffLogin = () => {
           </label>
 
           <label className="staff-auth-field">
-            <span className="staff-auth-password-label">
-              Password
-            </span>
+            <span className="staff-auth-password-label">Password</span>
             <div className="staff-auth-password">
               <input
                 type={showPassword ? "text" : "password"}
@@ -166,7 +182,11 @@ const StaffLogin = () => {
             </div>
           </label>
 
-          <button className="staff-auth-submit" type="submit" disabled={isSubmitting}>
+          <button
+            className="staff-auth-submit"
+            type="submit"
+            disabled={isSubmitting}
+          >
             {isSubmitting ? "Signing in..." : "Sign in as Manager"}
           </button>
 

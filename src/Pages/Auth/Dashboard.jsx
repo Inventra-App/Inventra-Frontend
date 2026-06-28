@@ -534,7 +534,10 @@ const Dashboard = () => {
   const expiredAlerts = expiryItems.filter(
     (item) => item.status === "EXPIRED",
   ).length;
-  const criticalAlerts = expiredAlerts + lowStockItems.length;
+  
+  const criticalAlerts = expiryItems.filter((item) => {
+    return item.daysRemaining <= 0 || item.daysRemaining <= 3;
+  }).length;
 
   const statCards = [
     {

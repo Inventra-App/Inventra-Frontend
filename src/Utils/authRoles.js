@@ -72,7 +72,7 @@ const rolePermissions = {
     "/settings",
   ],
   Manager: ["/dashboard", "/inventory", "/inventory/categories", "/expiry", "/activity", "/settings"],
-  Cashier: ["/dashboard", "/sales", "/activity", "/settings"],
+  Cashier: [ "/sales",],
 };
 
 export const canAccessPath = (role, path) => {

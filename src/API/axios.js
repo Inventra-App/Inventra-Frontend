@@ -12,12 +12,12 @@ const API = axios.create({
 });
 
 API.interceptors.request.use((config) => {
-  const token = localStorage.getItem("inventra_token"); 
-  
+  const token = localStorage.getItem("inventra_token");
+
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
-  
+
   return config;
 });
 
@@ -28,21 +28,25 @@ API.interceptors.response.use(
 
     if (error?.response?.status === 401 && hadSessionToken) {
       const sessionUser = getSessionUser();
-      const loginPath = getLoginPathForRole(sessionUser.role);
+
+      const role = sessionUser?.role || "cashier";
+      const loginPath = getLoginPathForRole(role);
 
       setSessionExpiredMessage();
-      clearAuthStorage();
 
-      if (
-        window.location.pathname !== loginPath &&
-        !window.location.pathname.includes("login")
-      ) {
+      const currentPath = window.location.pathname;
+
+      const isAlreadyLoginPage =
+        currentPath.includes("login") || currentPath === loginPath;
+
+      if (!isAlreadyLoginPage) {
+        clearAuthStorage();
         window.location.replace(loginPath);
       }
     }
 
     return Promise.reject(error);
-  },
+  }
 );
 
 export default API;
