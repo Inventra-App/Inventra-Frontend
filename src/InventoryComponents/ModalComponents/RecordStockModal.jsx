@@ -2,7 +2,10 @@ import React, { useState, useEffect } from "react";
 import { X, CheckCircle, Info } from "lucide-react";
 import "./ModalStyles/RecordStockModal.css";
 import Logo from "../../Components/Logo";
-import { recordStockEntry } from "../../API/inventoryApi";
+import {
+  recordStockEntry,
+  getBatchesByInventoryId,
+} from "../../API/inventoryApi";
 
 const RecordStockModal = ({ onClose, visible, onAddProduct, product }) => {
   const [supplierName, setSupplierName] = useState("");
@@ -14,13 +17,33 @@ const RecordStockModal = ({ onClose, visible, onAddProduct, product }) => {
   const [success, setSuccess] = useState(false);
   const [expiryError, setExpiryError] = useState("");
   const [hasExpiry, setHasExpiry] = useState(true);
+  const [loadingBatch, setLoadingBatch] = useState(false);
 
   useEffect(() => {
-    if (product) {
+    const loadBatchInfo = async () => {
+      if (!product?.inventoryId) return;
+
       setPackageQuantity(product.packageQuantity || "");
       setUnitPerPackage(product.unitPerPackage || "");
 
-      setHasExpiry(product.hasExpiry ?? !!product.expiryDate);
+      try {
+        setLoadingBatch(true);
+
+        const response = await getBatchesByInventoryId(product.inventoryId);
+
+        const firstBatch = response?.data?.[0];
+
+        setHasExpiry(firstBatch?.isExpiring ?? true);
+      } catch (err) {
+        console.error("Failed to fetch batch:", err);
+        setHasExpiry(true);
+      } finally {
+        setLoadingBatch(false);
+      }
+    };
+
+    if (product) {
+      loadBatchInfo();
     }
   }, [product]);
 
@@ -57,7 +80,7 @@ const RecordStockModal = ({ onClose, visible, onAddProduct, product }) => {
     const payload = {
       inventoryId: product?.inventoryId,
       supplier: supplierName,
-      expiryDate: expiryDate || null,
+      expiryDate: hasExpiry ? expiryDate || null : null,
       packageType: product?.packageType,
       packageQuantity: parseInt(packageQuantity),
       unitPerPackage: parseInt(unitPerPackage),
@@ -251,21 +274,37 @@ const RecordStockModal = ({ onClose, visible, onAddProduct, product }) => {
               </div>
 
               <div className="record-field">
-                <label>Expiry Date </label>
-                <input
-                  type="date"
-                  value={expiryDate}
-                  min={
-                    new Date(Date.now() + 86400000).toISOString().split("T")[0]
-                  }
-                  onChange={(e) => {
-                    setExpiryDate(e.target.value);
-                    setExpiryError("");
-                  }}
-              
-                />
-                {expiryError && (
-                  <div className="record-field-error">{expiryError}</div>
+                <label>{hasExpiry ? "Expiry Date *" : ""}</label>
+
+                {hasExpiry ? (
+                  <>
+                    <input
+                      type="date"
+                      value={expiryDate}
+                      min={
+                        new Date(Date.now() + 86400000)
+                          .toISOString()
+                          .split("T")[0]
+                      }
+                      onChange={(e) => {
+                        setExpiryDate(e.target.value);
+                        setExpiryError("");
+                      }}
+                      required
+                    />
+
+                    {expiryError && (
+                      <div className="record-field-error">{expiryError}</div>
+                    )}
+                  </>
+                ) : (
+                  <div className="record-no-expiry-card">
+                    <Info size={18} />
+                    <div>
+                      <strong>Non-expiring product</strong>
+                      <p>This product does not require an expiry date.</p>
+                    </div>
+                  </div>
                 )}
               </div>
             </div>

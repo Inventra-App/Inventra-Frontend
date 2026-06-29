@@ -148,7 +148,6 @@ const UserMgm = () => {
     return () => window.clearTimeout(timerId)
   }, [loadStaffs])
 
-  // Default permission state per role (used when no custom config exists yet)
   const defaultRolePermissions = {
     Manager: {
       'Dashboard': true,
@@ -173,10 +172,8 @@ const UserMgm = () => {
     Cashier: 'Cashier',
   }
 
-  // Active role being managed in the Role & Permissions page
   const [activePermissionRole, setActivePermissionRole] = useState('Manager')
 
-  // Persist custom permission toggles per role
   const [rolePermissions, setRolePermissions] = useState(defaultRolePermissions)
 
   const getActivePermissionMap = () => {
@@ -510,7 +507,7 @@ const UserMgm = () => {
             <img src={Icon5} alt="" />
           </div>
           <div>
-            <p>Staff</p>
+            <p>Cashiers</p>
             <h3>{staffCount || cashierCount}</h3>
           </div>
         </div>

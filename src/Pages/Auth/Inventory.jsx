@@ -121,9 +121,13 @@ const Inventory = () => {
   const [hasCreatedCategory, setHasCreatedCategory] = useState(
     localStorage.getItem("hasCreatedCategory") === "true",
   );
-  const [showNewUserGuide, setShowNewUserGuide] = useState(
-    shouldShowInventoryGuide(),
-  );
+
+  const [showNewUserGuide, setShowNewUserGuide] = useState(() => {
+    const dismissed =
+      localStorage.getItem("inventoryGuideDismissed") === "true";
+
+    return shouldShowInventoryGuide() && !dismissed;
+  });
 
   const [openProductAfterCategory, setOpenProductAfterCategory] =
     useState(false);
@@ -153,6 +157,7 @@ const Inventory = () => {
       const inventory = Array.isArray(inventoryRes)
         ? inventoryRes
         : inventoryRes?.data || [];
+      console.log("vent", inventory);
 
       const stored = JSON.parse(localStorage.getItem("stockReceived") || "{}");
 
@@ -172,6 +177,7 @@ const Inventory = () => {
           inventoryId: inv._id,
           id: prod._id,
           name: prod.productName || "Unnamed Product",
+          isExpiring: prod.isExpiring,
           category: prod.categoryName || "Uncategorized",
           packageType: prod.packageType,
           packageQuantity: prod.packageQuantity,
@@ -182,7 +188,9 @@ const Inventory = () => {
           availableStock: Number(inv.availableStock) || 0,
           totalStock: total,
           backroomStock: Number(inv.backroomStock) || 0,
-          writeOffStock: Number(inv.writeOffStock) || 0,
+          writeOffStock: Number(
+            inv.writeOffStock ?? inv.writtenOffStock ?? inv.writtenOff ?? 0,
+          ),
           stockReceived: stored[prod._id] || 0,
           status,
         };
@@ -271,7 +279,7 @@ const Inventory = () => {
   };
 
   const closeNewUserGuide = () => {
-    markReturningSessionUser();
+    localStorage.setItem("inventoryGuideDismissed", "true");
     setShowNewUserGuide(false);
   };
 

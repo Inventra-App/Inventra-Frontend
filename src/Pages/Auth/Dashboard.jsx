@@ -163,26 +163,24 @@ const findInventoryRecord = (item, inventoryLookup) => {
   );
 };
 
-const normalizeLowStockAlert = (item, inventoryLookup, products = []) => {
-  const matchedProduct = findMatchingProduct(item, products);
-  const inventoryRecord = findInventoryRecord(item, inventoryLookup);
-  const productId = getProductId(item) || matchedProduct?._id || item?._id;
-  const name = getValue(
-    getProductName(item),
-    matchedProduct?.productName,
-    matchedProduct?.name,
-    "Unnamed Product",
-  );
+const normalizeLowStockAlert = (item, productLookup = {}) => {
+  const availableStock = Number(item?.availableStock ?? 0);
+  const totalStock = Number(item?.totalStock ?? 0);
+  const reservedStock = Number(item?.reservedStock ?? 0);
+
+  const matchedProduct = productLookup[item?.productId];
 
   return {
-    id: productId || `${name}-${item?.batchCode ?? item?.batch ?? ""}`,
-    productId,
-    name,
-    category:
-      inventoryRecord?.category || getCategoryName(item, matchedProduct),
-    units: Number(inventoryRecord?.units ?? getInventoryUnits(item)),
-    batch: item?.batchCode ?? item?.batch ?? "",
-    expiryDate: item?.expiryDate ? formatAlertDate(item.expiryDate) : "",
+    id: item?.productId || item?.id || item?.product,
+    productId: item?.productId,
+    name: item?.product || item?.productName || "Unnamed Product",
+    category: item?.categoryName || matchedProduct?.category || "Uncategorized",
+    availableStock,
+    totalStock,
+    reservedStock,
+    backroomStock: item?.backroomStock ?? matchedProduct?.backroomStock ?? 0,
+    stockReceived: 0,
+    status: "Low Stock",
   };
 };
 
@@ -200,7 +198,11 @@ const getCategoryName = (item, matchedProduct) =>
     "Uncategorized",
   );
 
-const normalizeExpiryAlert = (item, products = [], inventoryLookup = new Map()) => {
+const normalizeExpiryAlert = (
+  item,
+  products = [],
+  inventoryLookup = new Map(),
+) => {
   const matchedProduct = findMatchingProduct(item, products);
   const inventoryRecord = findInventoryRecord(item, inventoryLookup);
   const productId = getProductId(item) || matchedProduct?._id || item?._id;
@@ -211,40 +213,41 @@ const normalizeExpiryAlert = (item, products = [], inventoryLookup = new Map()) 
     item?.expirationDate;
 
   const daysRemaining = Number(
-  item?.daysLeft ?? item?.daysRemaining ?? getDaysRemaining(expiryValue),
-);
+    item?.daysLeft ?? item?.daysRemaining ?? getDaysRemaining(expiryValue),
+  );
 
-const expiredDays = Math.abs(daysRemaining);
+  const expiredDays = Math.abs(daysRemaining);
 
-return {
-  id: `${productId}-${item?.batchCode ?? item?.batch ?? "NA"}`,
-  productId,
-  name: getValue(
-    getProductName(item),
-    matchedProduct?.productName,
-    matchedProduct?.name,
-    "Unnamed Product",
-  ),
-  batch: item?.batchCode ?? item?.batch ?? "N/A",
-  quantity: Number(
-    getValue(
-      inventoryRecord?.units,
-      item?.quantityRemaining,
-      item?.inventory?.totalStock,
-      item?.totalStock,
-      item?.quantity,
-      0,
+  return {
+    id: `${productId}-${item?.batchCode ?? item?.batch ?? "NA"}`,
+    productId,
+    name: getValue(
+      getProductName(item),
+      matchedProduct?.productName,
+      matchedProduct?.name,
+      "Unnamed Product",
     ),
-  ),
-  category: inventoryRecord?.category || getCategoryName(item, matchedProduct),
-  expiryDate: formatAlertDate(expiryValue),
-  daysRemaining,
-  urgency: item?.urgencyLevel,
-  daysLeft:
-    daysRemaining <= 0
-      ? `${expiredDays} day${expiredDays === 1 ? "" : "s"} ago`
-      : `${daysRemaining} day${daysRemaining === 1 ? "" : "s"} left`,
-};
+    batch: item?.batchCode ?? item?.batch ?? "N/A",
+    quantity: Number(
+      getValue(
+        inventoryRecord?.units,
+        item?.quantityRemaining,
+        item?.inventory?.totalStock,
+        item?.totalStock,
+        item?.quantity,
+        0,
+      ),
+    ),
+    category:
+      inventoryRecord?.category || getCategoryName(item, matchedProduct),
+    expiryDate: formatAlertDate(expiryValue),
+    daysRemaining,
+    urgency: item?.urgencyLevel,
+    daysLeft:
+      daysRemaining <= 0
+        ? `${expiredDays} day${expiredDays === 1 ? "" : "s"} ago`
+        : `${daysRemaining} day${daysRemaining === 1 ? "" : "s"} left`,
+  };
 };
 
 const dashboardCache = {
@@ -357,44 +360,44 @@ const Dashboard = () => {
         products.map((p) => [
           p._id,
           {
+            category: p.categoryName || "Uncategorized",
             productName: p.productName,
-            categoryName: p.categoryName,
             reorderLevel: Number(p.reorderLevel || 10),
+            backroomStock: 0,
           },
         ]),
       );
 
       const inventoryLookup = buildInventoryLookup(inventoryItems);
-      const lowStockPayload =
-        lowStockRes.status === "fulfilled"
-          ? getArrayPayload(lowStockRes.value)
-          : [];
 
-      let lowStock = lowStockPayload.map((item) =>
-        normalizeLowStockAlert(item, inventoryLookup, products),
-      );
+      const mappedProducts = products.map((prod) => {
+        const inv = inventoryItems.find((i) => i.productId === prod._id) || {};
 
-      if (lowStock.length === 0) {
-        lowStock = inventoryItems
-          .filter((item) => {
-          const product = productLookup[getProductId(item)];
-          const reorderLevel = product?.reorderLevel || 10;
-          const totalStock = getInventoryUnits(item);
+        const total = Number(inv.totalStock) || 0;
+        const reorderLevel = Number(prod.reorderLevel) || 10;
 
-          return (
-            totalStock > 0 &&
-            totalStock <= reorderLevel
-          );
-        })
-        .map((item) => ({
-          id: getProductId(item),
-          productId: getProductId(item),
-          name: productLookup[getProductId(item)]?.productName || getProductName(item) || "Unknown",
-          category:
-            productLookup[getProductId(item)]?.categoryName || getCategoryName(item),
-          units: getInventoryUnits(item),
-        }));
-      }
+        const status =
+          total > reorderLevel
+            ? "In Stock"
+            : total > 0
+              ? "Low Stock"
+              : "Out of Stock";
+
+        return {
+          id: prod._id,
+          productId: prod._id,
+          name: prod.productName || "Unnamed Product",
+          category: prod.categoryName || "Uncategorized",
+          totalStock: total,
+          availableStock: Number(inv.availableStock) || 0,
+          backroomStock: Number(inv.backroomStock) || 0,
+          reservedStock: Number(inv.reservedStock) || 0,
+          status,
+        };
+      });
+
+      const lowStock = mappedProducts.filter((p) => p.status === "Low Stock");
+
       setLowStockItems(lowStock);
 
       let normalized = [];
@@ -431,12 +434,12 @@ const Dashboard = () => {
       setExpiryItems(normalizedExpiry);
 
       const expiredItems = normalizedExpiry.filter(
-  (item) => item.daysRemaining <= 3,
-);
+        (item) => item.daysRemaining <= 3,
+      );
 
-const expiringItems = normalizedExpiry.filter(
-  (item) => item.daysRemaining >= 4 && item.daysRemaining <= 7,
-);
+      const expiringItems = normalizedExpiry.filter(
+        (item) => item.daysRemaining >= 4 && item.daysRemaining <= 7,
+      );
 
       const queue = [];
       if (expiredItems.length > 0) {
@@ -531,7 +534,10 @@ const expiringItems = normalizedExpiry.filter(
   const expiredAlerts = expiryItems.filter(
     (item) => item.status === "EXPIRED",
   ).length;
-  const criticalAlerts = expiredAlerts + lowStockItems.length;
+  
+  const criticalAlerts = expiryItems.filter((item) => {
+    return item.daysRemaining <= 0 || item.daysRemaining <= 3;
+  }).length;
 
   const statCards = [
     {
@@ -677,87 +683,87 @@ const expiringItems = normalizedExpiry.filter(
       </div>
 
       {(isAdmin || isManager) && (
-      <div className="dashboard-alerts">
-        <div className="alert-card">
-          <div className="alert-card-header">
-            <div className="alert-card-title">
-              <AlertTriangle size={18} className="alert-icon-red" />
-              <h4>Expiry Alerts</h4>
+        <div className="dashboard-alerts">
+          <div className="alert-card">
+            <div className="alert-card-header">
+              <div className="alert-card-title">
+                <AlertTriangle size={18} className="alert-icon-red" />
+                <h4>Expiry Alerts</h4>
+              </div>
+              <span className="alert-badge alert-badge-red">
+                {expiryItems.length}
+              </span>
             </div>
-            <span className="alert-badge alert-badge-red">
-              {expiryItems.length}
-            </span>
-          </div>
-          <div className="alert-list">
-            {expiryItems.length === 0 ? (
-              <p className="expiry-meta dashboard-empty-alert">
-                No expiry alerts to display.
-              </p>
-            ) : (
-              expiryItems.map((item, index) => (
-                <div
-                  key={`${item.id}-${index}`}
-                  className={`dashboard-expiry-item dashboard-expiry-${
-                    item.daysRemaining <= 3 ? "critical" : "expiring"
-                  }`}
-                >
-                  <div className="dashboard-expiry-content">
-                    <p className="dashboard-expiry-name">{item.name}</p>
-                    <p className="dashboard-expiry-details">
-                      Batch: {item.batch} • Qty: {item.quantity} • Expires:{" "}
-                      {item.expiryDate}
-                    </p>
+            <div className="alert-list">
+              {expiryItems.length === 0 ? (
+                <p className="expiry-meta dashboard-empty-alert">
+                  No expiry alerts to display.
+                </p>
+              ) : (
+                expiryItems.map((item, index) => (
+                  <div
+                    key={`${item.id}-${index}`}
+                    className={`dashboard-expiry-item dashboard-expiry-${
+                      item.daysRemaining <= 3 ? "critical" : "expiring"
+                    }`}
+                  >
+                    <div className="dashboard-expiry-content">
+                      <p className="dashboard-expiry-name">{item.name}</p>
+                      <p className="dashboard-expiry-details">
+                        Batch: {item.batch} • Qty: {item.quantity} • Expires:{" "}
+                        {item.expiryDate}
+                      </p>
+                    </div>
+                    <div className="dashboard-expiry-badge">
+                      <span
+                        className={`dashboard-days-badge dashboard-days-${
+                          item.daysRemaining <= 3 ? "red" : "orange"
+                        }`}
+                      >
+                        {item.daysLeft}
+                      </span>
+                    </div>
                   </div>
-                  <div className="dashboard-expiry-badge">
-                    <span
-                      className={`dashboard-days-badge dashboard-days-${
-                        item.daysRemaining <= 3 ? "red" : "orange"
-                      }`}
-                    >
-                      {item.daysLeft}
-                    </span>
-                  </div>
-                </div>
-              ))
-            )}
+                ))
+              )}
+            </div>
           </div>
-        </div>
 
-        <div className="alert-card">
-          <div className="alert-card-header">
-            <div className="alert-card-title">
-              <TrendingDown size={18} className="alert-icon-red" />
-              <h4>Low Stock Alerts</h4>
+          <div className="alert-card">
+            <div className="alert-card-header">
+              <div className="alert-card-title">
+                <TrendingDown size={18} className="alert-icon-red" />
+                <h4>Low Stock Alerts</h4>
+              </div>
+              <span className="alert-badge alert-badge-red">
+                {lowStockItems.length}
+              </span>
             </div>
-            <span className="alert-badge alert-badge-red">
-              {lowStockItems.length}
-            </span>
-          </div>
-          <div className="alert-list">
-            {lowStockItems.length === 0 ? (
-              <p
-                className="expiry-meta"
-                style={{ padding: "12px 0", textAlign: "center" }}
-              >
-                All products are well-stocked.
-              </p>
-            ) : (
-              lowStockItems.map((item, index) => (
-                <div key={index} className="lowstock-item">
-                  <div>
-                    <p className="expiry-name">{item.name}</p>
-                    <p className="expiry-meta">Category: {item.category}</p>
+            <div className="alert-list">
+              {lowStockItems.length === 0 ? (
+                <p
+                  className="expiry-meta"
+                  style={{ padding: "12px 0", textAlign: "center" }}
+                >
+                  All products are well-stocked.
+                </p>
+              ) : (
+                lowStockItems.map((item, index) => (
+                  <div key={index} className="lowstock-item">
+                    <div>
+                      <p className="expiry-name">{item.name}</p>
+                      <p className="expiry-meta">Category: {item.category}</p>
+                    </div>
+                    <div className="lowstock-units">
+                      <span className="lowstock-count">{item.totalStock}</span>
+                      <span className="lowstock-label">units left</span>
+                    </div>
                   </div>
-                  <div className="lowstock-units">
-                    <span className="lowstock-count">{item.units}</span>
-                    <span className="lowstock-label">units left</span>
-                  </div>
-                </div>
-              ))
-            )}
+                ))
+              )}
+            </div>
           </div>
         </div>
-      </div>
       )}
 
       <div className="activity-card">

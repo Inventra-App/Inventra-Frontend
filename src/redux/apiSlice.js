@@ -21,8 +21,6 @@ const apiSlice = createSlice({
     setRegistrationEmail: (state, action) => {
       state.registrationEmail = action.payload;
     },
-    // Wipes auth-related state when the user logs out.
-    // We keep `registrationEmail` so any in-progress sign-up flow isn't disturbed.
     clearAuth: (state) => {
       state.accessToken = null;
       state.refreshToken = null;

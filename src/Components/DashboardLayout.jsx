@@ -1,73 +1,79 @@
-import React, { useEffect, useState } from 'react'
-import { Outlet, useNavigate } from 'react-router-dom'
-import { useDispatch } from 'react-redux'
-import { LogOut } from 'lucide-react'
-import toast from 'react-hot-toast'
-import '../Pages/Auth/Css/Dashboard.css'
-import SideBar from './SideBar'
-import DashboardHeader from './DashboardHeader'
-import Logo from './Logo'
-import { logoutUser } from '../API/logoutUser'
-import NoInternet from '../Pages/Auth/NoInternet'
-import { getLoginPathForRole } from '../Utils/authRoles'
-import { getSessionUser } from '../Utils/sessionUser'
-import { getUserProfile } from '../API/userProfileApi'
-import { setAccessToken } from '../redux/apiSlice'
-import { persistUserProfile } from '../Utils/userProfileState'
+import React, { useEffect, useState } from "react";
+import { Outlet, useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { LogOut } from "lucide-react";
+import toast from "react-hot-toast";
+import "../Pages/Auth/Css/Dashboard.css";
+import SideBar from "./SideBar";
+import DashboardHeader from "./DashboardHeader";
+import Logo from "./Logo";
+import { logoutUser } from "../API/logoutUser";
+import NoInternet from "../Pages/Auth/NoInternet";
+import { getLoginPathForRole } from "../Utils/authRoles";
+import { getSessionUser } from "../Utils/sessionUser";
+import { getUserProfile } from "../API/userProfileApi";
+import { setAccessToken } from "../redux/apiSlice";
+import { persistUserProfile } from "../Utils/userProfileState";
 
 const DashboardLayout = () => {
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
-  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false)
-  const [isLoggingOut, setIsLoggingOut] = useState(false)
-  const [isOffline, setIsOffline] = useState(!navigator.onLine)
-  const navigate = useNavigate()
-  const dispatch = useDispatch()
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [isOffline, setIsOffline] = useState(!navigator.onLine);
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   useEffect(() => {
-    const showOfflinePage = () => setIsOffline(true)
-    const hideOfflinePage = () => setIsOffline(false)
+    const showOfflinePage = () => setIsOffline(true);
+    const hideOfflinePage = () => setIsOffline(false);
 
-    window.addEventListener('offline', showOfflinePage)
-    window.addEventListener('online', hideOfflinePage)
+    window.addEventListener("offline", showOfflinePage);
+    window.addEventListener("online", hideOfflinePage);
 
     return () => {
-      window.removeEventListener('offline', showOfflinePage)
-      window.removeEventListener('online', hideOfflinePage)
-    }
-  }, [])
+      window.removeEventListener("offline", showOfflinePage);
+      window.removeEventListener("online", hideOfflinePage);
+    };
+  }, []);
 
   useEffect(() => {
-    let isMounted = true
+    let isMounted = true;
 
     const loadAuthenticatedProfile = async () => {
-      const token = localStorage.getItem('inventra_token')
-      if (!token) return
+      const token = localStorage.getItem("inventra_token");
+      if (!token) return;
 
-      dispatch(setAccessToken(token))
+      dispatch(setAccessToken(token));
+
+      const sessionUser = getSessionUser();
+
+      if (String(sessionUser.role).toLowerCase() !== "admin") {
+        return;
+      }
 
       try {
-        const profile = await getUserProfile()
+        const profile = await getUserProfile();
         if (isMounted) {
-          persistUserProfile(profile, dispatch)
+          persistUserProfile(profile, dispatch);
         }
       } catch (error) {
-        console.error('Profile refresh failed:', error)
+        console.error("Profile refresh failed:", error);
       }
-    }
+    };
 
-    loadAuthenticatedProfile()
+    loadAuthenticatedProfile();
 
     return () => {
-      isMounted = false
-    }
-  }, [dispatch])
+      isMounted = false;
+    };
+  }, [dispatch]);
 
-  const closeMobileMenu = () => setIsMobileMenuOpen(false)
+  const closeMobileMenu = () => setIsMobileMenuOpen(false);
   const openLogoutModal = () => {
-    closeMobileMenu()
-    setIsLogoutModalOpen(true)
-  }
-  const closeLogoutModal = () => setIsLogoutModalOpen(false)
+    closeMobileMenu();
+    setIsLogoutModalOpen(true);
+  };
+  const closeLogoutModal = () => setIsLogoutModalOpen(false);
 
   const confirmLogout = async () => {
     if (isLoggingOut) return;
@@ -93,7 +99,9 @@ const DashboardLayout = () => {
         <SideBar onItemClick={() => {}} onLogout={openLogoutModal} />
       </div>
 
-      <div className={`mobile-navigation-bar ${isMobileMenuOpen ? 'nav-hidden-state' : ''}`}>
+      <div
+        className={`mobile-navigation-bar ${isMobileMenuOpen ? "nav-hidden-state" : ""}`}
+      >
         <div className="mobile-brand-emblem">
           <Logo variant="dark" />
         </div>
@@ -107,9 +115,16 @@ const DashboardLayout = () => {
         </button>
       </div>
 
-      <div className={`mobile-sidebar-backdrop ${isMobileMenuOpen ? 'backdrop-active' : ''}`} onClick={closeMobileMenu} />
-      <div className={`mobile-sidebar-drawer ${isMobileMenuOpen ? 'drawer-active' : ''}`}>
-        <button className="mobile-drawer-close" onClick={closeMobileMenu}>×</button>
+      <div
+        className={`mobile-sidebar-backdrop ${isMobileMenuOpen ? "backdrop-active" : ""}`}
+        onClick={closeMobileMenu}
+      />
+      <div
+        className={`mobile-sidebar-drawer ${isMobileMenuOpen ? "drawer-active" : ""}`}
+      >
+        <button className="mobile-drawer-close" onClick={closeMobileMenu}>
+          ×
+        </button>
         <SideBar onItemClick={closeMobileMenu} onLogout={openLogoutModal} />
       </div>
 
@@ -122,7 +137,12 @@ const DashboardLayout = () => {
 
       {isLogoutModalOpen && (
         <div className="logout-modal-backdrop" role="presentation">
-          <div className="logout-modal" role="dialog" aria-modal="true" aria-labelledby="logout-modal-title">
+          <div
+            className="logout-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="logout-modal-title"
+          >
             <div className="logout-modal-icon">
               <LogOut size={28} />
             </div>
@@ -153,7 +173,7 @@ const DashboardLayout = () => {
         </div>
       )}
     </div>
-  )
-}
+  );
+};
 
-export default DashboardLayout
+export default DashboardLayout;

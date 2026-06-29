@@ -91,7 +91,7 @@ export const getBatchById = async (id) => {
 };
 
 export const getAllBatches = async () => {
-  const res = await API.get('batch/getAll');
+  const res = await API.get('getAll');
   return res.data;
 };
 
@@ -117,5 +117,10 @@ export const bookDemo = async (payload) => {
 
 export const getStockMovementHistory = async (inventoryId) => {
   const res = await API.get(`stock/log/${inventoryId}`);
+  return res.data;
+};
+
+export const deleteBatch = async (batchId) => {
+  const res = await API.delete(`batch/${batchId}`);
   return res.data;
 };

@@ -409,7 +409,8 @@
   margin-bottom: 12px;
 }
 
-.expiry-detail-alert-expired {
+.expiry-detail-alert-expired,
+.expiry-detail-alert-critical {
   border: 1px solid #fca5a5;
   background: #fef2f2;
   color: #ef4444;
@@ -532,7 +533,9 @@
 }
 
 .expiry-red-text,
-.expiry-status-text-expired {
+.expiry-status-text-expired,
+.expiry-status-text-critical
+{
   color: #ef4444;
 }
 
