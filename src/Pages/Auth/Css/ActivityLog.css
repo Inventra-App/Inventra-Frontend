@@ -404,6 +404,7 @@
   .activity-page {
     padding: 14px;
     gap: 16px;
+    margin-top: 70px;
   }
 
   .activity-stats {

@@ -1,10 +1,9 @@
 .dash-header {
-  height: 50px;
-  background-color: #ffffff;
+  height: 72px;
+  background: #fff;
   border-bottom: 1px solid #e5e7eb;
   display: flex;
   align-items: center;
-  justify-content: flex-end;
   padding: 0 32px;
   position: fixed;
   top: 0;
@@ -13,16 +12,70 @@
   z-index: 99;
 }
 
-.dash-header h1 {
-  color: #101828;
-  font-size: 0.92rem;
-  font-weight: 800;
-  line-height: 1;
-  margin: 0;
+.dash-header-right {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
 }
 
 .dash-header-date {
   font-size: 14px;
   color: #4A5565;
-  font-weight: 400;
+  font-weight: 500;
+}
+
+.cashier-profile-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px 14px;
+
+  background: #F5F3FF;
+  border: 1px solid #DDD6FE;
+  border-radius: 14px;
+
+  box-shadow: 0 2px 10px rgba(67, 45, 215, 0.08);
+}
+
+.cashier-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cashier-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: #111827;
+}
+
+.cashier-role-pill {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: #432DD7;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 999px;
+}
+
+.cashier-role-pill svg {
+  width: 11px;
+  height: 11px;
+}
+
+.cashier-bottom {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #667085;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.cashier-bottom svg {
+  color: #432DD7;
 }
