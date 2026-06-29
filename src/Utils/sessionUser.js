@@ -18,7 +18,15 @@ const readJson = (key) => {
 };
 
 export const buildSessionUser = (source = {}, fallback = {}) => {
-  const user = source.user ?? source.admin ?? source.staff ?? source.data?.user ?? source.data?.admin ?? source.data ?? source;
+  const user =
+    source.user ??
+    source.admin ??
+    source.staff ??
+    source.data?.user ??
+    source.data?.admin ??
+    source.data?.staff ??
+    source.data ??
+    source;
   const firstName = pick(user.firstName, user.firstname, source.firstName, fallback.firstName, "");
   const lastName = pick(user.lastName, user.lastname, source.lastName, fallback.lastName, "");
   const fullName = pick(user.fullName, user.name, `${firstName} ${lastName}`.trim(), fallback.fullName, "");

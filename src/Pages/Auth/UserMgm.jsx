@@ -29,6 +29,10 @@ import { getStaffs, onBoardStaff } from '../../API/userManagementAPI'
 const getArrayPayload = (payload) => {
   if (Array.isArray(payload)) return payload
   if (Array.isArray(payload?.data)) return payload.data
+  if (Array.isArray(payload?.data?.staffs)) return payload.data.staffs
+  if (Array.isArray(payload?.data?.staff)) return payload.data.staff
+  if (Array.isArray(payload?.data?.users)) return payload.data.users
+  if (Array.isArray(payload?.data?.items)) return payload.data.items
   if (Array.isArray(payload?.staffs)) return payload.staffs
   if (Array.isArray(payload?.staff)) return payload.staff
   if (Array.isArray(payload?.users)) return payload.users
@@ -36,23 +40,33 @@ const getArrayPayload = (payload) => {
   return []
 }
 
+const parseBoolean = (value) => {
+  if (typeof value === 'boolean') return value
+  if (typeof value === 'number') return value === 1
+  const normalized = String(value ?? '').trim().toLowerCase()
+  if (['true', '1', 'yes', 'active', 'online', 'logged in'].includes(normalized)) return true
+  if (['false', '0', 'no', 'inactive', 'offline', 'logged out'].includes(normalized)) return false
+  return null
+}
+
 const normalizeStaff = (staff) => {
   const fullName = staff?.fullName ?? staff?.name ?? `${staff?.firstName ?? ''} ${staff?.lastName ?? ''}`.trim()
   const rawRole = staff?.role ?? 'Cashier'
   const role = String(rawRole).charAt(0).toUpperCase() + String(rawRole).slice(1).toLowerCase()
   const rawStatus = String(staff?.status ?? staff?.loginStatus ?? '').toLowerCase()
-  const isActive = Boolean(
-    staff?.isLoggedIn ||
-    staff?.loggedIn ||
-    staff?.online ||
-    staff?.isOnline ||
-    staff?.active ||
-    staff?.isActive ||
-    rawStatus === 'active' ||
-    rawStatus === 'online' ||
-    rawStatus === 'logged in',
-  )
-  const normalizedStatus = isActive
+  const activeState = [
+    staff?.isActive,
+    staff?.isactive,
+    staff?.active,
+    staff?.isLoggedIn,
+    staff?.loggedIn,
+    staff?.online,
+    staff?.isOnline,
+    staff?.loginStatus,
+    staff?.status,
+  ].map(parseBoolean).find((value) => value !== null)
+
+  const normalizedStatus = activeState
     ? 'Active'
     : rawStatus === 'suspended'
       ? 'Suspended'

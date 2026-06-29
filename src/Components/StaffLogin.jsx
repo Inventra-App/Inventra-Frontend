@@ -15,6 +15,7 @@ const getAuthToken = (response) =>
   response?.accessToken ||
   response?.data?.token ||
   response?.data?.accessToken ||
+  response?.data?.staff?.token ||
   response?.staff?.token ||
   response?.user?.token ||
   "";
