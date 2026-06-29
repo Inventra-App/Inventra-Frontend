@@ -25,7 +25,7 @@ export const logoutUser = async () => {
     throw error;
   } finally {
     clearAuthStorage();
-    localStorage.removeItem("inventra_user");
+    sessionStorage.removeItem("inventra_token");
 
     try {
       store.dispatch(clearAuth());

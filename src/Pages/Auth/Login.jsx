@@ -42,27 +42,6 @@ const getResponseRole = (response, fallbackRole) =>
   response?.role ||
   fallbackRole;
 
-// const loginWithAdminOrStaff = async (payload) => {
-//   let adminError;
-//   let staffError;
-
-//   try {
-//     const response = await loginAdmin(payload);
-//     return { response, role: getResponseRole(response, "Admin") };
-//   } catch (err) {
-//     adminError = err;
-//   }
-
-//   try {
-//     const response = await loginStaff(payload);
-//     return { response, role: getResponseRole(response, "Staff") };
-//   } catch (err) {
-//     staffError = err;
-//   }
-
-//   throw staffError?.response ? staffError : adminError;
-// };
-
 const loginAdminOnly = async (payload) => {
   const response = await loginAdmin(payload);
   return { response, role: getResponseRole(response, "Admin") };
@@ -174,7 +153,7 @@ const Login = () => {
 
       const token = getAuthToken(res);
       if (token) {
-        localStorage.setItem("inventra_token", token);
+        sessionStorage.setItem("inventra_token", token);
         dispatch(setAccessToken(token));
       }
       let sessionUser = saveSessionUser(res, {

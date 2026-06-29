@@ -12,7 +12,7 @@ const API = axios.create({
 });
 
 API.interceptors.request.use((config) => {
-  const token = localStorage.getItem("inventra_token");
+  const token = sessionStorage.getItem("inventra_token");
 
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
@@ -24,7 +24,7 @@ API.interceptors.request.use((config) => {
 API.interceptors.response.use(
   (response) => response,
   (error) => {
-    const hadSessionToken = Boolean(localStorage.getItem("inventra_token"));
+    const hadSessionToken = Boolean(sessionStorage.getItem("inventra_token"));
 
     if (error?.response?.status === 401 && hadSessionToken) {
       const sessionUser = getSessionUser();

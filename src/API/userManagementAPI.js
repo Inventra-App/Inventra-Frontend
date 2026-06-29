@@ -16,3 +16,8 @@ export const loginStaff = async (payload) => {
   const res = await API.post("/staff/login", payload);
   return res.data;
 };
+
+export const getSingleStaff = async (staffId) => {
+  const res = await API.get(`/staff/${staffId}`);
+  return res.data;
+};
