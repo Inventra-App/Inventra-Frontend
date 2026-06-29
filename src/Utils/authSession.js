@@ -9,6 +9,7 @@ const AUTH_STORAGE_KEYS = [
   "inventra_refresh_token",
   "inventra_is_new_user",
   "inventra_show_inventory_guide",
+  "inventra_user",
 ];
 
 export const clearAuthStorage = () => {

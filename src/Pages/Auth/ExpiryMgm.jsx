@@ -483,7 +483,7 @@ const ExpiryMgm = () => {
 
       <div className="expiry-section">
         <div className="expiry-section-header">
-          <h3>Critical (Expired)</h3>
+          <h3>Critical (Expired / 3 days)</h3>
           <span className="expiry-count expiry-count-red">
             {criticalItems.length} items
           </span>

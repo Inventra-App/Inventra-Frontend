@@ -1,7 +1,9 @@
 import API from "./axios";
 
 export const getStaffs = async () => {
+    console.log("Fetching staff...");
   const res = await API.get("/staff");
+   console.log("Staff response:", res);
   return res.data;
 };
 

@@ -22,6 +22,7 @@ import { setAccessToken, setUser } from "../../redux/apiSlice";
 import { getAccountPath, saveSessionUser } from "../../Utils/sessionUser";
 import { consumeSessionExpiredMessage } from "../../Utils/authSession";
 import { persistUserProfile } from "../../Utils/userProfileState";
+import { normalizeRole } from "../../Utils/authRoles";
 
 const getAuthToken = (response) =>
   response?.token ||
@@ -41,25 +42,30 @@ const getResponseRole = (response, fallbackRole) =>
   response?.role ||
   fallbackRole;
 
-const loginWithAdminOrStaff = async (payload) => {
-  let adminError;
-  let staffError;
+// const loginWithAdminOrStaff = async (payload) => {
+//   let adminError;
+//   let staffError;
 
-  try {
-    const response = await loginAdmin(payload);
-    return { response, role: getResponseRole(response, "Admin") };
-  } catch (err) {
-    adminError = err;
-  }
+//   try {
+//     const response = await loginAdmin(payload);
+//     return { response, role: getResponseRole(response, "Admin") };
+//   } catch (err) {
+//     adminError = err;
+//   }
 
-  try {
-    const response = await loginStaff(payload);
-    return { response, role: getResponseRole(response, "Staff") };
-  } catch (err) {
-    staffError = err;
-  }
+//   try {
+//     const response = await loginStaff(payload);
+//     return { response, role: getResponseRole(response, "Staff") };
+//   } catch (err) {
+//     staffError = err;
+//   }
 
-  throw staffError?.response ? staffError : adminError;
+//   throw staffError?.response ? staffError : adminError;
+// };
+
+const loginAdminOnly = async (payload) => {
+  const response = await loginAdmin(payload);
+  return { response, role: getResponseRole(response, "Admin") };
 };
 
 const Login = () => {
@@ -157,10 +163,14 @@ const Login = () => {
         password: formData.password,
       };
 
-      console.log("=== LOGIN REQUEST ===", { email: payload.email });
-      const { response: res, role: loginRole } =
-        await loginWithAdminOrStaff(payload);
-      console.log("=== LOGIN SUCCESS ===", res);
+      const { response: res, role: loginRole } = await loginAdminOnly(payload);
+
+      const normalizedRole = normalizeRole(loginRole || getResponseRole(res));
+
+      if (normalizedRole !== "Admin") {
+        toast.error("Only admin accounts can sign in here.");
+        return;
+      }
 
       const token = getAuthToken(res);
       if (token) {
