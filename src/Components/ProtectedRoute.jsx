@@ -12,7 +12,7 @@ import { clearAuthStorage, setSessionExpiredMessage } from "../Utils/authSession
 const ProtectedRoute = () => {
   const { accountId } = useParams();
   const location = useLocation();
-  const token = localStorage.getItem("inventra_token");
+  const token = sessionStorage.getItem("inventra_token");
   const sessionUser = getSessionUser();
 
   if (!token) {

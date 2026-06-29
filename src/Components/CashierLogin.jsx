@@ -82,7 +82,7 @@ const CashierLogin = () => {
       clearAuthStorage();
 
       if (token) {
-        localStorage.setItem("inventra_token", token);
+        sessionStorage.setItem("inventra_token", token);
       }
 
       const sessionUser = saveSessionUser(response, {

@@ -39,8 +39,8 @@ const buildWebStorage = (type) => {
 };
 
 const storage =
-  typeof window !== "undefined" && window.localStorage
-    ? buildWebStorage("local")
+  typeof window !== "undefined" && window.sessionStorage
+    ? buildWebStorage("session")
     : noopStorage;
 
 export default storage;
