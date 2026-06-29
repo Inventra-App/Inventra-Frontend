@@ -40,6 +40,7 @@ import NewUserGuide from "../../Components/NewUserGuide";
 import {
   markInventoryGuideSeen,
   shouldShowInventoryGuide,
+  getSessionUser,
 } from "../../Utils/sessionUser";
 
 const ITEMS_PER_PAGE = 6;
@@ -94,15 +95,7 @@ const Inventory = () => {
   const [loading, setLoading] = useState(true);
   const [stockEntries, setStockEntries] = useState([]);
 
-  const getCurrentUser = () => {
-    try {
-      JSON.parse(sessionStorage.getItem("inventra_user")) || {};
-    } catch {
-      return {};
-    }
-  };
-
-  const currentUser = getCurrentUser();
+const currentUser = getSessionUser();
 
   const userName =
     currentUser?.fullName || currentUser?.firstName || "Unknown User";
@@ -355,7 +348,7 @@ const Inventory = () => {
       supplier: data?.batch?.supplier || "N/A",
       timestamp: new Date().toISOString(),
     };
-
+console.log(newEntry);
     setStockEntries((prev) => {
       const updated = [newEntry, ...prev];
       localStorage.setItem("stockEntries", JSON.stringify(updated));
