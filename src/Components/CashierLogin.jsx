@@ -16,6 +16,7 @@ import {
 import Logo from "./Logo";
 import loginBg from "../assets/LoginBg.png";
 import "./CashierLogin.css";
+import { getUserProfile } from "../API/userProfileApi";
 
 const getAuthToken = (response) =>
   response?.token ||
@@ -70,6 +71,9 @@ const CashierLogin = () => {
         password: formData.password,
       };
       const response = await loginStaff(payload);
+      console.log("LOGIN RESPONSE:", response);
+      console.log("LOGIN RESPONSE DATA:", response.data);
+      console.log("LOGIN RESPONSE USER:", response.data?.data);
       const token = getAuthToken(response);
       const tokenRole =
         getRoleFromToken(token) || normalizeRole(getResponseRole(response));
@@ -84,10 +88,21 @@ const CashierLogin = () => {
         sessionStorage.setItem("inventra_token", token);
       }
 
-      const sessionUser = saveSessionUser(response, {
-        email: payload.email,
-        role: tokenRole,
-      });
+      const profile = await getUserProfile();
+
+      const sessionUser = saveSessionUser(
+        {
+          ...response,
+          data: {
+            ...response.data,
+            businessName: profile.data.businessName,
+          },
+        },
+        {
+          email: payload.email,
+          role: tokenRole,
+        },
+      );
 
       toast.success(response?.message || "Cashier login successful");
       navigate(
