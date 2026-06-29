@@ -15,7 +15,7 @@ const AUTH_STORAGE_KEYS = [
 export const clearAuthStorage = () => {
   AUTH_STORAGE_KEYS.forEach((key) => {
     try {
-      localStorage.removeItem(key);
+      sessionStorage.removeItem(key);
     } catch {
       /* ignore storage failures */
     }

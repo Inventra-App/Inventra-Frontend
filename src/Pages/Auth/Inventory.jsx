@@ -96,7 +96,7 @@ const Inventory = () => {
 
   const getCurrentUser = () => {
     try {
-      return JSON.parse(localStorage.getItem("inventra_user")) || {};
+      JSON.parse(sessionStorage.getItem("inventra_user")) || {};
     } catch {
       return {};
     }
@@ -157,7 +157,6 @@ const Inventory = () => {
       const inventory = Array.isArray(inventoryRes)
         ? inventoryRes
         : inventoryRes?.data || [];
-      console.log("vent", inventory);
 
       const stored = JSON.parse(localStorage.getItem("stockReceived") || "{}");
 

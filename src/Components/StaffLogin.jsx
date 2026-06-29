@@ -74,10 +74,6 @@ const StaffLogin = () => {
       const tokenRole =
         getRoleFromToken(token) || normalizeRole(getResponseRole(response));
 
-      console.log("LOGIN RESPONSE", response);
-      console.log("TOKEN", token);
-      console.log("TOKEN ROLE", tokenRole);
-
       if (tokenRole !== "Manager") {
         toast.error("Only manager staff accounts can sign in here.");
         return;
@@ -86,7 +82,7 @@ const StaffLogin = () => {
       clearAuthStorage();
 
       if (token) {
-        localStorage.setItem("inventra_token", token);
+        sessionStorage.setItem("inventra_token", token);
       }
 
       const sessionUser = saveSessionUser(response, {

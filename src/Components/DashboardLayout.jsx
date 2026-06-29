@@ -12,6 +12,7 @@ import NoInternet from "../Pages/Auth/NoInternet";
 import { getLoginPathForRole } from "../Utils/authRoles";
 import { getSessionUser } from "../Utils/sessionUser";
 import { getUserProfile } from "../API/userProfileApi";
+import { getSingleStaff } from "../API/userManagementAPI";
 import { setAccessToken } from "../redux/apiSlice";
 import { persistUserProfile } from "../Utils/userProfileState";
 
@@ -40,19 +41,24 @@ const DashboardLayout = () => {
     let isMounted = true;
 
     const loadAuthenticatedProfile = async () => {
-      const token = localStorage.getItem("inventra_token");
+      const token = sessionStorage.getItem("inventra_token");
       if (!token) return;
 
       dispatch(setAccessToken(token));
 
       const sessionUser = getSessionUser();
 
-      if (String(sessionUser.role).toLowerCase() !== "admin") {
-        return;
-      }
+      const role = String(sessionUser.role || "").toLowerCase();
 
       try {
-        const profile = await getUserProfile();
+        let profile;
+
+        if (role === "admin") {
+          profile = await getUserProfile();
+        } else {
+          profile = await getSingleStaff(sessionUser.id);
+        }
+
         if (isMounted) {
           persistUserProfile(profile, dispatch);
         }
