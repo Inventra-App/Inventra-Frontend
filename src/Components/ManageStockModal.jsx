@@ -39,7 +39,8 @@ const ManageStockModal = ({ inventoryId, product, onClose, onUpdate }) => {
     };
 
     try {
-      await moveInventoryStock(inventoryId, payload);
+      const res = await moveInventoryStock(inventoryId, payload);
+      console.log(res);
       setSuccess(true);
       onUpdate();
 
@@ -134,8 +135,26 @@ const ManageStockModal = ({ inventoryId, product, onClose, onUpdate }) => {
               </p>
             </div>
 
-            <div>
-              <p className="manage-stock-label">Write-off Stock</p>
+            <div
+              style={{
+                position: "relative",
+                top: "-6px",
+              }}
+            >
+              <p className="manage-stock-label">
+                Write-off Stock
+                <span
+                  style={{
+                    display: "block",
+                    fontSize: "11px",
+                    color: "#92400E",
+                    fontWeight: 300,
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  (Damaged Goods)
+                </span>
+              </p>
               <p className="manage-stock-value" style={{ color: "#E7000B" }}>
                 {product.writeOffStock || 0}
               </p>
@@ -151,22 +170,27 @@ const ManageStockModal = ({ inventoryId, product, onClose, onUpdate }) => {
               value={actionType}
               onChange={(e) => {
                 const value = e.target.value;
-
                 setActionType(value);
 
-                if (value === "TRANSFER_TO_AVAILABLE") {
-                  setMoveFrom("backroom stock");
-                  setMoveTo("available stock");
-                }
+                switch (value) {
+                  case "TRANSFER_TO_AVAILABLE":
+                    setMoveFrom("backroom stock");
+                    setMoveTo("available stock");
+                    break;
 
-                if (value === "RETURN_TO_BACKROOM") {
-                  setMoveFrom("available stock");
-                  setMoveTo("backroom stock");
-                }
+                  case "RETURN_TO_BACKROOM":
+                    setMoveFrom("available stock");
+                    setMoveTo("backroom stock");
+                    break;
 
-                if (value === "TRANSFER_TO_WRITEOFF") {
-                  setMoveFrom("");
-                  setMoveTo("write-off stock");
+                  case "TRANSFER_TO_WRITEOFF":
+                    setMoveFrom("");
+                    setMoveTo("write-off stock");
+                    break;
+
+                  default:
+                    setMoveFrom("");
+                    setMoveTo("");
                 }
               }}
             >
@@ -205,9 +229,11 @@ const ManageStockModal = ({ inventoryId, product, onClose, onUpdate }) => {
               <select
                 required
                 value={moveFrom}
+                disabled={!actionType || actionType !== "TRANSFER_TO_WRITEOFF"}
                 onChange={(e) => setMoveFrom(e.target.value)}
               >
                 <option value=""></option>
+
                 <option value="available stock">Available Stock</option>
                 <option value="backroom stock">Backroom Stock</option>
               </select>
@@ -220,12 +246,21 @@ const ManageStockModal = ({ inventoryId, product, onClose, onUpdate }) => {
               <select
                 required
                 value={moveTo}
-                onChange={(e) => setMoveTo(e.target.value)}
+                disabled={!actionType || actionType === "TRANSFER_TO_WRITEOFF"}
               >
                 <option value=""></option>
-                <option value="available stock">Available Stock</option>
-                <option value="backroom stock">Backroom Stock</option>
-                <option value="write-off stock">Write-off Stock</option>
+
+                {actionType === "TRANSFER_TO_AVAILABLE" && (
+                  <option value="available stock">Available Stock</option>
+                )}
+
+                {actionType === "RETURN_TO_BACKROOM" && (
+                  <option value="backroom stock">Backroom Stock</option>
+                )}
+
+                {actionType === "TRANSFER_TO_WRITEOFF" && (
+                  <option value="write-off stock">Write-off Stock</option>
+                )}
               </select>
             </div>
           </div>

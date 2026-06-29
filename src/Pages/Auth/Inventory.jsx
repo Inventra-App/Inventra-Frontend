@@ -157,6 +157,7 @@ const Inventory = () => {
       const inventory = Array.isArray(inventoryRes)
         ? inventoryRes
         : inventoryRes?.data || [];
+      console.log("vent", inventory);
 
       const stored = JSON.parse(localStorage.getItem("stockReceived") || "{}");
 
@@ -187,7 +188,9 @@ const Inventory = () => {
           availableStock: Number(inv.availableStock) || 0,
           totalStock: total,
           backroomStock: Number(inv.backroomStock) || 0,
-          writeOffStock: Number(inv.writeOffStock) || 0,
+          writeOffStock: Number(
+            inv.writeOffStock ?? inv.writtenOffStock ?? inv.writtenOff ?? 0,
+          ),
           stockReceived: stored[prod._id] || 0,
           status,
         };
