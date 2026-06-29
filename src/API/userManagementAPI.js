@@ -1,9 +1,9 @@
 import API from "./axios";
 
 export const getStaffs = async () => {
-    console.log("Fetching staff...");
+  console.log("Fetching staff...");
   const res = await API.get("/staff");
-   console.log("Staff response:", res);
+  console.log("Staff response:", res);
   return res.data;
 };
 
@@ -19,5 +19,24 @@ export const loginStaff = async (payload) => {
 
 export const getSingleStaff = async (staffId) => {
   const res = await API.get(`/staff/${staffId}`);
+  return res.data;
+};
+
+export const suspendStaff = async (staffId) => {
+  const res = await API.patch(`/staff/suspend/${staffId}`);
+  return res.data;
+};
+
+export const changeStaffRole = async (staffId, role) => {
+  const res = await API.patch(`/staff/change-role/${staffId}`, {
+    role,
+  });
+  return res.data;
+};
+
+export const resetStaffPassword = async (email) => {
+  const res = await API.patch("/staff/change-password", {
+    email,
+  });
   return res.data;
 };
