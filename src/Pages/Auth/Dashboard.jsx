@@ -286,6 +286,13 @@ const Dashboard = () => {
   const reduxUser = useSelector((state) => state.apiInfo?.user);
   const sessionUser = reduxUser ?? getSessionUser();
   const currentRole = normalizeRole(sessionUser.role) || "Admin";
+  const displayName =
+    currentRole === "Admin"
+      ? sessionUser.businessName || "Admin"
+      : sessionUser.fullName ||
+        `${sessionUser.firstName ?? ""} ${sessionUser.lastName ?? ""}`.trim() ||
+        sessionUser.firstName ||
+        "User";
   const isAdmin = currentRole === "Admin";
   const isManager = currentRole === "Manager";
   const [isFirstLogin] = useState(() => isNewSessionUser());
@@ -534,7 +541,7 @@ const Dashboard = () => {
   const expiredAlerts = expiryItems.filter(
     (item) => item.status === "EXPIRED",
   ).length;
-  
+
   const criticalAlerts = expiryItems.filter((item) => {
     return item.daysRemaining <= 0 || item.daysRemaining <= 3;
   }).length;
@@ -658,8 +665,8 @@ const Dashboard = () => {
       <div className="dashboard-welcome">
         <h2>
           {isFirstLogin
-            ? `Welcome to INVENTRA ${sessionUser.businessName}`
-            : `Welcome back, ${sessionUser.businessName}!!`}
+            ? `Welcome to INVENTRA ${displayName}`
+            : `Welcome back, ${displayName}!!`}
         </h2>
         <p>
           Here's what's happening in your supermarket today.{" "}
