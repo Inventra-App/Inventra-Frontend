@@ -14,6 +14,8 @@ import {
   getAllProducts,
   getExpiryAlerts,
   getInventoryItems,
+  getAllBatches,
+  deleteBatch,
 } from "../../API/inventoryApi";
 
 const getArrayPayload = (payload) => {
@@ -135,14 +137,28 @@ const findMatchingProduct = (item, products) => {
   });
 };
 
-const normalizeExpiryItem = (item, products = []) => {
+const normalizeExpiryItem = (item, products = [], batches = []) => {
   const matchedProduct = findMatchingProduct(item, products);
+
+  const matchedBatch = batches.find((batch) => {
+    const batchProductId = String(
+      batch?.productId?._id ?? batch?.productId ?? "",
+    );
+
+    const itemProductId = String(item?.productId?._id ?? item?.productId ?? "");
+
+    return (
+      batchProductId === itemProductId && batch?.batchCode === item?.batchCode
+    );
+  });
+
   const expiryValue = getValue(
     item?.expiryDate,
     item?.expiresAt,
     item?.expires,
     item?.expirationDate,
   );
+
   const days = Number(
     getValue(
       item?.daysLeft,
@@ -151,6 +167,7 @@ const normalizeExpiryItem = (item, products = []) => {
       getDaysRemaining(expiryValue),
     ),
   );
+
   const expiredDays = Math.abs(days);
 
   return {
@@ -158,16 +175,24 @@ const normalizeExpiryItem = (item, products = []) => {
       item?._id ??
       getProductId(item) ??
       `${getProductName(item)}-${expiryValue}`,
+
+    batchId: matchedBatch?._id || matchedBatch?.id || "",
+
     name: getValue(
       getProductName(item),
       matchedProduct?.productName,
       matchedProduct?.name,
       "Unnamed Product",
     ),
+
     productId: getProductId(item) || "N/A",
+
     category: getCategoryName(item, matchedProduct),
+
     price: getProductPrice(item, matchedProduct),
+
     batch: item?.batchCode ?? item?.batch ?? item?.batchNumber ?? "N/A",
+
     quantity: Number(
       getValue(
         item?.quantityRemaining,
@@ -177,12 +202,18 @@ const normalizeExpiryItem = (item, products = []) => {
         0,
       ),
     ),
+
     expires: formatDate(expiryValue),
+
     urgency: item?.urgencyLevel || "",
+
     daysNumber: days,
+
     status: days <= 0 ? "EXPIRED" : "EXPIRING SOON",
+
     daysLeft:
       days <= 0 ? "0d left" : `${days} day${days === 1 ? "" : "s"} left`,
+
     expiredAgo:
       days <= 0
         ? `Expired ${expiredDays} day${expiredDays === 1 ? "" : "s"} ago`
@@ -251,37 +282,41 @@ const ExpiryMgm = () => {
   const [showRemovePopup, setShowRemovePopup] = useState(false);
   const [showRemovalSuccess, setShowRemovalSuccess] = useState(false);
 
+  const loadExpiryAlerts = async () => {
+    setLoading(true);
+    setError("");
+
+    try {
+      const [response, productsResponse, inventoryResponse, batchesResponse] =
+        await Promise.all([
+          getExpiryAlerts(),
+          getAllProducts().catch(() => []),
+          getInventoryItems().catch(() => []),
+          getAllBatches().catch(() => []),
+        ]);
+
+      const products = [
+        ...getArrayPayload(productsResponse),
+        ...getArrayPayload(inventoryResponse),
+      ];
+
+      const batches = getArrayPayload(batchesResponse);
+
+      const normalized = getArrayPayload(response).map((item) =>
+        normalizeExpiryItem(item, products, batches),
+      );
+
+      setExpiryItems(normalized);
+    } catch (err) {
+      console.error("Expiry alerts fetch error:", err);
+      setError("Failed to load expiry alerts.");
+      setExpiryItems([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const loadExpiryAlerts = async () => {
-      setLoading(true);
-      setError("");
-
-      try {
-        const [response, productsResponse, inventoryResponse] =
-          await Promise.all([
-            getExpiryAlerts(),
-            getAllProducts().catch(() => []),
-            getInventoryItems().catch(() => []),
-          ]);
-
-        const products = [
-          ...getArrayPayload(productsResponse),
-          ...getArrayPayload(inventoryResponse),
-        ];
-        const normalized = getArrayPayload(response).map((item) =>
-          normalizeExpiryItem(item, products),
-        );
-
-        setExpiryItems(normalized);
-      } catch (err) {
-        console.error("Expiry alerts fetch error:", err);
-        setError("Failed to load expiry alerts.");
-        setExpiryItems([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     loadExpiryAlerts();
   }, []);
 
@@ -406,17 +441,25 @@ const ExpiryMgm = () => {
           ? "Warning"
           : "Info";
 
-  const confirmRemoval = () => {
-    setExpiryItems((items) =>
-      items.filter((item) => item.id !== removingProduct?.id),
-    );
-    setShowRemovePopup(false);
-    setRemovingProduct(null);
-    setShowRemovalSuccess(true);
+  const confirmRemoval = async () => {
+    try {
+      await deleteBatch(removingProduct.batchId);
 
-    setTimeout(() => {
-      setShowRemovalSuccess(false);
-    }, 2500);
+      setShowRemovePopup(false);
+      setRemovingProduct(null);
+
+      await loadExpiryAlerts();
+
+      setShowRemovalSuccess(true);
+
+      setTimeout(() => {
+        setShowRemovalSuccess(false);
+      }, 2500);
+    } catch (error) {
+      console.error(error);
+
+      alert(error?.response?.data?.message || "Unable to delete batch.");
+    }
   };
 
   const openRemovePopup = () => {
