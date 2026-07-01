@@ -16,7 +16,7 @@ import {
 import Logo from "./Logo";
 import loginBg from "../assets/LoginBg.png";
 import "./CashierLogin.css";
-import { getUserProfile } from "../API/userProfileApi";
+import { getSupermarketById } from "../API/inventoryApi";
 
 const getAuthToken = (response) =>
   response?.token ||
@@ -39,6 +39,7 @@ const getResponseRole = (response) =>
 const CashierLogin = () => {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
+  const [businessName, setBusinessName] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
@@ -61,6 +62,21 @@ const CashierLogin = () => {
   }, [tenantId]);
 
   console.log("Tenant ID:", tenantId);
+
+  useEffect(() => {
+    if (!tenantId) return;
+
+    const loadSupermarket = async () => {
+      try {
+        const response = await getSupermarketById(tenantId);
+        setBusinessName(response.data.businessName);
+      } catch (error) {
+        console.error("Failed to load supermarket:", error);
+      }
+    };
+
+    loadSupermarket();
+  }, [tenantId]);
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -89,9 +105,6 @@ const CashierLogin = () => {
         tenant: tenantId,
       };
       const response = await loginStaff(payload);
-      console.log("LOGIN RESPONSE:", response);
-      console.log("LOGIN RESPONSE DATA:", response.data);
-      console.log("LOGIN RESPONSE USER:", response.data?.data);
       const token = getAuthToken(response);
       const tokenRole =
         getRoleFromToken(token) || normalizeRole(getResponseRole(response));
@@ -106,14 +119,12 @@ const CashierLogin = () => {
         sessionStorage.setItem("inventra_token", token);
       }
 
-      const profile = await getUserProfile();
-
       const sessionUser = saveSessionUser(
         {
           ...response,
           data: {
             ...response.data,
-            businessName: profile.data.businessName,
+            businessName,
           },
         },
         {
@@ -163,7 +174,12 @@ const CashierLogin = () => {
       <section className="staff-auth-form-section">
         <form className="staff-auth-form" onSubmit={handleSubmit}>
           <div className="staff-auth-heading">
-            <h2>Welcome back</h2>
+            <h2>Welcome to</h2>
+
+            {businessName && (
+              <h1 className="staff-auth-store">{businessName}</h1>
+            )}
+
             <p>Sign in with your admin-assigned Gmail account</p>
           </div>
 

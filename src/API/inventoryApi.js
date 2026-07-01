@@ -124,3 +124,8 @@ export const deleteBatch = async (batchId) => {
   const res = await API.delete(`batch/${batchId}`);
   return res.data;
 };
+
+export const getSupermarketById = async (supermarketId) => {
+  const res = await API.get(`/supermarket/${supermarketId}`);
+  return res.data;
+};

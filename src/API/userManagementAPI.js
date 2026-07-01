@@ -1,9 +1,7 @@
 import API from "./axios";
 
 export const getStaffs = async () => {
-  console.log("Fetching staff...");
   const res = await API.get("/staff");
-  console.log("Staff response:", res);
   return res.data;
 };
 
@@ -38,5 +36,10 @@ export const resetStaffPassword = async (email) => {
   const res = await API.patch("/staff/change-password", {
     email,
   });
+  return res.data;
+};
+
+export const activateStaff = async (staffId) => {
+  const res = await API.patch(`/staff/activate/${staffId}`);
   return res.data;
 };
