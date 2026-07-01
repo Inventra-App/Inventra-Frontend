@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import { loginStaff } from "../API/userManagementAPI";
 import { getAccountPath, saveSessionUser } from "../Utils/sessionUser";
@@ -50,6 +50,18 @@ const CashierLogin = () => {
     if (message) toast.error(message);
   }, []);
 
+  const [searchParams] = useSearchParams();
+
+  const tenantId = searchParams.get("tenant");
+
+  useEffect(() => {
+    if (tenantId) {
+      sessionStorage.setItem("tenant", tenantId);
+    }
+  }, [tenantId]);
+
+  console.log("Tenant ID:", tenantId);
+
   const handleChange = (event) => {
     const { name, value } = event.target;
     setFormData((currentData) => ({ ...currentData, [name]: value }));
@@ -58,6 +70,11 @@ const CashierLogin = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
     if (isSubmitting) return;
+
+    if (!tenantId) {
+      toast.error("Invalid staff login link.");
+      return;
+    }
 
     if (!formData.email.trim() || !formData.password) {
       toast.error("Gmail address and password are required");
@@ -69,6 +86,7 @@ const CashierLogin = () => {
       const payload = {
         email: formData.email.trim(),
         password: formData.password,
+        tenant: tenantId,
       };
       const response = await loginStaff(payload);
       console.log("LOGIN RESPONSE:", response);
@@ -150,7 +168,14 @@ const CashierLogin = () => {
           </div>
 
           <div className="staff-auth-switch" aria-label="Login type">
-            <button type="button" onClick={() => navigate("/staff-login")}>
+            <button
+              type="button"
+              onClick={() =>
+                navigate(
+                  tenantId ? `/staff-login?tenant=${tenantId}` : "/staff-login",
+                )
+              }
+            >
               Manager
             </button>
             <button type="button" className="active" aria-current="page">

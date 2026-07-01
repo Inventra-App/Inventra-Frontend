@@ -83,8 +83,22 @@ const DashboardLayout = () => {
 
   const confirmLogout = async () => {
     if (isLoggingOut) return;
+
     setIsLoggingOut(true);
-    const loginPath = getLoginPathForRole(getSessionUser().role);
+
+    const sessionUser = getSessionUser();
+    const role = String(sessionUser?.role || "").toLowerCase();
+    const tenant = sessionStorage.getItem("tenant");
+
+    let loginPath = getLoginPathForRole(role);
+
+    if (tenant) {
+      if (role === "manager") {
+        loginPath = `/staff-login?tenant=${tenant}`;
+      } else if (role === "cashier") {
+        loginPath = `/cashier-login?tenant=${tenant}`;
+      }
+    }
 
     try {
       await logoutUser();
