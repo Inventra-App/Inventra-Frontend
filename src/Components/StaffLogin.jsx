@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import { loginStaff } from "../API/userManagementAPI";
 import { getAccountPath, saveSessionUser } from "../Utils/sessionUser";
@@ -16,6 +16,7 @@ import {
 import Logo from "./Logo";
 import loginBg from "../assets/LoginBg.png";
 import "./StaffLogin.css";
+import { getUserProfile } from "../API/userProfileApi";
 
 const getAuthToken = (response) =>
   response?.token ||
@@ -49,6 +50,18 @@ const StaffLogin = () => {
     if (message) toast.error(message);
   }, []);
 
+  const [searchParams] = useSearchParams();
+
+  const tenantId = searchParams.get("tenant");
+
+  useEffect(() => {
+    if (tenantId) {
+      sessionStorage.setItem("tenant", tenantId);
+    }
+  }, [tenantId]);
+
+  console.log("Tenant ID:", tenantId);
+
   const handleChange = (event) => {
     const { name, value } = event.target;
     setFormData((currentData) => ({ ...currentData, [name]: value }));
@@ -57,6 +70,11 @@ const StaffLogin = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
     if (isSubmitting) return;
+
+    if (!tenantId) {
+      toast.error("Invalid staff login link.");
+      return;
+    }
 
     if (!formData.email.trim() || !formData.password) {
       toast.error("Gmail address and password are required");
@@ -68,6 +86,7 @@ const StaffLogin = () => {
       const payload = {
         email: formData.email.trim(),
         password: formData.password,
+        tenant: tenantId,
       };
       const response = await loginStaff(payload);
       const token = getAuthToken(response);
@@ -85,10 +104,21 @@ const StaffLogin = () => {
         sessionStorage.setItem("inventra_token", token);
       }
 
-      const sessionUser = saveSessionUser(response, {
-        email: payload.email,
-        role: tokenRole,
-      });
+      const profile = await getUserProfile();
+
+      const sessionUser = saveSessionUser(
+        {
+          ...response,
+          data: {
+            ...response.data,
+            businessName: profile.data.businessName,
+          },
+        },
+        {
+          email: payload.email,
+          role: tokenRole,
+        },
+      );
 
       toast.success(response?.message || "Staff login successful");
       navigate(
@@ -139,7 +169,16 @@ const StaffLogin = () => {
             <button type="button" className="active" aria-current="page">
               Manager
             </button>
-            <button type="button" onClick={() => navigate("/cashier-login")}>
+            <button
+              type="button"
+              onClick={() =>
+                navigate(
+                  tenantId
+                    ? `/cashier-login?tenant=${tenantId}`
+                    : "/cashier-login",
+                )
+              }
+            >
               Cashier
             </button>
           </div>

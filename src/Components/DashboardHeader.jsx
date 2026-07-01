@@ -1,6 +1,6 @@
 import React from "react";
 import { useSelector } from "react-redux";
-import { User, Shield, Store } from "lucide-react";
+import { User, Shield, Store,  Building2, } from "lucide-react";
 import "../Css/DashboardHeader.css";
 import { getSessionUser } from "../Utils/sessionUser";
 
@@ -23,7 +23,7 @@ const DashboardHeader = () => {
 
   return (
     <div className="dash-header">
-      {role === "Cashier" && (
+      {role === "Cashier" ? (
         <div className="cashier-profile-card">
           <div className="cashier-top">
             <div className="cashier-info">
@@ -41,7 +41,12 @@ const DashboardHeader = () => {
             <span>{user.businessName}</span>
           </div>
         </div>
-      )}
+      ) : role === "Manager" ? (
+        <div className="manager-store-badge">
+          <Store size={15} />
+          <span>{user.businessName}</span>
+        </div>
+      ) : null}
 
       <div className="dash-header-right">
         <span className="dash-header-date">{today}</span>
