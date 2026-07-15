@@ -53,7 +53,7 @@ const UserManagementInfo = () => {
           </div>
 
           <div className="user-info-section user-info-why">
-            <h2>Why it matters ?</h2>
+            <h2>Why it matter ?</h2>
             <p>
               User Management helps reduce operational errors, improve security, and ensure that
               every team member only has access to the tools they need to perform their duties
