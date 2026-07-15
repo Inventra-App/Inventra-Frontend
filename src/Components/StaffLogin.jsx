@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import { loginStaff } from "../API/userManagementAPI";
 import { getAccountPath, saveSessionUser } from "../Utils/sessionUser";
@@ -16,6 +16,7 @@ import {
 import Logo from "./Logo";
 import loginBg from "../assets/LoginBg.png";
 import "./StaffLogin.css";
+import { getSupermarketById } from "../API/inventoryApi";
 
 const getAuthToken = (response) =>
   response?.token ||
@@ -39,6 +40,7 @@ const getResponseRole = (response) =>
 const StaffLogin = () => {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
+  const [businessName, setBusinessName] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
@@ -50,6 +52,33 @@ const StaffLogin = () => {
     if (message) toast.error(message);
   }, []);
 
+  const [searchParams] = useSearchParams();
+
+  const tenantId = searchParams.get("tenant");
+
+  useEffect(() => {
+    if (tenantId) {
+      sessionStorage.setItem("tenant", tenantId);
+    }
+  }, [tenantId]);
+
+  console.log("Tenant ID:", tenantId);
+
+  useEffect(() => {
+    if (!tenantId) return;
+
+    const loadSupermarket = async () => {
+      try {
+        const response = await getSupermarketById(tenantId);
+        setBusinessName(response.data.businessName);
+      } catch (error) {
+        console.error("Failed to load supermarket:", error);
+      }
+    };
+
+    loadSupermarket();
+  }, [tenantId]);
+
   const handleChange = (event) => {
     const { name, value } = event.target;
     setFormData((currentData) => ({ ...currentData, [name]: value }));
@@ -58,6 +87,11 @@ const StaffLogin = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
     if (isSubmitting) return;
+
+    if (!tenantId) {
+      toast.error("Invalid staff login link.");
+      return;
+    }
 
     if (!formData.email.trim() || !formData.password) {
       toast.error("Gmail address and password are required");
@@ -69,6 +103,7 @@ const StaffLogin = () => {
       const payload = {
         email: formData.email.trim(),
         password: formData.password,
+        tenant: tenantId,
       };
       const response = await loginStaff(payload);
       const token = getAuthToken(response);
@@ -86,10 +121,19 @@ const StaffLogin = () => {
         sessionStorage.setItem("inventra_token", token);
       }
 
-      const sessionUser = saveSessionUser(response, {
-        email: payload.email,
-        role: tokenRole,
-      });
+      const sessionUser = saveSessionUser(
+        {
+          ...response,
+          data: {
+            ...response.data,
+            businessName,
+          },
+        },
+        {
+          email: payload.email,
+          role: tokenRole,
+        },
+      );
 
       toast.success(response?.message || "Staff login successful");
       navigate(
@@ -132,7 +176,12 @@ const StaffLogin = () => {
       <section className="staff-auth-form-section">
         <form className="staff-auth-form" onSubmit={handleSubmit}>
           <div className="staff-auth-heading">
-            <h2>Welcome back</h2>
+            <h2>Welcome to</h2>
+
+            {businessName && (
+              <h1 className="staff-auth-store">{businessName}</h1>
+            )}
+
             <p>Sign in with your admin-assigned Gmail account</p>
           </div>
 
@@ -140,7 +189,16 @@ const StaffLogin = () => {
             <button type="button" className="active" aria-current="page">
               Manager
             </button>
-            <button type="button" onClick={() => navigate("/cashier-login")}>
+            <button
+              type="button"
+              onClick={() =>
+                navigate(
+                  tenantId
+                    ? `/cashier-login?tenant=${tenantId}`
+                    : "/cashier-login",
+                )
+              }
+            >
               Cashier
             </button>
           </div>

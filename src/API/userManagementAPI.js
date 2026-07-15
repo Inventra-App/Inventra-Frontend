@@ -39,7 +39,14 @@ export const resetStaffPassword = async (email) => {
   return res.data;
 };
 
+<<<<<<< HEAD
 export const deleteStaff = async (staffId) => {
   const res = await API.delete(`/staff/${staffId}`);
   return res.data;
 };
+=======
+export const activateStaff = async (staffId) => {
+  const res = await API.patch(`/staff/activate/${staffId}`);
+  return res.data;
+};
+>>>>>>> 798e96f4a80b9de9d8fc779ff0ff09c78720eefa

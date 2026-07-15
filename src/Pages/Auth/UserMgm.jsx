@@ -29,6 +29,7 @@ import {
   getStaffs,
   onBoardStaff,
   suspendStaff,
+  activateStaff,
   changeStaffRole,
   resetStaffPassword,
 } from "../../API/userManagementAPI";
@@ -403,19 +404,19 @@ const UserMgm = () => {
     }
   };
 
-  const activateUser = () => {
-    const updatedUsers = users.map((user) => {
-      if (user.id === selectedUser.id) {
-        return { ...user, status: "Active" };
-      }
+  const activateUser = async () => {
+    try {
+      const response = await activateStaff(selectedUser.id);
+      console.log("Activate response:", response);
 
-      return user;
-    });
+      await loadStaffs(true);
 
-    setUsers(updatedUsers);
-    setSelectedUser({ ...selectedUser, status: "Active" });
-    closeModal();
-    showToast("User activated successfully");
+      closeModal();
+
+      showToast("User activated successfully");
+    } catch (error) {
+      showToast(error?.response?.data?.message || "Failed to activate user");
+    }
   };
 
   const saveRoleChange = async (event) => {
