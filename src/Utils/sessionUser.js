@@ -28,16 +28,6 @@ export const buildSessionUser = (source = {}, fallback = {}) => {
     source.admin ??
     source.staff ??
     source.data?.user ??
-<<<<<<< HEAD
-    source.data?.admin ??
-    source.data?.staff ??
-    source.data ??
-    source;
-  const firstName = pick(user.firstName, user.firstname, source.firstName, fallback.firstName, "");
-  const lastName = pick(user.lastName, user.lastname, source.lastName, fallback.lastName, "");
-  const fullName = pick(user.fullName, user.name, `${firstName} ${lastName}`.trim(), fallback.fullName, "");
-  const business = user.business ?? user.businessDetails ?? user.supermarket ?? source.business ?? source.businessDetails ?? {};
-=======
     source.data?.staff ??
     source.data?.admin ??
     source.data ??
@@ -70,7 +60,6 @@ export const buildSessionUser = (source = {}, fallback = {}) => {
     source.business ??
     source.businessDetails ??
     {};
->>>>>>> f6d84fd0edba759b83e0ace27f77ac85d55addba
   const email = pick(user.email, source.email, fallback.email, "");
   const businessName = pick(
     user.businessName,

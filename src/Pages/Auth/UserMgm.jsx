@@ -25,8 +25,8 @@ import manage from "../../assets/manage-roles-icon.png";
 import green from "../../assets/Icon green.png";
 import { getSessionUser } from "../../Utils/sessionUser";
 import {
+  deleteStaff,
   getStaffs,
-  loginStaff,
   onBoardStaff,
   suspendStaff,
   changeStaffRole,
@@ -34,34 +34,43 @@ import {
 } from "../../API/userManagementAPI";
 
 const getArrayPayload = (payload) => {
-<<<<<<< HEAD
-  if (Array.isArray(payload)) return payload
-  if (Array.isArray(payload?.data)) return payload.data
-  if (Array.isArray(payload?.data?.staffs)) return payload.data.staffs
-  if (Array.isArray(payload?.data?.staff)) return payload.data.staff
-  if (Array.isArray(payload?.data?.users)) return payload.data.users
-  if (Array.isArray(payload?.data?.items)) return payload.data.items
-  if (Array.isArray(payload?.staffs)) return payload.staffs
-  if (Array.isArray(payload?.staff)) return payload.staff
-  if (Array.isArray(payload?.users)) return payload.users
-  if (Array.isArray(payload?.items)) return payload.items
-  return []
-}
+  if (Array.isArray(payload)) return payload;
+  if (Array.isArray(payload?.data)) return payload.data;
+  if (Array.isArray(payload?.data?.staffs)) return payload.data.staffs;
+  if (Array.isArray(payload?.data?.staff)) return payload.data.staff;
+  if (Array.isArray(payload?.data?.users)) return payload.data.users;
+  if (Array.isArray(payload?.data?.items)) return payload.data.items;
+  if (Array.isArray(payload?.staffs)) return payload.staffs;
+  if (Array.isArray(payload?.staff)) return payload.staff;
+  if (Array.isArray(payload?.users)) return payload.users;
+  if (Array.isArray(payload?.items)) return payload.items;
+  return [];
+};
 
 const parseBoolean = (value) => {
-  if (typeof value === 'boolean') return value
-  if (typeof value === 'number') return value === 1
-  const normalized = String(value ?? '').trim().toLowerCase()
-  if (['true', '1', 'yes', 'active', 'online', 'logged in'].includes(normalized)) return true
-  if (['false', '0', 'no', 'inactive', 'offline', 'logged out'].includes(normalized)) return false
-  return null
-}
+  if (typeof value === "boolean") return value;
+  if (typeof value === "number") return value === 1;
+
+  const normalized = String(value ?? "").trim().toLowerCase();
+  if (["true", "1", "yes", "active", "online", "logged in"].includes(normalized)) return true;
+  if (["false", "0", "no", "inactive", "offline", "logged out"].includes(normalized)) return false;
+
+  return null;
+};
 
 const normalizeStaff = (staff) => {
-  const fullName = staff?.fullName ?? staff?.name ?? `${staff?.firstName ?? ''} ${staff?.lastName ?? ''}`.trim()
-  const rawRole = staff?.role ?? 'Cashier'
-  const role = String(rawRole).charAt(0).toUpperCase() + String(rawRole).slice(1).toLowerCase()
-  const rawStatus = String(staff?.status ?? staff?.loginStatus ?? '').toLowerCase()
+  const fullName =
+    staff?.fullName ??
+    staff?.name ??
+    `${staff?.firstName ?? ""} ${staff?.lastName ?? ""}`.trim();
+  const rawRole = staff?.role ?? "Cashier";
+  const role =
+    String(rawRole).charAt(0).toUpperCase() +
+    String(rawRole).slice(1).toLowerCase();
+  const rawStatus = String(
+    staff?.status ?? staff?.loginStatus ?? "",
+  ).toLowerCase();
+  const isStaffSuspended = staff?.isSuspended === true || rawStatus === "suspended";
   const activeState = [
     staff?.isActive,
     staff?.isactive,
@@ -72,55 +81,13 @@ const normalizeStaff = (staff) => {
     staff?.isOnline,
     staff?.loginStatus,
     staff?.status,
-  ].map(parseBoolean).find((value) => value !== null)
+  ]
+    .map(parseBoolean)
+    .find((value) => value !== null);
 
-  const normalizedStatus = activeState
-    ? 'Active'
-    : rawStatus === 'suspended'
-      ? 'Suspended'
-      : 'Inactive'
-=======
-  if (Array.isArray(payload)) return payload;
-  if (Array.isArray(payload?.data)) return payload.data;
-  if (Array.isArray(payload?.staffs)) return payload.staffs;
-  if (Array.isArray(payload?.staff)) return payload.staff;
-  if (Array.isArray(payload?.users)) return payload.users;
-  if (Array.isArray(payload?.items)) return payload.items;
-  return [];
-};
-const normalizeStaff = (staff) => {
-  const fullName =
-    staff?.fullName ??
-    staff?.name ??
-    `${staff?.firstName ?? ""} ${staff?.lastName ?? ""}`.trim();
-
-  const rawRole = staff?.role ?? "Cashier";
-  const role =
-    String(rawRole).charAt(0).toUpperCase() +
-    String(rawRole).slice(1).toLowerCase();
-
-  const rawStatus = String(
-    staff?.status ?? staff?.loginStatus ?? "",
-  ).toLowerCase();
-
-  const isSuspended = staff?.isSuspended === true || rawStatus === "suspended";
-
-  const isActive = Boolean(
-    !isSuspended &&
-    (staff?.isLoggedIn ||
-      staff?.loggedIn ||
-      staff?.online ||
-      staff?.isOnline ||
-      staff?.active ||
-      staff?.isActive ||
-      rawStatus === "active" ||
-      rawStatus === "online" ||
-      rawStatus === "logged in"),
-  );
-
-  const normalizedStatus = isSuspended
+  const normalizedStatus = isStaffSuspended
     ? "Suspended"
-    : isActive
+    : activeState
       ? "Active"
       : "Inactive";
 
@@ -130,7 +97,6 @@ const normalizeStaff = (staff) => {
     staff?.lastSeen ||
     staff?.loginAt ||
     staff?.updatedAt;
->>>>>>> ec9be776d61f11a2c39bbd755a4d024d5a56d627
 
   return {
     id:
@@ -321,7 +287,6 @@ const UserMgm = () => {
   const adminCount = users.filter((user) => user.role === "Admin").length;
   const managerCount = users.filter((user) => user.role === "Manager").length;
   const cashierCount = users.filter((user) => user.role === "Cashier").length;
-  const staffCount = Math.max(totalUsers - adminCount, 0);
 
   const showToast = (message) => {
     setToast(message);
@@ -491,6 +456,22 @@ const UserMgm = () => {
       showToast(response.message);
     } catch (error) {
       showToast(error?.response?.data?.message || "Failed to reset password");
+    }
+  };
+
+  const deleteUser = async () => {
+    try {
+      await deleteStaff(selectedUser.id);
+
+      setUsers((currentUsers) =>
+        currentUsers.filter((user) => user.id !== selectedUser.id),
+      );
+      await loadStaffs(true);
+      setSelectedUser(null);
+      closeModal();
+      showToast("User deleted successfully");
+    } catch (error) {
+      showToast(error?.response?.data?.message || "Failed to delete user");
     }
   };
 
@@ -948,6 +929,14 @@ const UserMgm = () => {
               Change Password
             </button>
 
+            <button
+              className="full-danger-btn"
+              type="button"
+              onClick={() => setModal("delete")}
+            >
+              Delete User
+            </button>
+
             <div className="details-actions">
               <button
                 className="change-role-btn"
@@ -1007,6 +996,37 @@ const UserMgm = () => {
                 onClick={suspendUser}
               >
                 Suspend User
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {modal === "delete" && selectedUser && (
+        <div className="user-modal-backdrop">
+          <div className="confirm-modal">
+            <div className="confirm-icon">
+              <AlertCircle size={22} />
+            </div>
+            <h3>Delete User</h3>
+            <p>
+              Deleting <strong>{selectedUser.name.split(" ")[0]}</strong> will
+              permanently remove this staff account from the system.
+            </p>
+            <div className="confirm-actions">
+              <button
+                className="neutral-btn"
+                type="button"
+                onClick={() => setModal("details")}
+              >
+                Cancel
+              </button>
+              <button
+                className="danger-btn"
+                type="button"
+                onClick={deleteUser}
+              >
+                Delete User
               </button>
             </div>
           </div>
