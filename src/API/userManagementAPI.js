@@ -43,3 +43,8 @@ export const activateStaff = async (staffId) => {
   const res = await API.patch(`/staff/activate/${staffId}`);
   return res.data;
 };
+
+export const deleteStaff = async (staffId) => {
+  const res = await API.delete(`/staff/${staffId}`);
+  return res.data;
+};

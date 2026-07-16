@@ -9,6 +9,7 @@ import {
   Lock,
   Power,
   Settings,
+  Trash2,
   User,
   UserCog,
   Users,
@@ -31,6 +32,7 @@ import {
   suspendStaff,
   activateStaff,
   changeStaffRole,
+  deleteStaff,
   resetStaffPassword,
 } from "../../API/userManagementAPI";
 
@@ -404,6 +406,23 @@ const UserMgm = () => {
       showToast("User activated successfully");
     } catch (error) {
       showToast(error?.response?.data?.message || "Failed to activate user");
+    }
+  };
+
+  const deleteUser = async () => {
+    try {
+      await deleteStaff(selectedUser.id);
+
+      setUsers((currentUsers) =>
+        currentUsers.filter((user) => user.id !== selectedUser.id),
+      );
+      await loadStaffs(true);
+
+      closeModal();
+
+      showToast("User deleted successfully");
+    } catch (error) {
+      showToast(error?.response?.data?.message || "Failed to delete user");
     }
   };
 
@@ -902,6 +921,14 @@ const UserMgm = () => {
               Change Password
             </button>
 
+            <button
+              className="full-danger-btn"
+              type="button"
+              onClick={() => setModal("delete")}
+            >
+              Delete User
+            </button>
+
             <div className="details-actions">
               <button
                 className="change-role-btn"
@@ -961,6 +988,33 @@ const UserMgm = () => {
                 onClick={suspendUser}
               >
                 Suspend User
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {modal === "delete" && selectedUser && (
+        <div className="user-modal-backdrop">
+          <div className="confirm-modal">
+            <div className="confirm-icon">
+              <Trash2 size={22} />
+            </div>
+            <h3>Delete User</h3>
+            <p>
+              Deleting <strong>{selectedUser.name.split(" ")[0]}</strong> will
+              remove this user from the system.
+            </p>
+            <div className="confirm-actions">
+              <button
+                className="neutral-btn"
+                type="button"
+                onClick={() => setModal("details")}
+              >
+                Cancel
+              </button>
+              <button className="danger-btn" type="button" onClick={deleteUser}>
+                Delete User
               </button>
             </div>
           </div>

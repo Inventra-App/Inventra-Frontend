@@ -778,6 +778,7 @@
 .primary-btn,
 .danger-btn,
 .full-primary-btn,
+.full-danger-btn,
 .change-role-btn,
 .suspend-btn {
   min-height: 42px;
@@ -809,6 +810,15 @@
 .change-role-btn {
   background: #4f35f5;
   color: #ffffff;
+}
+
+.full-danger-btn {
+  background: #dc2626;
+  color: #ffffff;
+}
+
+.full-danger-btn:hover {
+  background: #b91c1c;
 }
 
 .danger-btn,
@@ -988,7 +998,12 @@
 
 .full-primary-btn {
   width: 100%;
-  margin: 2px 0 12px;
+  margin: 2px 0 8px;
+}
+
+.full-danger-btn {
+  width: 100%;
+  margin: 0 0 12px;
 }
 
 .change-role-btn,
