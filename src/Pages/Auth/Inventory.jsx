@@ -42,6 +42,7 @@ import {
   shouldShowInventoryGuide,
   getSessionUser,
 } from "../../Utils/sessionUser";
+import ProductTypeModal from "../../InventoryComponents/ModalComponents/ProductTypeModal";
 
 const ITEMS_PER_PAGE = 6;
 const tabs = [
@@ -95,7 +96,7 @@ const Inventory = () => {
   const [loading, setLoading] = useState(true);
   const [stockEntries, setStockEntries] = useState([]);
 
-const currentUser = getSessionUser();
+  const currentUser = getSessionUser();
 
   const userName =
     currentUser?.fullName || currentUser?.firstName || "Unknown User";
@@ -108,6 +109,8 @@ const currentUser = getSessionUser();
   const [manageProduct, setManageProduct] = useState(null);
   const [showRecordStock, setShowRecordStock] = useState(null);
   const [showAddProduct, setShowAddProduct] = useState(false);
+  const [showProductTypeModal, setShowProductTypeModal] = useState(false);
+  const [hasExpiry, setHasExpiry] = useState(true);
   const [showToast, setShowToast] = useState(false);
   const [activeMenuProduct, setActiveMenuProduct] = useState(null);
   const [showAddCategory, setShowAddCategory] = useState(false);
@@ -348,7 +351,7 @@ const currentUser = getSessionUser();
       supplier: data?.batch?.supplier || "N/A",
       timestamp: new Date().toISOString(),
     };
-console.log(newEntry);
+    console.log(newEntry);
     setStockEntries((prev) => {
       const updated = [newEntry, ...prev];
       localStorage.setItem("stockEntries", JSON.stringify(updated));
@@ -462,7 +465,7 @@ console.log(newEntry);
 
           <button
             className="inv-btn-filled"
-            onClick={() => setShowAddProduct(true)}
+            onClick={() => setShowProductTypeModal(true)}
           >
             <Plus size={17} /> Add Product
           </button>
@@ -678,10 +681,21 @@ console.log(newEntry);
         onAddProduct={handleAddProduct}
       />
 
+      <ProductTypeModal
+        isOpen={showProductTypeModal}
+        onClose={() => setShowProductTypeModal(false)}
+        onSelect={(selectedHasExpiry) => {
+          setHasExpiry(selectedHasExpiry);
+          setShowProductTypeModal(false);
+          setShowAddProduct(true);
+        }}
+      />
+
       <AddProductModal
         isOpen={showAddProduct}
         onClose={() => setShowAddProduct(false)}
         onAddProduct={handleSaveNewProduct}
+        hasExpiry={hasExpiry}
         onCreateCategory={() => {
           setShowAddProduct(false);
           setOpenProductAfterCategory(true);
