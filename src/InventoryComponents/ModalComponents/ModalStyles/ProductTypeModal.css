@@ -1,0 +1,155 @@
+.product-type-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(17, 24, 39, 0.72);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+  padding: 20px;
+}
+
+.product-type-modal {
+  width: 100%;
+  max-width: 760px;
+  background: #fff;
+  border-radius: 22px;
+  padding: 28px;
+  animation: modalPop 0.25s ease;
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.18);
+}
+
+.product-type-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 28px;
+}
+
+.product-type-header h2 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+  color: #111827;
+  text-transform: uppercase;
+}
+
+.product-type-header p {
+  margin-top: 6px;
+  color: #6b7280;
+  font-size: 14px;
+}
+
+.product-type-close {
+  width: 38px;
+  height: 38px;
+  border: none;
+  background: #f3f4f6;
+  border-radius: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.product-type-close:hover {
+  background: #e5e7eb;
+}
+
+.product-type-options {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 22px;
+}
+
+.product-type-card {
+  border: 2px solid #e5e7eb;
+  background: #fff;
+  border-radius: 18px;
+  padding: 28px;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.25s ease;
+}
+
+.product-type-card {
+  transition:
+    background 0.25s,
+    border-color 0.25s,
+    transform 0.25s,
+    box-shadow 0.25s;
+}
+
+.product-type-card:hover {
+  border-color: #432dd7;
+  background: #432dd7;
+  transform: translateY(-5px);
+  box-shadow: 0 18px 45px rgba(67, 45, 215, 0.12);
+}
+
+.product-type-card:hover h3 {
+  color: white;
+}
+
+.product-type-card:hover p {
+  color: white;
+}
+
+.product-type-card h3 {
+  margin: 18px 0 10px;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.product-type-card p {
+  margin: 0;
+  color: #6b7280;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.product-type-icon {
+  width: 74px;
+  height: 74px;
+  margin: 0 auto;
+  border-radius: 18px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.expiry-icon {
+  background: #fff7ed;
+  color: #f97316;
+}
+
+.non-expiry-icon {
+  background: #ecfdf3;
+  color: #16a34a;
+}
+
+@keyframes modalPop {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@media (max-width: 640px) {
+  .product-type-modal {
+    padding: 22px;
+  }
+
+  .product-type-options {
+    grid-template-columns: 1fr;
+  }
+
+  .product-type-header h2 {
+    font-size: 18px;
+  }
+}

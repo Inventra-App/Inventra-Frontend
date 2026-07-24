@@ -6,17 +6,17 @@ import "./ModalStyles/AddProductModal.css";
 const STEPS = { CATEGORY: "category", FORM: "form" };
 
 const AddProductModal = ({
-  isOpen,
-  onClose,
-  onAddProduct,
-  onCreateCategory,
+    isOpen,
+    onClose,
+    onAddProduct,
+    onCreateCategory,
+    hasExpiry,
 }) => {
   const [step, setStep] = useState(STEPS.CATEGORY);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [categories, setCategories] = useState([]);
   const [loadingCategories, setLoadingCategories] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
-  const [hasExpiry, setHasExpiry] = useState(true);
 
   const [formData, setFormData] = useState({
     productName: "",
@@ -360,35 +360,6 @@ const AddProductModal = ({
             )}
 
             <form onSubmit={handleSubmit} className="product-form clean-form">
-              <div className="expiry-toggle-section">
-                <label className="expiry-toggle-title">
-                  {hasExpiry ? "Add Expiry Product" : "Add Non-Expiry Product"}
-                </label>
-
-                <div className="expiry-toggle-container">
-                  <div
-                    className={`expiry-option ${hasExpiry ? "active" : ""}`}
-                    onClick={() => setHasExpiry(true)}
-                  >
-                    <div className="expiry-radio">
-                      {hasExpiry && <div className="expiry-radio-inner" />}
-                    </div>
-
-                    <span>Expiry</span>
-                  </div>
-
-                  <div
-                    className={`expiry-option ${!hasExpiry ? "active" : ""}`}
-                    onClick={() => setHasExpiry(false)}
-                  >
-                    <div className="expiry-radio">
-                      {!hasExpiry && <div className="expiry-radio-inner" />}
-                    </div>
-
-                    <span>Non-expiry</span>
-                  </div>
-                </div>
-              </div>
               <div className="form-group full">
                 <label>Product Name *</label>
                 <input
@@ -430,6 +401,7 @@ const AddProductModal = ({
                     <option value="Can">Can</option>
                     <option value="Loaf">Loaf</option>
                     <option value="Piece">Piece</option>
+                    <option value="Piece">Set</option>
                     <option value="Tin">Tin</option>
                     <option value="Bar">Bar</option>
                     <option value="Tube">Tube</option>
